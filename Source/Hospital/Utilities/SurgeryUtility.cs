@@ -162,6 +162,7 @@ public class SurgeryUtility
 		        Hediff hediff = HediffMaker.MakeHediff(selectedRecipe.removesHediff, pawn);
 		        hediff.Part = part;
 		        pawn.health.AddHediff(hediff, part);
+		        patientData.TrackedHediffSeverity = Mathf.Max(hediff.Severity, 0.1f);
 		        patientData.Diagnosis = selectedRecipe.removesHediff.label;
 	        }
 	        else if (selectedRecipe.workerClass == typeof(Recipe_InstallArtificialBodyPart) ||
@@ -193,7 +194,8 @@ public class SurgeryUtility
 				                                                      pawn.RaceProps.ToolUser), pawn, part);
 			        hediffMissingPart.Part = part;
 			        hediffMissingPart.IsFresh = false;
-			        pawn.health.AddHediff(hediffMissingPart, part);			        
+			        pawn.health.AddHediff(hediffMissingPart, part);
+				        patientData.PartMissingAtArrival = true;			        
 		        }
 
 
