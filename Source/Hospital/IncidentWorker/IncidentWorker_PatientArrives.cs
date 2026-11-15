@@ -45,6 +45,9 @@ namespace Hospital
             
             if (potentialPatientFactions.Count == 0) return false;
 
+            // Resolve the landing cell before generating anything, so a failure leaves no half-created patient.
+            if (!IncidentHelper.TryFindPatientLandingCell(map, out var loc)) return false;
+
             bool goodPawnFound = false;
             Pawn pawn = null;
             do
@@ -58,7 +61,7 @@ namespace Hospital
                 }
             } while (!goodPawnFound);
 
-            PatientData patient = SpawnPatient(map, pawn);
+            PatientData patient = SpawnPatient(map, pawn, loc);
             var list = new List<Pawn> { pawn };
             LordMaker.MakeNewLord(parms.faction, CreateLordJob(parms, list), map, list);
             //pawn.mindState.duty = new PawnDuty(DefDatabase<DutyDef>.GetNamed("Patient"), pawn.Position, 1000);
@@ -78,7 +81,7 @@ namespace Hospital
             return true;
         }
 
-        protected virtual PatientData SpawnPatient(Map map, Pawn pawn)
+        protected virtual PatientData SpawnPatient(Map map, Pawn pawn, IntVec3 loc)
         {
             IncidentHelper.SetUpNewPatient(pawn);
             HospitalMapComponent hospital = map.GetComponent<HospitalMapComponent>();
@@ -88,15 +91,6 @@ namespace Hospital
             PatientData data = new PatientData(GenDate.TicksGame, pawn.MarketValue, pawn.needs.mood.curLevelInt, type);
             //TryFindEntryCell(map, out var cell);
             //GenSpawn.Spawn(pawn, cell, map);
-            // RandomElementWithFallback (not RandomElement) so an empty result - i.e. the player
-            // has not built a Patient Landing Spot - falls back silently instead of warning.
-            var spot = map.listerBuildings.AllBuildingsColonistOfDef(ThingDef.Named("PatientLandingSpot")).RandomElementWithFallback();
-            var loc = DropCellFinder.TryFindSafeLandingSpotCloseToColony(map, IntVec2.Two);
-            if (spot != null)
-            {
-                loc = spot.Position;
-            }
-
             // Spawn the pawn on the map first so it has a valid Map while we apply damage/disease.
             // Damaging an unspawned pawn (pawn.Map == null) collides with hediff comps and other
             // mods' patches that dereference pawn.Map (sound makers, FleckMaker, CompPostPostAdd, ...).

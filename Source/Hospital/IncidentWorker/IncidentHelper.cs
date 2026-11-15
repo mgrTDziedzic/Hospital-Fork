@@ -37,6 +37,14 @@ public static class IncidentHelper
         return true;
     }        
 
+    // Patient Landing Spot first; the (costly, fallible) drop cell finder only when there is none.
+    public static bool TryFindPatientLandingCell(Map map, out IntVec3 loc)
+    {
+        var spot = map.listerBuildings.AllBuildingsColonistOfDef(ThingDef.Named("PatientLandingSpot")).Where(b => b.Spawned && b.Map == map).RandomElementWithFallback();
+        loc = spot != null ? spot.Position : DropCellFinder.TryFindSafeLandingSpotCloseToColony(map, IntVec2.Two);
+        return loc.IsValid && loc.InBounds(map);
+    }
+
     public static bool CanSpawnPatient(Map map)
     {
         var hospital = map.GetComponent<HospitalMapComponent>();
