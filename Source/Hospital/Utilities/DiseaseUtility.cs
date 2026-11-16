@@ -61,7 +61,7 @@ public class DiseaseUtility
         List<HediffDef> list = CandidateDiseases().Where(def => hospital.IsDiseaseAllowed(def)).ToList();
         if (list.Count == 0)
         {
-            Log.Message("tried to find a disease but they are all blacklisted");
+            Log.Message("Hospital: no eligible disease (all blacklisted or filtered out), falling back to wounds");
             return true; // fall back to wounds
         }
         /*foreach (HediffDef def in list)
