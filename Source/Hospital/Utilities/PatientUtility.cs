@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -9,13 +10,30 @@ namespace Hospital.Utilities
 {
     public static class PatientUtility
     {
+        // Map.GetComponent<T> is a linear scan over all map components (mod components sit at the
+        // end), and IsPatient runs in hot paths such as JobGiver_Work.PawnCanUseWorkGiver (every
+        // pawn x every work giver). Weak keys: a discarded Map drops its entry with it.
+        private static readonly ConditionalWeakTable<Map, HospitalMapComponent> HospitalByMap =
+            new ConditionalWeakTable<Map, HospitalMapComponent>();
+
+        public static HospitalMapComponent HospitalOf(Map map)
+        {
+            if (map == null) return null;
+            if (HospitalByMap.TryGetValue(map, out var cached)) return cached;
+            var hospital = map.GetComponent<HospitalMapComponent>();
+            // While a map is being loaded its component list is built and then replaced by the
+            // saved components (Map.ExposeComponents), so only cache outside a Scribe pass.
+            if (hospital != null && Scribe.mode == LoadSaveMode.Inactive) HospitalByMap.Add(map, hospital);
+            return hospital;
+        }
+
         // activeOnly = false (default): true for every registered patient on the pawn's map, also discharged (Dismissed) ones.
         // activeOnly = true: true only for registered patients that are not Dismissed. Needs pawn.Map != null.
         public static bool IsPatient(this Pawn pawn,out HospitalMapComponent hospital, bool activeOnly = false)
         {
             hospital = null;
             if (pawn?.Map == null) return false;
-            hospital = pawn.Map.GetComponent<HospitalMapComponent>(); // TODO cache this?
+            hospital = HospitalOf(pawn.Map);
             if (hospital == null) return false;
             return hospital.GetPatientData(pawn, out var patientData) && (!activeOnly || !patientData.Dismissed);
         }

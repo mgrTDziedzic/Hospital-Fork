@@ -5,6 +5,7 @@ relative to the original [Hospital](https://github.com/tomvd/Hospital) by Adamas
 Original code is © its author, licensed under GPLv3; modifications are © mgrTDziedzic, also GPLv3.
 
 ## 2026-11-16
+- Performance: the hospital map component is cached per map, so the patient check run by every pawn's work search no longer scans all map components.
 - Added fork notice and attribution (README, About.xml, this changelog).
 - Dropped RimWorld 1.4 and 1.5 support; this fork targets 1.6 (and 1.7).
 - 1.6 assembly is now a deterministic Release build; test tooling no longer uses machine-specific paths.
