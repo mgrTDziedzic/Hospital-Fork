@@ -112,12 +112,27 @@ namespace HospitalTests
             Assert.Equal(before.Letters, after.Letters, what + ": letters");
         }
 
-        private static void AddCut(Pawn pawn)
+        // Gives the pawn exactly one fresh, tendable cut. Generated pawns may carry random old injuries / scars
+        // (permanent injuries are never "tended"), so those are removed first to keep the tests deterministic.
+        private static Hediff AddCut(Pawn pawn)
         {
+            foreach (var old in pawn.health.hediffSet.hediffs.OfType<Hediff_Injury>().ToList()) pawn.health.RemoveHediff(old);
             var part = pawn.RaceProps.body.GetPartsWithDef(BodyPartDefOf.Arm).First();
             var cut = HediffMaker.MakeHediff(HediffDefOf.Cut, pawn, part);
             cut.Severity = 4f;
             pawn.health.AddHediff(cut, part);
+            return cut;
+        }
+
+        // forceDowned alone does not down a pawn (it only matters inside the private MakeDowned / state update),
+        // so call the vanilla MakeDowned itself, like vanilla does for lethal damage.
+        private static void Down(Pawn pawn)
+        {
+            var make = typeof(Pawn_HealthTracker).GetMethod("MakeDowned", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(make, "Pawn_HealthTracker.MakeDowned not found");
+            pawn.health.forceDowned = true;
+            make.Invoke(pawn.health, new object[] { null, null });
+            Assert.True(pawn.Downed, "precondition: pawn is not downed after MakeDowned");
         }
 
         private static Building_Bed MakeMedicalBed(TestContext ctx)
@@ -365,20 +380,20 @@ namespace HospitalTests
             var doctor = Colonist(ctx);
 
             var visitor = Visitor(ctx, false);
-            AddCut(visitor);
+            var visitorCut = AddCut(visitor);
             var medicine = ctx.Track(ThingMaker.MakeThing(ThingDefOf.MedicineIndustrial));
             var before = Snap(ctx);
             TendUtility.DoTend(doctor, visitor, (Medicine)medicine);
-            Assert.True(visitor.health.hediffSet.hediffs.OfType<Hediff_Injury>().All(h => h.IsTended()), "vanilla tend did not happen for a non-patient");
+            Assert.True(visitorCut.IsTended(), "vanilla tend did not happen for a non-patient");
             AssertSame(before, Snap(ctx), "tending a non-patient");
 
             var patient = Visitor(ctx, false);
-            AddCut(patient);
+            var patientCut = AddCut(patient);
             var data = Register(ctx, patient);
             var medicine2 = ctx.Track(ThingMaker.MakeThing(ThingDefOf.MedicineIndustrial));
             float expected = Mathf.Clamp(medicine2.MarketValue * 1.2f, 0, 70);
             TendUtility.DoTend(doctor, patient, (Medicine)medicine2);
-            Assert.True(patient.health.hediffSet.hediffs.OfType<Hediff_Injury>().All(h => h.IsTended()), "control: patient was not tended");
+            Assert.True(patientCut.IsTended(), "control: patient was not tended");
             Assert.True(Math.Abs(data.Bill - expected) < 0.01f, "control: patient bill expected " + expected + " but was " + data.Bill);
         }
 
@@ -640,10 +655,14 @@ namespace HospitalTests
                 Assert.True(result == null, "postfix invented a bed for a non-patient");
             }
 
+            // vanilla only lets a medical bed be used by a pawn that ShouldSeekMedicalRest (so the patient needs a wound),
+            // and the traveler (the carrier) must be of the bed's faction - for a real patient that is a colonist, not the patient.
             var patient = Visitor(ctx, false);
+            AddCut(patient);
             Register(ctx, patient);
+            Assert.True(HealthAIUtility.ShouldSeekMedicalRest(patient), "precondition: injured patient does not seek medical rest");
             Building_Bed found = null;
-            Patients_BedFinder_Patch.FindBedPatch.Postfix(ref found, patient, patient);
+            Patients_BedFinder_Patch.FindBedPatch.Postfix(ref found, patient, colonist);
             Assert.NotNull(found, "control: patient was not given a bed (is a hospital bed free and reachable?)");
             Assert.True(found.Medical && found.GetComp<CompHospitalBed>().Hospital, "control: patient got a non-hospital bed");
         }
@@ -658,8 +677,8 @@ namespace HospitalTests
         {
             var searcher = Visitor(ctx, true);
             var guest = HospitalRegressionTests.MakePawn(ctx, searcher.Faction, true);
-            guest.health.forceDowned = true;
-            Assert.True(guest.Downed && guest.guest != null && !guest.IsPrisoner, "precondition: test guest is not a downed non-prisoner guest");
+            Down(guest);
+            Assert.True(guest.guest != null && !guest.IsPrisoner, "precondition: test guest is not a non-prisoner guest");
             var found = KidnapAIUtility.ReachableWoundedGuest(searcher);
             Assert.NotNull(found, "vanilla would return the downed guest, Hospital returned null");
 
@@ -690,19 +709,22 @@ namespace HospitalTests
             var node = new ThinkNode_ConditionalNPCCanSelfTendNow();
             bool Call(Pawn p) => (bool)satisfied.Invoke(node, new object[] { p });
 
+            // The raider is created only at the end: a hostile-faction pawn standing nearby is an "active threat"
+            // for the visitor (vanilla looks 5 regions around it) and would make the vanilla answer false.
             var visitor = Visitor(ctx, false);
             AddCut(visitor);
             var colonist = Colonist(ctx);
             AddCut(colonist);
-            var raider = Visitor(ctx, true);
-            AddCut(raider);
 
-            Assert.True(Call(visitor), "vanilla: an injured neutral visitor self-tends (precondition failed: threats within 5 regions of the map centre?)");
+            Assert.True(Call(visitor), "vanilla: an injured neutral visitor self-tends (precondition failed: active threat within 5 regions of the visitor?)");
             Assert.False(Call(colonist), "vanilla: colonists never use the NPC self-tend node");
-            Assert.False(Call(raider), "vanilla: hostile pawns never use the NPC self-tend node");
 
             Register(ctx, visitor);
             Assert.False(Call(visitor), "control: a patient must not self-tend");
+
+            var raider = Visitor(ctx, true);
+            AddCut(raider);
+            Assert.False(Call(raider), "vanilla: hostile pawns never use the NPC self-tend node");
         }
 
         // Given: self-tend jobs (target = the worker itself) for a colonist, a non-patient visitor and a patient; plus a doctor tending the patient.
