@@ -24,6 +24,8 @@ namespace Hospital
         public bool MassCasualties;
         public bool AcceptSurgery;
         public bool AcceptDanger;
+        // Mass casualty events ignore dangers on the map (manhunters etc.) unless this is switched off.
+        public bool MceAcceptDanger = true;
         
         public HospitalMapComponent(Map map) : base(map)
         {
@@ -48,6 +50,7 @@ namespace Hospital
             Scribe_Values.Look(ref MassCasualties, "massCasualties", false);
             Scribe_Values.Look(ref AcceptSurgery, "acceptSurgery", true);
             Scribe_Values.Look(ref AcceptDanger, "AcceptDanger", false);
+            Scribe_Values.Look(ref MceAcceptDanger, "MceAcceptDanger", true);
 
             // Scribe_Collections.Look sets a collection to null when its node is missing from the
             // save (older mod version), so defaults have to be restored AFTER Look. Patients only

@@ -20,6 +20,7 @@ Original code is © its author, licensed under GPLv3; modifications are © mgrTD
 - Fix payment silver: amounts are rounded, a stack of 0 is never created, and large payments are split by the silver stack limit.
 - Fix wound patients arriving without wounds when the wound severity multiplier is small (damage budget is at least 1 and rounded, not truncated).
 - Fix an error when a WorkGiverDef without a work type (some mods) is evaluated for a patient.
+- New per-map setting "Mass casualties during danger" (default on = unchanged behaviour: mass casualty events ignore manhunters etc.). Switch it off to make mass casualty events wait for a map without aggressive pawns; weather dangers still follow "Allow patients during danger". Translated for French, German and Spanish variants.
 - Clarified the log message shown when no disease is eligible for a patient.
 - 1.7: added the missing English translation key for the externally-cured condition message.
 

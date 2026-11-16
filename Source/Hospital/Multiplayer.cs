@@ -23,6 +23,7 @@ namespace Hospital
                 MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.MassCasualties)),
                 MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.AcceptSurgery)),
                 MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.AcceptDanger)),
+                MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.MceAcceptDanger)),
                 //MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.refusedOperations)),
                 //MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.openingHours)),
                 MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.PatientFoodPolicy)),

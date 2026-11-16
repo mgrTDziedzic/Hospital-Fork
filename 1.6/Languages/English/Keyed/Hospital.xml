@@ -37,6 +37,8 @@
     <AcceptSurgeryTooltip>uncheck this if you do not want to get surgery events</AcceptSurgeryTooltip>
     <AcceptDanger>Allow patients during danger</AcceptDanger>
     <AcceptDangerTooltip>check this if you want to override the check if the map if safe for patients to arrive</AcceptDangerTooltip>
+    <MceAcceptDanger>Mass casualties during danger</MceAcceptDanger>
+    <MceAcceptDangerTooltip>check this to let mass casualty events happen while the map is dangerous (e.g. manhunters). Uncheck to make them wait for a safe map. Weather dangers are still controlled by "Allow patients during danger".</MceAcceptDangerTooltip>
     <SilverMultiplier>Silver multiplier</SilverMultiplier>
     <SilverMultiplierTooltip>Changes the patients bill by this percentage. (recommended: 100%)</SilverMultiplierTooltip>
     <!-- difficulty -->

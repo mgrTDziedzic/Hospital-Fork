@@ -90,6 +90,14 @@ public static class IncidentHelper
         return loc.IsValid && loc.InBounds(map);
     }
 
+    // True when a mass casualty event should be skipped because of dangers on the map: the MCE danger setting
+    // is off, the normal danger override is off and an active pawn is in an aggressive mental state (manhunter).
+    public static bool MapTooDangerousForMce(Map map, HospitalMapComponent hospital)
+    {
+        if (hospital.MceAcceptDanger || hospital.AcceptDanger) return false;
+        return map.mapPawns.AllPawnsSpawned.Any(p => !p.Dead && !p.IsPrisoner && !p.Downed && !PatientUtility.IsFogged(p) && !p.InContainerEnclosed && p.InAggroMentalState);
+    }
+
     public static bool CanSpawnPatient(Map map)
     {
         var hospital = map.GetComponent<HospitalMapComponent>();

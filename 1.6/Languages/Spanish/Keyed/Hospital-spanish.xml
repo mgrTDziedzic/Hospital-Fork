@@ -19,6 +19,8 @@
    <AcceptSurgeryTooltip>desmarcar esto si no deseas recibir eventos de cirugía</AcceptSurgeryTooltip>
    <AcceptDanger>Permitir pacientes en caso de peligro</AcceptDanger>
    <AcceptDangerTooltip>Marca esta opción si deseas omitir la verificación de seguridad del mapa para la llegada de pacientes</AcceptDangerTooltip>
+   <MceAcceptDanger>Víctimas en masa durante peligro</MceAcceptDanger>
+   <MceAcceptDangerTooltip>Marca esta opción para permitir eventos de víctimas en masa mientras el mapa es peligroso (p. ej. animales enfurecidos). Desmárcala para que esperen a un mapa seguro.</MceAcceptDangerTooltip>
    <PatientLimit>Límite de pacientes</PatientLimit>
    <PatientLimitTooltip>número máximo de pacientes para aceptar, 0=ilimitado</PatientLimitTooltip>
    <PctBedsForColonists>Pct camas para colonos</PctBedsForColonists>

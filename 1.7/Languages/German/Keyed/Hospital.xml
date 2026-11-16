@@ -20,6 +20,8 @@
     <AcceptSurgeryTooltip>Deaktivieren Sie dies, wenn Sie keine chirurgischen Ereignisse erhalten möchten.</AcceptSurgeryTooltip>
     <AcceptDanger>Patienten bei Gefahr zulassen</AcceptDanger>
     <AcceptDangerTooltip>Aktivieren Sie diese Option, um die Sicherheitsüberprüfung der Karte für ankommende Patienten zu überschreiben</AcceptDangerTooltip>
+    <MceAcceptDanger>Massenanfall bei Gefahr</MceAcceptDanger>
+    <MceAcceptDangerTooltip>Aktivieren, damit Massenanfälle auch bei Gefahr auf der Karte auftreten (z. B. Amok-Tiere). Deaktivieren, damit sie auf eine sichere Karte warten.</MceAcceptDangerTooltip>
     <PatientLimit>Patientenlimit</PatientLimit>
     <PatientLimitTooltip>Maximale Anzahl der zu akzeptierenden Patienten, 0=unbegrenzt</PatientLimitTooltip>
     <PctBedsForColonists>% Betten für Kolonisten</PctBedsForColonists>

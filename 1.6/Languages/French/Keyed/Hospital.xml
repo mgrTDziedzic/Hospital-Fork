@@ -21,6 +21,8 @@
     <AcceptSurgeryTooltip>décochez cette case si vous ne voulez pas recevoir d'événements chirurgicaux</AcceptSurgeryTooltip>
     <AcceptDanger>Autoriser les patients en cas de danger</AcceptDanger>
     <AcceptDangerTooltip>Cochez cette case si vous souhaitez ignorer la vérification de la sécurité de la carte pour l'arrivée des patients</AcceptDangerTooltip>
+    <MceAcceptDanger>Afflux massif en cas de danger</MceAcceptDanger>
+    <MceAcceptDangerTooltip>Cochez pour autoriser les afflux massifs de victimes quand la carte est dangereuse (ex. animaux enragés). Décochez pour les faire attendre une carte sûre.</MceAcceptDangerTooltip>
     <PatientLimit>Limite de patients</PatientLimit>
     <PatientLimitTooltip>nombre maximal de patients à accepter, 0=illimité</PatientLimitTooltip>
     <PctBedsForColonists>Pct lits pour colons</PctBedsForColonists>

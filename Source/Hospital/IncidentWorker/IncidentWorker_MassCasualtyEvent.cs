@@ -51,6 +51,7 @@ namespace Hospital
             {
                 return false;
             }
+            if (IncidentHelper.MapTooDangerousForMce(map, hospital)) return false;
 
             if (parms.pawnCount == 0)
             {

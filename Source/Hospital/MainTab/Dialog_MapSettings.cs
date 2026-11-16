@@ -46,8 +46,9 @@ namespace Hospital.MainTab
             listingStandard.CheckboxLabeled("MassCasualties".Translate(), ref hospital.MassCasualties, "MassCasualtiesTooltip".Translate());
             listingStandard.CheckboxLabeled("AcceptSurgery".Translate(), ref hospital.AcceptSurgery, "AcceptSurgeryTooltip".Translate());
             listingStandard.CheckboxLabeled("AcceptDanger".Translate(), ref hospital.AcceptDanger, "AcceptDangerTooltip".Translate());
+            listingStandard.CheckboxLabeled("MceAcceptDanger".Translate(), ref hospital.MceAcceptDanger, "MceAcceptDangerTooltip".Translate());
             listingStandard.End();
-            int y = 120;
+            int y = 150;
             TimetableUtility.DoHeader(new Rect(0, y, inRect.width, 50));
             y += 60;
             TimetableUtility.DoCell(new Rect(0, y, inRect.width, 20), hospital.openingHours, map);

@@ -488,6 +488,31 @@ namespace HospitalTests
             Assert.Equal(lettersBefore, Find.LetterStack.LettersListForReading.Count, "letter sent by an empty MCE");
         }
 
+        // Given: a berserk pawn on the map (a manhunter-like danger) and the per-map MCE danger setting.
+        // Then:  the MCE is blocked only when MceAcceptDanger is off and AcceptDanger is off; the default is on (MCE ignores danger).
+        [HospitalTest("MCE danger setting: MCE skips a dangerous map only when MceAcceptDanger is off (default on)")]
+        public static void MceHonoursDangerSetting(TestContext ctx)
+        {
+            var hospital = ctx.Map.GetComponent<HospitalMapComponent>();
+            bool mce = hospital.MceAcceptDanger, danger = hospital.AcceptDanger;
+            ctx.OnCleanup(() => { hospital.MceAcceptDanger = mce; hospital.AcceptDanger = danger; });
+            var berserk = HospitalRegressionTests.MakePawn(ctx, Faction.OfPlayer, true);
+            Assert.True(berserk.mindState.mentalStateHandler.TryStartMentalState(MentalStateDefOf.Berserk, forced: true), "could not start a berserk state");
+            Assert.True(berserk.InAggroMentalState, "precondition: pawn is not in an aggro mental state");
+
+            hospital.AcceptDanger = false;
+            hospital.MceAcceptDanger = true;
+            Assert.False(IncidentHelper.MapTooDangerousForMce(ctx.Map, hospital), "MceAcceptDanger on: danger must be ignored");
+            hospital.MceAcceptDanger = false;
+            Assert.True(IncidentHelper.MapTooDangerousForMce(ctx.Map, hospital), "MceAcceptDanger off: a dangerous map must block the MCE");
+            hospital.AcceptDanger = true;
+            Assert.False(IncidentHelper.MapTooDangerousForMce(ctx.Map, hospital), "AcceptDanger overrides");
+            berserk.mindState.mentalStateHandler.Reset();
+            hospital.AcceptDanger = false;
+            Assert.False(IncidentHelper.MapTooDangerousForMce(ctx.Map, hospital), "no danger on the map");
+            Assert.True(new HospitalMapComponent(ctx.Map).MceAcceptDanger, "default must be on");
+        }
+
         [HospitalTest("A6: silver payment is rounded, never a 0 stack, and split by the stack limit")]
         public static void SilverStacksAreValid(TestContext ctx)
         {
