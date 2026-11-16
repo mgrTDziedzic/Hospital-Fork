@@ -14,6 +14,7 @@ public class DiseaseUtility
     public static IEnumerable<HediffDef> CandidateDiseases()
     {
         return DefDatabase<HediffDef>.defsList.Where(def => def.tendable && def.makesSickThought
+        && def.lethalSeverity > 0f // severity is derived from lethalSeverity; 0 would add a harmless hediff that never needs tending
         //&& def.defName.ToLower().Contains("infection") //debug
         && !CausesAggroMentalState(def)
         && !def.defName.ToLower().Contains("abasia")
@@ -49,6 +50,10 @@ public class DiseaseUtility
         return false;
     }
 
+    // Upper bound for attempts to give a patient a disease that actually makes them sick.
+    // A candidate that never needs tending (immune pawn, odd modded hediff) must not loop forever.
+    private const int MaxDiseaseAttempts = 20;
+
     public static bool AddRandomDisease(Pawn pawn, PatientData patientData, HospitalMapComponent hospital)
     {
         bool retry = true;
@@ -65,8 +70,14 @@ public class DiseaseUtility
         }*/
 
         Hediff hediff = null;
+        int attempts = 0;
         while (retry)
         {
+            if (++attempts > MaxDiseaseAttempts)
+            {
+                Log.Message("could not give the patient a disease that needs tending, falling back to wounds");
+                return true; // fall back to wounds
+            }
 
             hediff = HediffMaker.MakeHediff(list.RandomElement(), pawn);
             //Log.Message(hediff.def.label + " choosen" );
@@ -83,7 +94,7 @@ public class DiseaseUtility
                         select x;
                     if (!source.Any())
                     {
-                        break;
+                        return true; // no usable body part: fall back to wounds, nothing was added
                     }
                     BodyPartRecord bodyPartRecord = source.RandomElement();
                     WoundsUtility.DamagePart(pawn, 5, bodyPartRecord, out var s, DamageDefOf.Bite);
@@ -97,7 +108,7 @@ public class DiseaseUtility
                         select x;
                     if (!source.Any())
                     {
-                        break;
+                        return true; // no usable body part: fall back to wounds, nothing was added
                     }
                     BodyPartRecord bodyPartRecord = source.RandomElement();
                     pawn.health.AddHediff(hediff, bodyPartRecord);
@@ -111,6 +122,7 @@ public class DiseaseUtility
                 //Log.Message(hediff.def.label + " HealthAIUtility.ShouldSeekMedicalRest(pawn) " + HealthAIUtility.ShouldSeekMedicalRest(pawn));
                 retry = (!pawn.health.HasHediffsNeedingTend() 
                          && !HealthAIUtility.ShouldSeekMedicalRest(pawn));
+                if (retry) pawn.health.RemoveHediff(hediff); // did not make the patient sick: do not leave it on the pawn
             }
             else
             {
@@ -126,36 +138,37 @@ public class DiseaseUtility
         return false;
     }
 
-    public static void AddPlague(Pawn pawn, PatientData patientData)
+    // Returns true when no plague could be given (caller falls back to wounds), like AddRandomDisease.
+    public static bool AddPlague(Pawn pawn, PatientData patientData)
     {
-        bool retry = true;
         float loweredSeverity = 0;
-        Hediff hediff = HediffMaker.MakeHediff(HediffDefOf.Plague, pawn);;
-        while (retry)
+        Hediff hediff = HediffMaker.MakeHediff(HediffDefOf.Plague, pawn);
+        for (int attempt = 0; attempt < MaxDiseaseAttempts; attempt++)
         {
-
             //Log.Message(hediff.def.label + " choosen" );
             float severity = Rand.Range(hediff.def.lethalSeverity / 20.0f, hediff.def.lethalSeverity / 10.0f) * HospitalMod.Settings.DiseaseSeverityMultiplier;
             hediff.Severity = severity - loweredSeverity;
             if (!pawn.health.WouldDieAfterAddingHediff(hediff))
             {
-                pawn.health.AddHediff(hediff);                    
+                pawn.health.AddHediff(hediff);
                 // check if the disease actually made the patient sick - otherwise we have to try again
-                //Log.Message(hediff.def.label + " pawn.health.HasHediffsNeedingTend() " + pawn.health.HasHediffsNeedingTend() );
-                //Log.Message(hediff.def.label + " HealthAIUtility.ShouldSeekMedicalRest(pawn) " + HealthAIUtility.ShouldSeekMedicalRest(pawn));
-                retry = (!pawn.health.HasHediffsNeedingTend() && !HealthAIUtility.ShouldSeekMedicalRest(pawn));
-                if (retry) hediff = HediffMaker.MakeHediff(HediffDefOf.Hangover, pawn); // perhaps immune to plague? try flu
-                
+                if (pawn.health.HasHediffsNeedingTend() || HealthAIUtility.ShouldSeekMedicalRest(pawn))
+                {
+                    patientData.Bill = 10;//Medicine.GetMedicineCountToFullyHeal(pawn) * ((int)pawn.playerSettings.medCare * 15.0f) * 2;
+                    patientData.Diagnosis = hediff.Label;
+                    patientData.Cure = "CureDisease".Translate();
+                    return false;
+                }
+                pawn.health.RemoveHediff(hediff);
+                hediff = HediffMaker.MakeHediff(HediffDefOf.Hangover, pawn); // perhaps immune to plague? try flu
             }
             else
             {
                 loweredSeverity += 0.1f;
                 //Log.Message("disease would kill patient, trying lower severity " + hediff.def.label);
+                if (loweredSeverity > 0.9f) return true;
             }
         }
-
-        if (!retry) patientData.Bill = 10;//Medicine.GetMedicineCountToFullyHeal(pawn) * ((int)pawn.playerSettings.medCare * 15.0f) * 2;
-        patientData.Diagnosis = hediff.Label;
-        patientData.Cure = "CureDisease".Translate();
+        return true;
     }
 }

@@ -85,7 +85,7 @@ namespace Hospital.Utilities
                 switch (type)
                 {
                     case IncidentWorker_MassCasualtyEvent.MCEType.Pandemic:
-                        DiseaseUtility.AddPlague(pawn, patientData);
+                        if (DiseaseUtility.AddPlague(pawn, patientData)) WoundsUtility.AddRandomWounds(pawn, patientData);
                         break;
                     case IncidentWorker_MassCasualtyEvent.MCEType.Raid:
                         WoundsUtility.AddGunshotWounds(pawn, patientData);
