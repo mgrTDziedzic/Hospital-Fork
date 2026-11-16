@@ -90,8 +90,8 @@ namespace HospitalTests
                 }
                 Assert.True(pawn.guest != null && pawn.guest.GuestStatus == GuestStatus.Guest, "patient is not a guest");
                 Assert.False(pawn.Dead, "patient is dead");
-                // arrives in a drop pod: not spawned yet, held by a skyfaller
-                bool inPod = map.listerThings.AllThings.OfType<Skyfaller>().Any(sf => sf.innerContainer.Contains(pawn));
+                // arrives in a drop pod: not spawned yet; nesting is Skyfaller -> ActiveTransporter -> Contents.innerContainer -> pawn
+                bool inPod = ThingOwnerUtility.AnyParentIs<Skyfaller>(pawn);
                 Assert.True(inPod || pawn.Spawned, "patient is neither in a drop pod nor spawned");
                 Assert.True(map.lordManager.lords.Any(l => !lordsBefore.Contains(l) && l.ownedPawns.Contains(pawn)), "patient has no new lord");
             }
@@ -104,11 +104,9 @@ namespace HospitalTests
             foreach (var p in pawns) hospital.Patients.Remove(p);
             foreach (var lord in map.lordManager.lords.Where(l => !lordsBefore.Contains(l)).ToList())
                 map.lordManager.RemoveLord(lord);
-            foreach (var pod in map.listerThings.AllThings.OfType<Skyfaller>().Where(sf => pawns.Any(p => sf.innerContainer.Contains(p))).ToList())
-            {
-                foreach (var p in pawns) pod.innerContainer.Remove(p);
+            // Destroying the skyfaller destroys the ActiveTransporter and, through it, the pawns inside (ClearAndDestroyContents).
+            foreach (var pod in pawns.Select(p => ThingOwnerUtility.GetAnyParent<Skyfaller>(p)).Where(sf => sf != null).Distinct().ToList())
                 if (!pod.Destroyed) pod.Destroy(DestroyMode.Vanish);
-            }
             foreach (var p in pawns)
             {
                 if (p.Spawned) p.DeSpawn();
