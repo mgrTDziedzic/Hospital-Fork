@@ -9,4 +9,5 @@ when you submit code changes, your submissions are understood to be under the sa
 Coming soon!
 
 # Opening a New Issue
-Use github for bug reports and feature requests.
+Use GitHub issues at https://github.com/mgrTDziedzic/Hospital-Fork/issues for bug reports and feature requests concerning this fork.
+This repository is a fork of https://github.com/tomvd/Hospital by Adamas (tomvd); issues that also affect the original mod may be reported there.
