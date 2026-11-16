@@ -1,2 +1,19 @@
+# Steam Workshop ID - assigned per publisher, kept local
 About/PublishedFileId.txt
-.vscode/obj
+
+# Build intermediates (contain absolute local paths)
+obj/
+bin/
+
+# Debug symbols (contain absolute local paths)
+*.pdb
+
+# IDE / editor settings
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Local AI assistant notes
+.claude/
