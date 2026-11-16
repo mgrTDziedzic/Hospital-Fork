@@ -2,6 +2,7 @@ using HarmonyLib;
 using Hospital.Utilities;
 using RimWorld;
 using UnityEngine;
+using Verse.AI;
 
 namespace Hospital.Patches;
 
@@ -17,8 +18,10 @@ public class Billing_Feed_Patch
         public static void Postfix(JobDriver_FoodFeedPatient __instance)
         {
             __instance.AddFinishAction(
-            (x) =>
+            (condition) =>
             {
+                // Finish actions run for every end condition; bill only a meal that was really fed.
+                if (condition != JobCondition.Succeeded || __instance.Food == null) return;
                 HospitalMapComponent hospital;
                 if (__instance.Deliveree.IsPatient(out hospital))
                 {
