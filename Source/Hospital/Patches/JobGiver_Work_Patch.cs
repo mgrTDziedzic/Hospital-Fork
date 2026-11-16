@@ -24,8 +24,9 @@ namespace Hospital.Patches
                 return false;
             }
 
-            private static bool IsPatientWork(WorkTypeDef workTypeDef)
+            public static bool IsPatientWork(WorkTypeDef workTypeDef)
             {
+                if (workTypeDef == null) return false; // WorkGiverDef without a workType (some mods)
                 return workTypeDef.defName.EqualsIgnoreCase("Patient") || workTypeDef.defName.EqualsIgnoreCase("PatientBedRest");
             }
         }

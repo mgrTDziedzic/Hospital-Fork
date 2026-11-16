@@ -48,18 +48,14 @@ namespace Hospital
             // Resolve the landing cell before generating anything, so a failure leaves no half-created patient.
             if (!IncidentHelper.TryFindPatientLandingCell(map, out var loc)) return false;
 
-            bool goodPawnFound = false;
-            Pawn pawn = null;
-            do
+            // Bounded retries: a faction that only yields androids / non-bleeding pawns must not freeze the game.
+            if (!IncidentHelper.TryGenerateAcceptedPawn(potentialPatientFactions, IncidentHelper.IsSuitablePatient,
+                    IncidentHelper.MaxPawnGenerationAttempts, out Pawn pawn, out Faction patientFaction))
             {
-                goodPawnFound = true;
-                parms.faction = potentialPatientFactions.RandomElement();
-                pawn = IncidentHelper.GeneratePawn(parms.faction);
-                if (pawn.kindDef.defName.Contains("VREA") || !pawn.health.CanBleed)
-                {
-                    goodPawnFound = false; // if for some reason we got an android or any other weird creature
-                }
-            } while (!goodPawnFound);
+                Log.Message("Hospital: could not generate a suitable patient, skipping this arrival");
+                return false;
+            }
+            parms.faction = patientFaction;
 
             PatientData patient = SpawnPatient(map, pawn, loc);
             var list = new List<Pawn> { pawn };

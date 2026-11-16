@@ -2,15 +2,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Hospital.Utilities;
 using RimWorld;
+using RimWorld.Planet;
 using Verse;
 
 namespace Hospital;
 
 public static class IncidentHelper
 {
+    // Upper bound for attempts to generate a pawn that can be a patient (see TryGenerateAcceptedPawn).
+    public const int MaxPawnGenerationAttempts = 20;
+
     public static Pawn GeneratePawn(Faction faction)
     {
-        Pawn p = PawnGenerator.GeneratePawn(new PawnGenerationRequest(faction.RandomPawnKind(), faction,
+        PawnKindDef kind = faction.RandomPawnKind();
+        if (kind == null) return null; // faction without any pawn kind
+        Pawn p = PawnGenerator.GeneratePawn(new PawnGenerationRequest(kind, faction,
             PawnGenerationContext.NonPlayer, -1, forceGenerateNewPawn: true, allowDead: false, allowDowned: false,
             canGeneratePawnRelations: true, false, 1f,
             forceAddFreeWarmLayerIfNeeded: false, allowGay: true, allowPregnant: true, allowFood: true,
@@ -20,6 +26,45 @@ public static class IncidentHelper
         return p;
     }
     
+    // Pawns that cannot be patients: androids (VREA) and anything that cannot bleed.
+    public static bool IsSuitablePatient(Pawn pawn)
+    {
+        return pawn.kindDef != null && !pawn.kindDef.defName.Contains("VREA") && pawn.health.CanBleed;
+    }
+
+    // Generates a pawn from a random one of the factions that passes `accept`. Gives up after maxAttempts
+    // (returns false, pawn null) instead of looping forever. Rejected pawns are discarded so they do not
+    // pile up in the world pawn pool.
+    public static bool TryGenerateAcceptedPawn(IList<Faction> factions, System.Func<Pawn, bool> accept, int maxAttempts,
+        out Pawn pawn, out Faction faction, System.Func<Faction, Pawn> generate = null)
+    {
+        generate = generate ?? GeneratePawn;
+        pawn = null;
+        faction = null;
+        if (factions == null || factions.Count == 0) return false;
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            Faction f = factions.RandomElement();
+            Pawn candidate = generate(f);
+            if (candidate == null) continue;
+            if (accept(candidate))
+            {
+                pawn = candidate;
+                faction = f;
+                return true;
+            }
+            DiscardGeneratedPawn(candidate);
+        }
+        return false;
+    }
+
+    public static void DiscardGeneratedPawn(Pawn pawn)
+    {
+        if (pawn == null || pawn.Discarded) return;
+        if (Find.WorldPawns.Contains(pawn)) Find.WorldPawns.RemovePawn(pawn);
+        Find.WorldPawns.PassToWorld(pawn, PawnDiscardDecideMode.Discard);
+    }
+
     public static IEnumerable<Pawn> GetKnownPawns(IncidentParms parms)
     {
         return Find.WorldPawns.AllPawnsAlive.Where(pawn => ValidPatient(pawn, parms.faction));

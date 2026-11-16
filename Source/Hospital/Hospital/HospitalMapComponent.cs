@@ -263,6 +263,21 @@ namespace Hospital
             MainTabWindowUtility.NotifyAllPawnTables_PawnsChanged();
         }
         
+        // Splits a payment into stacks of at most stackLimit. Rounds to whole silver; nothing for < 1.
+        public static List<int> SilverStacks(float silver, int stackLimit)
+        {
+            var stacks = new List<int>();
+            int count = Mathf.RoundToInt(silver);
+            int limit = Mathf.Max(1, stackLimit);
+            while (count > 0)
+            {
+                int stack = Mathf.Min(count, limit);
+                stacks.Add(stack);
+                count -= stack;
+            }
+            return stacks;
+        }
+
         public void PatientLeaves(Pawn pawn)
         {
             if (Patients.TryGetValue(pawn, out var patientData) && !patientData.Dismissed)
@@ -288,10 +303,10 @@ namespace Hospital
                         MessageTypeDefOf.NeutralEvent);
                 }
 
-                if (silver > 0)
+                foreach (int stack in SilverStacks(silver, ThingDefOf.Silver.stackLimit))
                 {
                     var silverThing = ThingMaker.MakeThing(ThingDefOf.Silver);
-                    silverThing.stackCount = (int)silver;
+                    silverThing.stackCount = stack;
                     GenPlace.TryPlaceThing(silverThing, pawn.Position, pawn.Map, ThingPlaceMode.Near);
                 }
 
