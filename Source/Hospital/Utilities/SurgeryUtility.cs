@@ -8,6 +8,32 @@ namespace Hospital.Utilities;
 
 public class SurgeryUtility
 {
+        // Bills on the pawn that are real treatment; automatic "Administer drug" bills do not count
+        // (they must not keep a patient in bed or move them to a surgery bed).
+        public static bool HasRealSurgeryBills(Pawn pawn)
+        {
+                var bills = pawn?.health?.surgeryBills?.Bills;
+                if (bills == null) return false;
+                foreach (var bill in bills)
+                {
+                        if (!DrugUtility.IsAdministerBill(bill)) return true;
+                }
+                return false;
+        }
+
+        // Vanilla HealthAIUtility.ShouldSeekMedicalRest, minus the surgery-bill part. Vanilla treats ANY bill that
+        // should be done now (and a doctor exists) as "needs rest", which would keep a patient in the hospital for
+        // an automatic drug bill. Real surgery bills are checked separately by the callers (HasRealSurgeryBills).
+        public static bool ShouldSeekMedicalRestIgnoringBills(Pawn pawn)
+        {
+                if ((pawn.Downed && !LifeStageUtility.AlwaysDowned(pawn))
+                    || pawn.health.HasHediffsNeedingTend()
+                    || pawn.health.hediffSet.InLabor())
+                        return true;
+                return pawn.health.hediffSet.HasTendedAndHealingInjury()
+                       || pawn.health.hediffSet.HasImmunizableNotImmuneHediff();
+        }
+
         // True for surgery recipes the mod is willing to assign as a random "needs an operation" event.
         // Mirrors the per-pawn filtering in AddRandomSurgeryBill, minus the runtime checks, so the
         // blacklist picker dialog shows exactly the recipes that could otherwise show up.

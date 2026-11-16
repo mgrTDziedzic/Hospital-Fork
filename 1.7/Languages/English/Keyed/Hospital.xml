@@ -28,6 +28,18 @@
     <BlacklistSurgeriesTitle>Blacklisted surgeries</BlacklistSurgeriesTitle>
     <BlacklistDiseasesTitle>Blacklisted diseases</BlacklistDiseasesTitle>
     <BlacklistFactionsTitle>Blacklisted factions</BlacklistFactionsTitle>
+    <!-- patient drug policies -->
+    <HospitalDrugPolicies>Patient drugs</HospitalDrugPolicies>
+    <HospitalDrugPoliciesTooltip>Drug policy entries with "Scheduled" enabled are administered by doctors as medical bills placed before other bills. The entry's frequency, mood and joy limits apply. Policies are edited in the drug policy manager.</HospitalDrugPoliciesTooltip>
+    <HospitalDrugListAll>All patients</HospitalDrugListAll>
+    <HospitalDrugListInfection>Infection</HospitalDrugListInfection>
+    <HospitalDrugListSurgery>Surgery</HospitalDrugListSurgery>
+    <HospitalDrugListTooltip>Drug policy given to patients of this kind. Patients get the drugs of every list that applies to them.</HospitalDrugListTooltip>
+    <HospitalDrugListInjuries>Injuries</HospitalDrugListInjuries>
+    <HospitalDrugListScars>Scars</HospitalDrugListScars>
+    <HospitalDrugTeetotalers>Teetotalers too</HospitalDrugTeetotalers>
+    <HospitalDrugTeetotalersTooltip>Also give this list's drugs to teetotalers. When unchecked, teetotaler patients skip this list.</HospitalDrugTeetotalersTooltip>
+    <HospitalDrugManagePolicies>Manage drug policies...</HospitalDrugManagePolicies>
     <!-- settings -->
     <HospitalMapSettings>Hospital Policies...</HospitalMapSettings>
     <HospitalSettings>Hospital Policies</HospitalSettings>

@@ -53,8 +53,16 @@ public class Billing_Surgery_Patch
             if (__state == null) return;
             // Vanilla completes the bill even after a failed surgery; the failed attempt is not billed
             // (the failure and the completion happen in the same tick).
-            if (__state.IsPatient(out var hospital) && hospital.GetPatientData(__state, out var data)
-                && data.SurgeryFailedTick == Find.TickManager.TicksGame) return;
+            if (__state.IsPatient(out var hospital) && hospital.GetPatientData(__state, out var data))
+            {
+                if (data.SurgeryFailedTick == Find.TickManager.TicksGame) return;
+                // The drug was really given: the policy's frequency counts from now.
+                if (DrugUtility.IsAdministerBill(__instance))
+                {
+                    var drug = DrugUtility.DrugOf(__instance.recipe);
+                    if (drug != null) data.LastDrugTick[drug] = Find.TickManager.TicksGame;
+                }
+            }
             BillingHelper.BillForSurgery(__state, __instance);
         }
     }
@@ -100,7 +108,8 @@ public class Billing_Surgery_Patch
 
             hospital.AddSurgeryBill(pawn, surgeryBill);
 
-            patientData.HasPendingSurgeryBill = false;
+            // Only the cure surgery settles the pending flag; other medical bills (drugs, extra operations) do not.
+            if (recipe == patientData.CureRecipe) patientData.HasPendingSurgeryBill = false;
         }
 
         /// <summary>
@@ -155,8 +164,9 @@ public class Billing_Surgery_Patch
             {
                 if (pawn.IsPatient(out var hospital) && hospital.GetPatientData(pawn, out var patientData))
                 {
-                    // Clear the pending flag so patient can be dismissed
-                    patientData.HasPendingSurgeryBill = false;
+                    // Clear the pending flag so patient can be dismissed (only when the cure bill goes;
+                    // deleting a drug bill or another operation leaves the cure pending)
+                    if (bill.recipe == patientData.CureRecipe) patientData.HasPendingSurgeryBill = false;
                 }
             }
         }

@@ -32,8 +32,8 @@ namespace Hospital
             }
 
             bool canbedismissed =  (!pawn.health.HasHediffsNeedingTend()
-                                   && !HealthAIUtility.ShouldSeekMedicalRest(pawn)
-                                   && pawn.health.surgeryBills.Count == 0
+                                   && !SurgeryUtility.ShouldSeekMedicalRestIgnoringBills(pawn)
+                                   && !SurgeryUtility.HasRealSurgeryBills(pawn)
                                    && !hasPendingSurgery
                                    && pawn.health.healthState == PawnHealthState.Mobile);
             //Log.Message("result=" + canbedismissed);

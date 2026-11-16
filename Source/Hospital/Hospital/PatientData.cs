@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Verse;
 
 namespace Hospital;
@@ -39,6 +40,8 @@ public class PatientData : IExposable
     // Cured-externally tracking (see HospitalMapComponent.CheckExternallyCuredPatients). Defaults = not tracked.
     public bool PartMissingAtArrival;
     public float TrackedHediffSeverity = -1f;
+    // Tick the hospital last finished administering each drug (saved); drives the drug policy frequency.
+    public Dictionary<ThingDef, int> LastDrugTick = new Dictionary<ThingDef, int>();
 
     public void ExposeData()
     {
@@ -53,5 +56,7 @@ public class PatientData : IExposable
         Scribe_Values.Look(ref PartMissingAtArrival, "PartMissingAtArrival");
         Scribe_Values.Look(ref TrackedHediffSeverity, "TrackedHediffSeverity", -1f);
         Scribe_Defs.Look(ref CureRecipe, "CureRecipe");
+        Scribe_Collections.Look(ref LastDrugTick, "LastDrugTick", LookMode.Def, LookMode.Value);
+        LastDrugTick ??= new Dictionary<ThingDef, int>();
     }
 }

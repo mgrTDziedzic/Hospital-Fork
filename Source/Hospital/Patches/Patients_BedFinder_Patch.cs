@@ -53,7 +53,7 @@ public class Patients_BedFinder_Patch
     {
         if (candidates == null || candidates.Count == 0) return null;
 
-        bool wantsSurgeryBed = patient.health.surgeryBills.Count > 0;
+        bool wantsSurgeryBed = SurgeryUtility.HasRealSurgeryBills(patient);
         var preferred = candidates.Where(b => b.GetComp<CompHospitalBed>().Surgery == wantsSurgeryBed).ToList();
         var pool = preferred.Count > 0 ? preferred : candidates;
 
@@ -80,7 +80,7 @@ public class Patients_BedFinder_Patch
     /// <summary>Surgery bill beats disease, disease beats everything else.</summary>
     public static PatientBedNeed GetNeed(Pawn patient)
     {
-        if (patient.health.surgeryBills.Count > 0) return PatientBedNeed.Surgery;
+        if (SurgeryUtility.HasRealSurgeryBills(patient)) return PatientBedNeed.Surgery;
         foreach (var hediff in patient.health.hediffSet.hediffs)
         {
             var immunizable = hediff.TryGetComp<HediffComp_Immunizable>();

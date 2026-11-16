@@ -21,6 +21,18 @@ namespace Hospital
         public List<HediffDef> refusedDiseases = new List<HediffDef>();
         public List<FactionDef> refusedFactions = new List<FactionDef>();
         public FoodPolicy PatientFoodPolicy;
+        // Vanilla drug policies handed to patients (null = none). Entries with allowScheduled are administered.
+        public DrugPolicy DrugsAllPatients;
+        public DrugPolicy DrugsInfection;
+        public DrugPolicy DrugsSurgery;
+        public DrugPolicy DrugsInjuries;
+        public DrugPolicy DrugsScars;
+        // Give a list's drugs to teetotalers too. Defaults: All off, Infection/Surgery on.
+        public bool DrugsAllTeetotal = false;
+        public bool DrugsInfectionTeetotal = true;
+        public bool DrugsSurgeryTeetotal = true;
+        public bool DrugsInjuriesTeetotal = true;
+        public bool DrugsScarsTeetotal = false;
         public bool MassCasualties;
         public bool AcceptSurgery;
         public bool AcceptDanger;
@@ -47,6 +59,16 @@ namespace Hospital
             Scribe_Collections.Look(ref Patients, "patients", LookMode.Reference, LookMode.Deep, ref _colonistsKeysWorkingList, ref _colonistsValuesWorkingList, logNullErrors: false);
             Scribe_References.Look(ref PatientFoodPolicy, "PatientFoodPolicy");
             PatientFoodPolicy ??= Current.Game.foodRestrictionDatabase.DefaultFoodRestriction();
+            Scribe_References.Look(ref DrugsAllPatients, "DrugsAllPatients");
+            Scribe_References.Look(ref DrugsInfection, "DrugsInfection");
+            Scribe_References.Look(ref DrugsSurgery, "DrugsSurgery");
+            Scribe_References.Look(ref DrugsInjuries, "DrugsInjuries");
+            Scribe_References.Look(ref DrugsScars, "DrugsScars");
+            Scribe_Values.Look(ref DrugsAllTeetotal, "DrugsAllTeetotal", false);
+            Scribe_Values.Look(ref DrugsInfectionTeetotal, "DrugsInfectionTeetotal", true);
+            Scribe_Values.Look(ref DrugsSurgeryTeetotal, "DrugsSurgeryTeetotal", true);
+            Scribe_Values.Look(ref DrugsInjuriesTeetotal, "DrugsInjuriesTeetotal", true);
+            Scribe_Values.Look(ref DrugsScarsTeetotal, "DrugsScarsTeetotal", false);
             Scribe_Values.Look(ref MassCasualties, "massCasualties", false);
             Scribe_Values.Look(ref AcceptSurgery, "acceptSurgery", true);
             Scribe_Values.Look(ref AcceptDanger, "AcceptDanger", false);
@@ -88,7 +110,84 @@ namespace Hospital
         {
             base.MapComponentTick();
             if (Find.TickManager.TicksGame % 2000 == 0) RemoveLostPatients();
-            if (Find.TickManager.TicksGame % 250 == 0) CheckExternallyCuredPatients();
+            if (Find.TickManager.TicksGame % 250 == 0)
+            {
+                CheckExternallyCuredPatients();
+                ScheduleDrugBills();
+            }
+        }
+
+        public DrugPolicy GetDrugPolicy(DrugList list)
+        {
+            switch (list)
+            {
+                case DrugList.Infection: return DrugsInfection;
+                case DrugList.Surgery: return DrugsSurgery;
+                case DrugList.Injuries: return DrugsInjuries;
+                case DrugList.Scars: return DrugsScars;
+                default: return DrugsAllPatients;
+            }
+        }
+
+        public bool GetDrugTeetotal(DrugList list)
+        {
+            switch (list)
+            {
+                case DrugList.Infection: return DrugsInfectionTeetotal;
+                case DrugList.Surgery: return DrugsSurgeryTeetotal;
+                case DrugList.Injuries: return DrugsInjuriesTeetotal;
+                case DrugList.Scars: return DrugsScarsTeetotal;
+                default: return DrugsAllTeetotal;
+            }
+        }
+
+        // The UI calls these; the Synced variants below are the Multiplayer sync methods
+        // (plain ints/bools, so no policy object has to be serialised).
+        public void SetDrugPolicy(DrugList list, DrugPolicy policy) => SetDrugPolicySynced((int)list, policy?.id ?? -1);
+
+        public void SetDrugTeetotal(DrugList list, bool value) => SetDrugTeetotalSynced((int)list, value);
+
+        public void SetDrugPolicySynced(int list, int policyId)
+        {
+            DrugPolicy policy = policyId < 0 ? null : Current.Game.drugPolicyDatabase.AllPolicies.FirstOrDefault(p => p.id == policyId);
+            switch ((DrugList)list)
+            {
+                case DrugList.Infection: DrugsInfection = policy; break;
+                case DrugList.Surgery: DrugsSurgery = policy; break;
+                case DrugList.Injuries: DrugsInjuries = policy; break;
+                case DrugList.Scars: DrugsScars = policy; break;
+                default: DrugsAllPatients = policy; break;
+            }
+        }
+
+        public void SetDrugTeetotalSynced(int list, bool value)
+        {
+            switch ((DrugList)list)
+            {
+                case DrugList.Infection: DrugsInfectionTeetotal = value; break;
+                case DrugList.Surgery: DrugsSurgeryTeetotal = value; break;
+                case DrugList.Injuries: DrugsInjuriesTeetotal = value; break;
+                case DrugList.Scars: DrugsScarsTeetotal = value; break;
+                default: DrugsAllTeetotal = value; break;
+            }
+        }
+
+        // Adds the "Administer X" bills the drug policies call for (see DrugUtility.ScheduleFor).
+        public void ScheduleDrugBills()
+        {
+            if (DrugsAllPatients == null && DrugsInfection == null && DrugsSurgery == null && DrugsInjuries == null && DrugsScars == null) return;
+            int now = Find.TickManager.TicksGame;
+            foreach (var pair in Patients.ToList())
+            {
+                try
+                {
+                    DrugUtility.ScheduleFor(this, pair.Key, pair.Value, now);
+                }
+                catch (Exception e)
+                {
+                    Log.Warning($"Hospital: scheduling drugs failed for {pair.Key}: {e.Message}");
+                }
+            }
         }
 
         // A tracked severity above this counts as "still sick" when the hediff disappears.
@@ -377,6 +476,7 @@ namespace Hospital
             {
                 patientData.Dismissed = true;
             }
+            DrugUtility.RemoveAdministerBills(pawn); // leftover drug bills must not outlive the stay
             pawn.playerSettings.selfTend = true; // in case the patient gets hurt while walking home
             pawn.guest.SetGuestStatus(null); // might fix the "patients stay hanging around" issue
             MainTabWindowUtility.NotifyAllPawnTables_PawnsChanged();

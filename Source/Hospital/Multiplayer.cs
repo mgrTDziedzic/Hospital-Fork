@@ -49,6 +49,8 @@ namespace Hospital
                 MP.RegisterSyncMethod(AccessTools.Method(typeof(HospitalMapComponent), nameof(HospitalMapComponent.SetRefusedDisease)));
                 MP.RegisterSyncMethod(AccessTools.Method(typeof(HospitalMapComponent), nameof(HospitalMapComponent.SetRefusedFaction)));
                 MP.RegisterSyncMethod(AccessTools.Method(typeof(HospitalMapComponent), nameof(HospitalMapComponent.SetPatientFoodPolicy)));
+                MP.RegisterSyncMethod(AccessTools.Method(typeof(HospitalMapComponent), nameof(HospitalMapComponent.SetDrugPolicySynced)));
+                MP.RegisterSyncMethod(AccessTools.Method(typeof(HospitalMapComponent), nameof(HospitalMapComponent.SetDrugTeetotalSynced)));
                 MP.RegisterSyncMethod(AccessTools.Method(typeof(Multiplayer), nameof(SyncOpeningHour)));
                 //MP.RegisterSyncMethod(AccessTools.Method(typeof(IncidentWorker_PatientArrives),
                 //    nameof(IncidentWorker_PatientArrives.TryExecuteWorker)));

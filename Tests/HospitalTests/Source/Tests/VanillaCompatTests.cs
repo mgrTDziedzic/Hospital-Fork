@@ -459,6 +459,7 @@ namespace HospitalTests
             var data = Register(ctx, patient);
             var patientBill = MakeDeadSurgeryBill(patient);
             data.HasPendingSurgeryBill = true;
+            data.CureRecipe = patientBill.recipe; // only the cure bill settles the pending flag
             patientBill.Notify_IterationCompleted(doctor, new List<Thing>());
             Assert.True(data.Bill > 0f, "control: completed surgery was not charged");
             Assert.False(data.HasPendingSurgeryBill, "control: pending flag not cleared");
