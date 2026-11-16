@@ -8,7 +8,10 @@ namespace HospitalTests
 {
     public static class ArrivalTests
     {
-        [HospitalTest("Arrival smoke test: PatientArrives incident registers patients with sane PatientData, in drop pods")]
+        // Given: the hospital is open with a free hospital bed and danger accepted.
+        // When:  the PatientArrives incident is forced.
+        // Then:  new patients are registered with sane PatientData, are guests under a new lord and arrive in a drop pod.
+        [HospitalTest("Smoke: PatientArrives registers patients with sane PatientData, as guests under a new lord, arriving in drop pods")]
         public static void PatientArrivalSmoke(TestContext ctx)
         {
             var map = ctx.Map;

@@ -81,7 +81,10 @@ namespace HospitalTests
 
         private static bool BillStillThere(Setup s) { return s.Pawn.health.surgeryBills.Bills.Contains(s.Bill); }
 
-        [HospitalTest("External cure: removesHediff vanishing abruptly is billed, bill deleted, tracking reset")]
+        // Given: a tracked patient with Carcinoma (severity 0.3) and a pending excise-carcinoma bill.
+        // When:  the hediff is removed straight from the hediff list (as MedPod does) and the check runs.
+        // Then:  the patient is billed for the cure, the surgery bill is deleted and the tracking data is reset.
+        [HospitalTest("MedPod: a removesHediff cure that vanishes abruptly is billed, the bill deleted and tracking reset")]
         public static void AbruptVanishIsBilled(TestContext ctx)
         {
             var s = MakeCarcinomaPatient(ctx, 0.3f);
@@ -97,7 +100,10 @@ namespace HospitalTests
             Assert.False(s.Data.PartMissingAtArrival, "PartMissingAtArrival not reset");
         }
 
-        [HospitalTest("External cure: removesHediff that faded naturally is not billed, but bill and flag are cleared")]
+        // Given: a tracked patient whose Carcinoma had already faded to a tiny severity (0.05).
+        // When:  the hediff is removed and the check runs.
+        // Then:  nobody is charged (it healed on its own), but the bill and pending flag are cleared.
+        [HospitalTest("MedPod: a hediff that faded naturally is not billed, but its bill and pending flag are cleared")]
         public static void FadedHediffNotBilled(TestContext ctx)
         {
             var s = MakeCarcinomaPatient(ctx, 0.05f);
@@ -112,7 +118,12 @@ namespace HospitalTests
             Assert.Equal(-1f, s.Data.TrackedHediffSeverity, "TrackedHediffSeverity not reset");
         }
 
-        [HospitalTest("External cure: regrown missing part (PartMissingAtArrival) counts as cured and is billed")]
+        // Given: a patient who arrived with a missing leg and a pending peg-leg bill.
+        // When:  (control) the check runs while the leg is still missing.
+        // Then:  nothing happens: bill stays, no charge.
+        // When:  the missing-part hediff is removed (leg regrown) and the check runs again.
+        // Then:  the patient is billed, the bill deleted and the arrival flag reset.
+        [HospitalTest("MedPod: a regrown missing part counts as cured and is billed (nothing happens while still missing)")]
         public static void RegrownPartIsBilled(TestContext ctx)
         {
             var recipe = DefDatabase<RecipeDef>.GetNamedSilentFail("InstallPegLeg");
@@ -134,7 +145,15 @@ namespace HospitalTests
             Assert.False(data.PartMissingAtArrival, "PartMissingAtArrival not reset");
         }
 
-        [HospitalTest("External cure: bill removed without BillStack.Delete -> ResolveVanishedBill clears the flag (charges only if verifiably cured)")]
+        // Part 1
+        // Given: a tracked patient with Carcinoma still present and a pending bill.
+        // When:  the bill disappears without going through BillStack.Delete and the check runs.
+        // Then:  the pending flag is cleared and tracking reset, but nobody is charged.
+        // Part 2
+        // Given: the same setup, but the Carcinoma is removed too.
+        // When:  the bill disappears and the check runs.
+        // Then:  the flag is cleared and the patient is billed, since the cure is verifiable.
+        [HospitalTest("MedPod: a bill that vanished silently clears the pending flag, and charges only if the cure is verifiable")]
         public static void VanishedBillClearsFlag(TestContext ctx)
         {
             // condition still present: flag cleared, no charge
@@ -155,7 +174,10 @@ namespace HospitalTests
             Assert.True(s2.Data.Bill > 0f, "not billed although the condition is verifiably cured");
         }
 
-        [HospitalTest("External cure: old-save patient (not tracked) is left untouched")]
+        // Given: an old-save patient with no tracked severity (-1) and a pending bill.
+        // When:  the hediff is removed and the check runs.
+        // Then:  the patient is left untouched: bill stays, flag stays, no charge.
+        [HospitalTest("MedPod: an old-save patient without tracking data is left untouched")]
         public static void UntrackedPatientUntouched(TestContext ctx)
         {
             var s = MakeCarcinomaPatient(ctx, -1f);

@@ -42,7 +42,7 @@ namespace HospitalTests
             return (bed, comp);
         }
 
-        [HospitalTest("A3: switching bed to Hospital mode removes colonist owners")]
+        [HospitalTest("A3: switching a bed to hospital mode removes colonist owners")]
         public static void BedHospitalModeRemovesColonistOwner(TestContext ctx)
         {
             var (bed, comp) = MakeBed(ctx);
@@ -56,7 +56,10 @@ namespace HospitalTests
             Assert.False(bed.OwnersForReading.Contains(colonist), "colonist must lose the bed in hospital mode");
         }
 
-        [HospitalTest("A3: switching bed back to normal mode removes patient owners")]
+        // Given: a bed in hospital mode owned by a registered patient.
+        // When:  the bed is switched back to normal mode.
+        // Then:  the patient loses the bed.
+        [HospitalTest("A3: switching a bed back to normal mode removes patient owners (patients may own it in hospital mode)")]
         public static void BedNormalModeRemovesPatientOwner(TestContext ctx)
         {
             var (bed, comp) = MakeBed(ctx);
@@ -78,7 +81,7 @@ namespace HospitalTests
 
         private static readonly MethodInfo DamageParts = typeof(WoundsUtility).GetMethod("DamageParts", BindingFlags.NonPublic | BindingFlags.Static);
 
-        [HospitalTest("A14: WoundsUtility.DamageParts leaves forceDowned false")]
+        [HospitalTest("A14: DamageParts leaves forceDowned false")]
         public static void DamagePartsResetsForceDowned(TestContext ctx)
         {
             Assert.NotNull(DamageParts, "WoundsUtility.DamageParts not found (renamed?)");
@@ -90,6 +93,9 @@ namespace HospitalTests
             Assert.False(pawn.health.forceDowned, "forceDowned left set after DamageParts");
         }
 
+        // Given: a pawn and a bogus damage def that makes DamageParts fail.
+        // When:  DamageParts is called and throws.
+        // Then:  forceDowned is still false afterwards.
         [HospitalTest("A14: forceDowned is reset even when DamageParts throws")]
         public static void DamagePartsResetsForceDownedOnException(TestContext ctx)
         {
@@ -103,6 +109,9 @@ namespace HospitalTests
             Assert.False(pawn.health.forceDowned, "forceDowned left set after DamageParts threw");
         }
 
+        // Given: a map with a Patient Landing Spot (one is placed if the save has none).
+        // When:  a patient landing cell is requested.
+        // Then:  the cell is valid, in bounds and is the landing spot.
         [HospitalTest("A2: TryFindPatientLandingCell returns a valid in-bounds cell and prefers the Patient Landing Spot")]
         public static void LandingCellIsValid(TestContext ctx)
         {
@@ -127,7 +136,10 @@ namespace HospitalTests
             }
         }
 
-        [HospitalTest("B1: EnsureValidSettings repairs missing/invalid settings from an old save")]
+        // Given: hospital settings as an old save leaves them: null lists, too-short and too-long opening hours.
+        // When:  EnsureValidSettings runs.
+        // Then:  null lists are restored to defaults, short hours padded with closed, long hours truncated to 24.
+        [HospitalTest("B1: EnsureValidSettings restores null settings and fixes opening hours to 24 entries (pad short, truncate long)")]
         public static void EnsureValidSettingsRepairsOldSaveState(TestContext ctx)
         {
             var hospital = ctx.Map.GetComponent<HospitalMapComponent>();
