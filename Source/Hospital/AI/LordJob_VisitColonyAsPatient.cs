@@ -52,6 +52,15 @@ public class LordJob_VisitColonyAsPatient : LordJob
         public override void Notify_PawnLost(Pawn pawn, PawnLostCondition condition)
         {
             //Log.Message($"{pawn.NameFullColored} lost because of {condition}");
-            (pawn.MapHeld ?? lord?.Map)?.GetComponent<HospitalMapComponent>()?.DismissPatient(pawn);
+            var hospital = (pawn.MapHeld ?? lord?.Map)?.GetComponent<HospitalMapComponent>();
+            if (hospital == null) return;
+            if (condition == PawnLostCondition.MadePrisoner || condition == PawnLostCondition.ChangedFaction)
+            {
+                // The pawn is no longer ours to discharge: arrested (vanilla sets the prisoner status right
+                // after this call returns) or recruited. Only forget them; DismissPatient would reset the guest status.
+                hospital.StopBeingPatient(pawn);
+                return;
+            }
+            hospital.DismissPatient(pawn);
         }
 }
