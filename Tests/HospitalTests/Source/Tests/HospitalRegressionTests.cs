@@ -10,7 +10,7 @@ namespace HospitalTests
 {
     public static class HospitalRegressionTests
     {
-        private static Pawn MakePawn(TestContext ctx, Faction faction, bool spawn)
+        internal static Pawn MakePawn(TestContext ctx, Faction faction, bool spawn)
         {
             var map = ctx.Map;
             var pawn = PawnGenerator.GeneratePawn(new PawnGenerationRequest(PawnKindDefOf.Colonist, faction,
@@ -24,7 +24,7 @@ namespace HospitalTests
             return pawn;
         }
 
-        private static (Building_Bed bed, CompHospitalBed comp) MakeBed(TestContext ctx)
+        internal static (Building_Bed bed, CompHospitalBed comp) MakeBed(TestContext ctx)
         {
             var map = ctx.Map;
             // plain (non-medical) bed so vanilla allows assigning owners; Hospital injects its comp into every bed that can be medical
