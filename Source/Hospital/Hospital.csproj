@@ -16,6 +16,9 @@
         <Optimize>true</Optimize>
         <DebugType>none</DebugType>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <!-- Reproducible output: no absolute local paths embedded in the DLL/PDB. -->
+        <Deterministic>true</Deterministic>
+        <PathMap>$(MSBuildProjectDirectory)=/_/Source/Hospital/</PathMap>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

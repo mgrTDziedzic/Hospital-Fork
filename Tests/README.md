@@ -1,9 +1,10 @@
 # Hospital in-game tests (dev only, RimWorld 1.6)
 
 ## Install
-RimWorld only scans top-level folders in `Mods`, so the test mod needs its own junction (admin cmd may be needed):
+RimWorld only scans top-level folders in `Mods`, so the test mod needs its own junction (admin cmd may be needed).
+Replace `<RimWorld>` with your game folder (e.g. `...\steamapps\common\RimWorld`) and `<repo>` with this repository's folder:
 
-    mklink /J "C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Hospital-Tests-dev" "C:\Users\PC\Documents\RimWorld Mods\Hospital\Tests\HospitalTests"
+    mklink /J "<RimWorld>\Mods\Hospital-Tests-dev" "<repo>\Tests\HospitalTests"
 
 Build it: `dotnet build Tests\HospitalTests\Source\HospitalTests.csproj` (output: `Tests\HospitalTests\1.6\Assemblies`).
 Enable "Hospital Tests (dev)" in the mod list (after Hospital).
@@ -19,9 +20,12 @@ Tests spawn and remove their own throwaway pawns/beds. Note: tests also run fine
 Dev mode -> debug actions menu -> "Hospital Tests" -> "Run all" (or "Run: <test>"). A results window opens.
 
 ## Run automatically
-`powershell -File Tests\run-tests.ps1 [-SaveName HospitalTest] [-TimeoutMinutes 10] [-SaveDataFolder <path>]`
+`powershell -File Tests\run-tests.ps1 [-SaveName HospitalTest] [-TimeoutMinutes 10] [-SaveDataFolder <path>] [-GameDir <path>] [-Dotnet <path>]`
 - builds both projects, starts the game with `-hospitaltest=<SaveName>`, which loads the save, runs all tests, writes the results file and quits.
 - exit code 0 = all passed.
+- game folder: `-GameDir`, else the `RIMWORLD_DIR` environment variable, else detected from Steam (all Steam libraries).
+- `dotnet`: `-Dotnet`, else PATH, else the default install location.
+- Hospital is built in Release and deterministically, so rebuilding unchanged sources leaves the committed `1.6/Assemblies/Hospital.dll` byte-identical.
 - `-SaveDataFolder` (off by default) uses a separate data folder; it needs its own ModsConfig.xml (Harmony + Hospital + Hospital Tests enabled) and the save in its Saves folder.
 
 ## Results
