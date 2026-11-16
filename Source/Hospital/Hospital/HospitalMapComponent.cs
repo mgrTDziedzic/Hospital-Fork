@@ -16,14 +16,7 @@ namespace Hospital
         private List<PatientData> _colonistsValuesWorkingList;
         
         public bool openForBusiness = false;
-        public List<bool> openingHours = new System.Collections.Generic.List<bool>
-        {
-            false,false,false,false,false,false,false,true, //8
-            false,false,false,true, //12
-            false,false,false,true,//16
-            false,false,false,true,//20
-            false,false,false,false
-        };
+        public List<bool> openingHours = DefaultOpeningHours();
         public List<RecipeDef> refusedOperations = new List<RecipeDef>();
         public List<HediffDef> refusedDiseases = new List<HediffDef>();
         public List<FactionDef> refusedFactions = new List<FactionDef>();
@@ -41,27 +34,11 @@ namespace Hospital
         public override void ExposeData()
         {
             base.ExposeData();
-            openingHours ??= new System.Collections.Generic.List<bool>
-            {
-                false,false,false,false,false,false,false,true, //8
-                false,false,false,true, //12
-                false,false,false,true,//16
-                false,false,false,true,//20
-                false,false,false,false
-            };
-            refusedOperations ??= new List<RecipeDef>();
-            refusedDiseases ??= new List<HediffDef>();
-            refusedFactions ??= new List<FactionDef>();
-
             Scribe_Collections.Look(ref openingHours, "openingHours");
             Scribe_Collections.Look(ref refusedOperations, "refusedOperations");
             Scribe_Collections.Look(ref refusedDiseases, "refusedDiseases");
             Scribe_Collections.Look(ref refusedFactions, "refusedFactions");
-            refusedOperations ??= new List<RecipeDef>();
-            refusedDiseases ??= new List<HediffDef>();
-            refusedFactions ??= new List<FactionDef>();
             Scribe_Values.Look(ref openForBusiness, "openForBusiness", false);
-            Patients ??= new Dictionary<Pawn, PatientData>();
             // logNullErrors: false - a reference to a destroyed pawn is always saved as null, so a
             // patient that was lost without being removed (see RemoveLostPatients) used to log
             // "Null key while loading dictionary" on load. The null entry itself is just skipped.
@@ -71,6 +48,37 @@ namespace Hospital
             Scribe_Values.Look(ref MassCasualties, "massCasualties", false);
             Scribe_Values.Look(ref AcceptSurgery, "acceptSurgery", true);
             Scribe_Values.Look(ref AcceptDanger, "AcceptDanger", false);
+
+            // Scribe_Collections.Look sets a collection to null when its node is missing from the
+            // save (older mod version), so defaults have to be restored AFTER Look. Patients only
+            // in PostLoadInit, after the dictionary has been rebuilt from its working lists.
+            if (Scribe.mode == LoadSaveMode.LoadingVars) EnsureValidSettings();
+            else if (Scribe.mode == LoadSaveMode.PostLoadInit) Patients ??= new Dictionary<Pawn, PatientData>();
+        }
+
+        public static List<bool> DefaultOpeningHours() => new List<bool>
+        {
+            false,false,false,false,false,false,false,true, //8
+            false,false,false,true, //12
+            false,false,false,true,//16
+            false,false,false,true,//20
+            false,false,false,false
+        };
+
+        // Repairs settings a save may lack: missing lists, and an opening-hours table that is
+        // not exactly one entry per hour (IsOpen indexes it by hour of day).
+        public void EnsureValidSettings()
+        {
+            if (openingHours == null) openingHours = DefaultOpeningHours();
+            else if (openingHours.Count != GenDate.HoursPerDay)
+            {
+                if (openingHours.Count > GenDate.HoursPerDay)
+                    openingHours.RemoveRange(GenDate.HoursPerDay, openingHours.Count - GenDate.HoursPerDay);
+                while (openingHours.Count < GenDate.HoursPerDay) openingHours.Add(false);
+            }
+            refusedOperations ??= new List<RecipeDef>();
+            refusedDiseases ??= new List<HediffDef>();
+            refusedFactions ??= new List<FactionDef>();
         }
 
         public override void MapComponentTick()

@@ -126,5 +126,48 @@ namespace HospitalTests
                 Assert.Equal(spotCell, cell2, "spot not preferred");
             }
         }
+
+        [HospitalTest("B1: EnsureValidSettings repairs missing/invalid settings from an old save")]
+        public static void EnsureValidSettingsRepairsOldSaveState(TestContext ctx)
+        {
+            var hospital = ctx.Map.GetComponent<HospitalMapComponent>();
+            Assert.NotNull(hospital, "map has no HospitalMapComponent");
+            var hours = hospital.openingHours;
+            var ops = hospital.refusedOperations;
+            var diseases = hospital.refusedDiseases;
+            var factions = hospital.refusedFactions;
+            ctx.OnCleanup(() =>
+            {
+                hospital.openingHours = hours;
+                hospital.refusedOperations = ops;
+                hospital.refusedDiseases = diseases;
+                hospital.refusedFactions = factions;
+            });
+
+            // node missing in the save -> Scribe_Collections.Look leaves null
+            hospital.openingHours = null;
+            hospital.refusedOperations = null;
+            hospital.refusedDiseases = null;
+            hospital.refusedFactions = null;
+            hospital.EnsureValidSettings();
+            Assert.NotNull(hospital.openingHours, "openingHours not restored");
+            Assert.Equal(24, hospital.openingHours.Count, "restored openingHours size");
+            Assert.True(hospital.openingHours.SequenceEqual(HospitalMapComponent.DefaultOpeningHours()), "restored openingHours are not the defaults");
+            Assert.NotNull(hospital.refusedOperations, "refusedOperations not restored");
+            Assert.NotNull(hospital.refusedDiseases, "refusedDiseases not restored");
+            Assert.NotNull(hospital.refusedFactions, "refusedFactions not restored");
+            hospital.IsOpen(); // threw NRE before the fix
+
+            // too short: saved values kept, padded with "closed"
+            hospital.openingHours = Enumerable.Repeat(true, 5).ToList();
+            hospital.EnsureValidSettings();
+            Assert.Equal(24, hospital.openingHours.Count, "short openingHours not padded");
+            Assert.True(hospital.openingHours.Take(5).All(h => h) && hospital.openingHours.Skip(5).All(h => !h), "short openingHours padded wrongly");
+
+            // too long: truncated
+            hospital.openingHours = Enumerable.Repeat(true, 30).ToList();
+            hospital.EnsureValidSettings();
+            Assert.Equal(24, hospital.openingHours.Count, "long openingHours not truncated");
+        }
     }
 }
