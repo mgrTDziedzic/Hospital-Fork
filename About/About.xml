@@ -5,8 +5,6 @@
 	<packageId>Adamas.Hospital</packageId>
 	<url>https://github.com/mgrTDziedzic/Hospital-Fork</url>
 	<supportedVersions>
-		<li>1.4</li>
-		<li>1.5</li>
 		<li>1.6</li>
 		<li>1.7</li>
 	</supportedVersions>

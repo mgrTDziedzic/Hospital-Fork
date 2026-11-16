@@ -6,6 +6,8 @@ Original code is © its author, licensed under GPLv3; modifications are © mgrTD
 
 ## 2026-11-16
 - Added fork notice and attribution (README, About.xml, this changelog).
+- Dropped RimWorld 1.4 and 1.5 support; this fork targets 1.6 (and 1.7).
+- 1.6 assembly is now a deterministic Release build; test tooling no longer uses machine-specific paths.
 
 ## 2026-11-15
 - Detect conditions cured externally (MedPod compatibility).
