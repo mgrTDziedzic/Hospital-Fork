@@ -89,10 +89,13 @@ public static class DrugUtility
         return false;
     }
 
-    /// <summary>Nothing left to treat: no tending, no real surgery, no pending cure. Healed patients get no new drug bills.</summary>
+    /// <summary>
+    /// The patient would be sent home (same rule as Trigger_SentAway, ignoring drug bills): no rest needed (a tended
+    /// but still sick or healing patient still needs rest), no real surgery, no pending cure. Healed patients get no new drug bills.
+    /// </summary>
     public static bool IsOtherwiseHealed(Pawn pawn, PatientData data)
     {
-        return !pawn.health.HasHediffsNeedingTend()
+        return !SurgeryUtility.ShouldSeekMedicalRestIgnoringBills(pawn)
                && !SurgeryUtility.HasRealSurgeryBills(pawn)
                && !(data?.HasPendingSurgeryBill ?? false);
     }

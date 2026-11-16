@@ -470,6 +470,42 @@ namespace HospitalTests
             pawn.health.AddHediff(scar, part);
         }
 
+        // Tends every hediff that needs it, so the patient has a tended (not "needs tending") infection.
+        private static void TendAll(Pawn pawn)
+        {
+            foreach (var h in pawn.health.hediffSet.hediffs.ToList())
+                if (h.TendableNow()) h.Tended(0.8f, 1f);
+        }
+
+        // Given: a patient with a just-tended Flu (HasHediffsNeedingTend false) and a permanent scar; Scars list = beer.
+        // When:  scheduled.
+        // Then:  the beer bill is added: a tended but still sick patient is not "healed" (the rule matches the discharge check).
+        // Given: a tended Flu patient on the All list (tea) whose last dose is older than daysFrequency.
+        // When:  scheduled.
+        // Then:  a new tea bill is added (repeat doses must not stall while the tend lasts); not before the interval.
+        [HospitalTest("Drugs17: a tended but still sick patient still gets Scars drugs and repeat doses")]
+        public static void TendedSickPatientStillTreated(TestContext ctx)
+        {
+            var tea = Drug(TeaDefName); var beer = Drug(BeerDefName);
+            var rig = HealthyPatient(ctx);
+            AddInfection(rig);
+            AddScar(rig.Pawn);
+            TendAll(rig.Pawn);
+            Assert.False(rig.Pawn.health.HasHediffsNeedingTend(), "precondition: flu was tended" + Diag(rig));
+            Assert.True(DrugUtility.HasScars(rig.Pawn), "precondition: scar");
+            rig.Hospital.DrugsScars = Policy(ctx, beer);
+            ExpectSchedule(rig, 1, "tended flu patient with a scar");
+
+            var policy = Policy(ctx, tea);
+            policy[tea].daysFrequency = 2f;
+            rig.Hospital.DrugsAllPatients = policy;
+            int now = Find.TickManager.TicksGame;
+            rig.Data.LastDrugTick[tea] = now - GenDate.TicksPerDay;
+            ExpectSchedule(rig, 0, "tea before the interval");
+            rig.Data.LastDrugTick[tea] = now - 2 * GenDate.TicksPerDay;
+            ExpectSchedule(rig, 1, "tea after the interval");
+        }
+
         // ---------- interplay with the rest of the mod ----------
 
         // Given: a surgery patient with a drug bill and the cure bill (HasPendingSurgeryBill = true).
