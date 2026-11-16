@@ -1,0 +1,83 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using LudeonTK;
+using RimWorld;
+using UnityEngine;
+using Verse;
+
+namespace HospitalTests
+{
+    public class Window_TestResults : Window
+    {
+        private readonly List<TestResult> results;
+        private Vector2 scroll;
+        private float viewHeight;
+
+        public Window_TestResults(List<TestResult> results)
+        {
+            this.results = results;
+            doCloseX = true;
+            draggable = true;
+            resizeable = true;
+            absorbInputAroundWindow = false;
+        }
+
+        public override Vector2 InitialSize => new Vector2(800f, 600f);
+
+        public override void DoWindowContents(Rect inRect)
+        {
+            int pass = results.Count(r => r.Passed);
+            Text.Font = GameFont.Medium;
+            Widgets.Label(new Rect(0, 0, inRect.width, 32f), "Hospital tests: " + pass + "/" + results.Count + " passed");
+            Text.Font = GameFont.Small;
+            if (Widgets.ButtonText(new Rect(inRect.width - 120f, 34f, 120f, 28f), "Run all again"))
+            {
+                Close();
+                TestEntryPoints.RunAllAndShow();
+                return;
+            }
+            Widgets.Label(new Rect(0, 36f, inRect.width - 130f, 24f), "Results file: " + TestRunner.ResultsPath);
+
+            var outRect = new Rect(0, 70f, inRect.width, inRect.height - 70f);
+            var view = new Rect(0, 0, outRect.width - 16f, viewHeight);
+            Widgets.BeginScrollView(outRect, ref scroll, view);
+            float y = 0;
+            foreach (var r in results)
+            {
+                string text = (r.Passed ? "PASS  " : "FAIL  ") + r.Name + "  (" + r.Millis + " ms)"
+                              + (r.Description != null ? "\n" + r.Description : "")
+                              + (r.Passed ? "" : "\n" + r.Message);
+                float h = Text.CalcHeight(text, view.width - 8f) + 6f;
+                var row = new Rect(0, y, view.width, h);
+                Widgets.DrawBoxSolid(row, r.Passed ? new Color(0.1f, 0.35f, 0.1f, 0.6f) : new Color(0.45f, 0.1f, 0.1f, 0.6f));
+                Widgets.Label(new Rect(4f, y + 3f, view.width - 8f, h), text);
+                y += h + 2f;
+            }
+            viewHeight = y;
+            Widgets.EndScrollView();
+        }
+    }
+
+    public static class TestEntryPoints
+    {
+        public static void RunAllAndShow()
+        {
+            Find.WindowStack.Add(new Window_TestResults(TestRunner.RunAll()));
+        }
+
+        [DebugAction("Hospital Tests", "Run all", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void RunAll() { RunAllAndShow(); }
+
+        [DebugActionYielder]
+        public static IEnumerable<DebugActionNode> RunSingle()
+        {
+            foreach (MethodInfo m in TestRunner.Discover())
+            {
+                MethodInfo method = m;
+                yield return new DebugActionNode("Run: " + method.DeclaringType.Name + "." + method.Name, DebugActionType.Action,
+                    () => Find.WindowStack.Add(new Window_TestResults(TestRunner.Run(new[] { method }))));
+            }
+        }
+    }
+}

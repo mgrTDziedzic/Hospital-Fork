@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>Hospital Tests (dev)</name>
+	<author>Adamas</author>
+	<packageId>Adamas.Hospital.Tests</packageId>
+	<supportedVersions>
+		<li>1.6</li>
+	</supportedVersions>
+	<description>Developer-only in-game test harness for the Hospital mod. Not for publishing.</description>
+	<modDependencies>
+		<li>
+			<packageId>Adamas.Hospital</packageId>
+			<displayName>Hospital</displayName>
+		</li>
+	</modDependencies>
+	<loadAfter>
+		<li>Adamas.Hospital</li>
+	</loadAfter>
+</ModMetaData>
