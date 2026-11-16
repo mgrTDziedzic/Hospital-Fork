@@ -33,6 +33,27 @@ public class SurgeryUtility
                 return ThingDefOf.Human.AllRecipes.Where(IsBlacklistableSurgery).Distinct();
         }
 
+        // Hardcoded parts for modded recipes (disease overhauled etc.) whose target is not derivable from the recipe.
+        // A rule overrides `part` only when the pawn really has that part; otherwise the part chosen so far is kept.
+        public static BodyPartRecord ApplyNameBasedPartOverrides(RecipeDef recipe, Pawn pawn, BodyPartRecord part)
+        {
+                string recipeName = recipe.defName.ToLower();
+                string hediffName = recipe.removesHediff?.defName.ToLower();
+
+                BodyPartRecord Find(string label) => pawn.health.hediffSet.GetNotMissingParts()
+                        .FirstOrDefault(record => record.def.label.ToLower().Equals(label)) ?? part;
+
+                if (hediffName == "appendicitis") part = Find("torso");
+                if (hediffName == "toothache") part = Find("jaw");
+                if (recipeName.Contains("kidney")) part = Find("kidney");
+                if (recipeName.Contains("deaf")) part = Find("ear");
+                if (recipeName.Contains("glaucoma") || recipeName.Contains("strabismus")) part = Find("eye");
+                if (recipeName.Contains("arrhythmia") || recipeName.Contains("heart")) part = Find("heart");
+                if (recipeName.Contains("spinal") || recipeName.Contains("hernia")) part = Find("spine");
+                if (recipeName.Contains("gastritis")) part = Find("stomach");
+                return part;
+        }
+
         public static bool AddRandomSurgeryBill(Pawn pawn, PatientData patientData, HospitalMapComponent hospital)
         {
 	        List<RecipeDef> list = new List<RecipeDef>();
@@ -95,50 +116,7 @@ public class SurgeryUtility
 		        part = selectedRecipe.Worker.GetPartsToApplyOn(pawn, selectedRecipe).RandomElement();
 		        //Log.Message($"part selected2:" + part.def.defName);
 	        }
-	        if (selectedRecipe.removesHediff != null)
-	        {
-		        // some hardcoded parts from disease overhauled
-		        if (selectedRecipe.removesHediff.defName.ToLower().Equals("appendicitis"))
-		        {
-			        part = pawn.health.hediffSet.GetNotMissingParts()
-				        .Where(record => record.def.label.ToLower().Equals("torso")).FirstOrFallback(null);
-		        }
-		        if (selectedRecipe.removesHediff.defName.ToLower().Equals("toothache"))
-		        {
-			        part = pawn.health.hediffSet.GetNotMissingParts()
-				        .Where(record => record.def.label.ToLower().Equals("jaw")).FirstOrFallback(null);
-		        }		        
-	        }
-	        if (selectedRecipe.defName.ToLower().Contains("kidney"))
-	        {
-		        part = pawn.health.hediffSet.GetNotMissingParts()
-			        .Where(record => record.def.label.ToLower().Equals("kidney")).FirstOrFallback(null);		        
-	        }
-	        if (selectedRecipe.defName.ToLower().Contains("deaf"))
-	        {
-		        part = pawn.health.hediffSet.GetNotMissingParts()
-			        .Where(record => record.def.label.ToLower().Equals("kidney")).FirstOrFallback(null);		        
-	        }
-	        if (selectedRecipe.defName.ToLower().Contains("glaucoma") || selectedRecipe.defName.ToLower().Contains("strabismus"))
-	        {
-		        part = pawn.health.hediffSet.GetNotMissingParts()
-			        .Where(record => record.def.label.ToLower().Equals("eye")).FirstOrFallback(null);		        
-	        }	     
-	        if (selectedRecipe.defName.ToLower().Contains("arrhythmia") || selectedRecipe.defName.ToLower().Contains("heart"))
-	        {
-		        part = pawn.health.hediffSet.GetNotMissingParts()
-			        .Where(record => record.def.label.ToLower().Equals("heart")).FirstOrFallback(null);		        
-	        }
-	        if (selectedRecipe.defName.ToLower().Contains("spinal") || selectedRecipe.defName.ToLower().Contains("hernia"))
-	        {
-		        part = pawn.health.hediffSet.GetNotMissingParts()
-			        .Where(record => record.def.label.ToLower().Equals("spine")).FirstOrFallback(null);		        
-	        }	
-	        if (selectedRecipe.defName.ToLower().Contains("gastritis"))
-	        {
-		        part = pawn.health.hediffSet.GetNotMissingParts()
-			        .Where(record => record.def.label.ToLower().Equals("stomach")).FirstOrFallback(null);		        
-	        }
+	        part = ApplyNameBasedPartOverrides(selectedRecipe, pawn, part);
 	        if (part == null)
 	        {
 		        IEnumerable<BodyPartRecord> source = from x in pawn.health.hediffSet.GetNotMissingParts()
