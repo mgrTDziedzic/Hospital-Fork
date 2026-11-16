@@ -15,6 +15,41 @@ namespace HospitalTests
         public static void PatientArrivalSmoke(TestContext ctx)
         {
             var map = ctx.Map;
+            var added = FireArrival(ctx, out var lordsBefore);
+            Assert.True(added.Count >= 1, "no patient was added to hospital.Patients");
+            foreach (var pair in added)
+            {
+                Pawn pawn = pair.Key;
+                PatientData data = pair.Value;
+                Assert.NotNull(data, "patient has null PatientData");
+                Assert.False(data.Dismissed, "new patient is marked dismissed");
+                Assert.Equal(Find.TickManager.TicksGame, data.ArrivedAtTick, "ArrivedAtTick");
+                Assert.True(data.InitialMarketValue > 0f, "InitialMarketValue not set: " + data.InitialMarketValue);
+                Assert.True(data.InitialMood >= 0f && data.InitialMood <= 1f, "InitialMood out of range: " + data.InitialMood);
+                Assert.True(data.Type != PatientType.Test, "PatientType left at Test");
+                Assert.False(string.IsNullOrEmpty(data.Diagnosis), "Diagnosis empty (type " + data.Type + ")");
+                Assert.False(string.IsNullOrEmpty(data.Cure), "Cure empty (type " + data.Type + ")");
+                Assert.True(data.Bill >= 0f, "negative Bill");
+                if (data.HasPendingSurgeryBill)
+                {
+                    Assert.NotNull(data.CureRecipe, "pending surgery bill but no CureRecipe");
+                    Assert.True(pawn.health.surgeryBills.Bills.Any(b => b.recipe == data.CureRecipe), "pending surgery flag set but pawn has no such bill");
+                }
+                Assert.True(pawn.guest != null && pawn.guest.GuestStatus == GuestStatus.Guest, "patient is not a guest");
+                Assert.False(pawn.Dead, "patient is dead");
+                // arrives in a drop pod: not spawned yet; nesting is Skyfaller -> ActiveTransporter -> Contents.innerContainer -> pawn
+                bool inPod = ThingOwnerUtility.AnyParentIs<Skyfaller>(pawn);
+                Assert.True(inPod || pawn.Spawned, "patient is neither in a drop pod nor spawned");
+                Assert.True(map.lordManager.lords.Any(l => !lordsBefore.Contains(l) && l.ownedPawns.Contains(pawn)), "patient has no new lord");
+            }
+        }
+
+        // Opens the hospital, makes sure a free bed exists, forces one PatientArrives incident and returns the new patients.
+        // Everything (settings, bed, patients, lords, letters) is undone by ctx cleanup. Patients are still in their drop pods
+        // (nothing ticks inside a test): Skyfaller -> ActiveTransporter -> Contents.innerContainer -> pawn.
+        internal static List<KeyValuePair<Pawn, PatientData>> FireArrival(TestContext ctx, out HashSet<Verse.AI.Group.Lord> lordsBefore)
+        {
+            var map = ctx.Map;
             var hospital = map.GetComponent<HospitalMapComponent>();
             Assert.NotNull(hospital, "map has no HospitalMapComponent");
             var def = DefDatabase<IncidentDef>.GetNamedSilentFail("PatientArrives");
@@ -57,8 +92,9 @@ namespace HospitalTests
 
             var patientsBefore = new HashSet<Pawn>(hospital.Patients.Keys);
             var lettersBefore = new HashSet<Letter>(Find.LetterStack.LettersListForReading);
-            var lordsBefore = new HashSet<Verse.AI.Group.Lord>(map.lordManager.lords);
-            ctx.OnCleanup(() => CleanUpArrivals(map, hospital, patientsBefore, lettersBefore, lordsBefore));
+            var lordsSnapshot = new HashSet<Verse.AI.Group.Lord>(map.lordManager.lords);
+            lordsBefore = lordsSnapshot;
+            ctx.OnCleanup(() => CleanUpArrivals(map, hospital, patientsBefore, lettersBefore, lordsSnapshot));
 
             Assert.True(IncidentHelper.CanSpawnPatient(map),
                 "CanSpawnPatient is false even with the hospital open and a free bed (no reachable edge cell?)");
@@ -68,33 +104,7 @@ namespace HospitalTests
             Assert.True(fired,
                 "TryExecuteWorker returned false (no allied/neutral humanlike faction, hostile pawn on the map, or no landing cell?)");
 
-            var added = hospital.Patients.Where(p => !patientsBefore.Contains(p.Key)).ToList();
-            Assert.True(added.Count >= 1, "no patient was added to hospital.Patients");
-            foreach (var pair in added)
-            {
-                Pawn pawn = pair.Key;
-                PatientData data = pair.Value;
-                Assert.NotNull(data, "patient has null PatientData");
-                Assert.False(data.Dismissed, "new patient is marked dismissed");
-                Assert.Equal(Find.TickManager.TicksGame, data.ArrivedAtTick, "ArrivedAtTick");
-                Assert.True(data.InitialMarketValue > 0f, "InitialMarketValue not set: " + data.InitialMarketValue);
-                Assert.True(data.InitialMood >= 0f && data.InitialMood <= 1f, "InitialMood out of range: " + data.InitialMood);
-                Assert.True(data.Type != PatientType.Test, "PatientType left at Test");
-                Assert.False(string.IsNullOrEmpty(data.Diagnosis), "Diagnosis empty (type " + data.Type + ")");
-                Assert.False(string.IsNullOrEmpty(data.Cure), "Cure empty (type " + data.Type + ")");
-                Assert.True(data.Bill >= 0f, "negative Bill");
-                if (data.HasPendingSurgeryBill)
-                {
-                    Assert.NotNull(data.CureRecipe, "pending surgery bill but no CureRecipe");
-                    Assert.True(pawn.health.surgeryBills.Bills.Any(b => b.recipe == data.CureRecipe), "pending surgery flag set but pawn has no such bill");
-                }
-                Assert.True(pawn.guest != null && pawn.guest.GuestStatus == GuestStatus.Guest, "patient is not a guest");
-                Assert.False(pawn.Dead, "patient is dead");
-                // arrives in a drop pod: not spawned yet; nesting is Skyfaller -> ActiveTransporter -> Contents.innerContainer -> pawn
-                bool inPod = ThingOwnerUtility.AnyParentIs<Skyfaller>(pawn);
-                Assert.True(inPod || pawn.Spawned, "patient is neither in a drop pod nor spawned");
-                Assert.True(map.lordManager.lords.Any(l => !lordsBefore.Contains(l) && l.ownedPawns.Contains(pawn)), "patient has no new lord");
-            }
+            return hospital.Patients.Where(p => !patientsBefore.Contains(p.Key)).ToList();
         }
 
         private static void CleanUpArrivals(Map map, HospitalMapComponent hospital, HashSet<Pawn> patientsBefore, HashSet<Letter> lettersBefore, HashSet<Verse.AI.Group.Lord> lordsBefore)

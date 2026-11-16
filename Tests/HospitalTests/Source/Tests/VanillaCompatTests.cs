@@ -25,7 +25,7 @@ namespace HospitalTests
 
         // ---------- helpers ----------
 
-        private static Faction FindFaction(bool hostile)
+        internal static Faction FindFaction(bool hostile)
         {
             var player = Faction.OfPlayer;
             var f = Find.FactionManager.AllFactionsListForReading.FirstOrDefault(x =>
@@ -35,17 +35,17 @@ namespace HospitalTests
             return f;
         }
 
-        private static Pawn Visitor(TestContext ctx, bool hostile)
+        internal static Pawn Visitor(TestContext ctx, bool hostile)
         {
             return HospitalRegressionTests.MakePawn(ctx, FindFaction(hostile), true);
         }
 
-        private static Pawn Colonist(TestContext ctx)
+        internal static Pawn Colonist(TestContext ctx)
         {
             return HospitalRegressionTests.MakePawn(ctx, Faction.OfPlayer, true);
         }
 
-        private static HospitalMapComponent HospitalOf(TestContext ctx)
+        internal static HospitalMapComponent HospitalOf(TestContext ctx)
         {
             var h = ctx.Map.GetComponent<HospitalMapComponent>();
             Assert.NotNull(h, "map has no HospitalMapComponent");
@@ -53,7 +53,7 @@ namespace HospitalTests
         }
 
         // Registers a spawned pawn as an active patient (guest of the player), unregistered again on cleanup.
-        private static PatientData Register(TestContext ctx, Pawn p, float bill = 0f)
+        internal static PatientData Register(TestContext ctx, Pawn p, float bill = 0f)
         {
             var hospital = HospitalOf(ctx);
             Assert.True(p.Spawned, "patient must be spawned (IsPatient needs pawn.Map)");
@@ -66,7 +66,7 @@ namespace HospitalTests
         }
 
         // Faction goodwill can change as a side effect of a control run; put it back afterwards.
-        private static void ProtectGoodwill(TestContext ctx)
+        internal static void ProtectGoodwill(TestContext ctx)
         {
             var saved = new List<(FactionRelation rel, int goodwill, FactionRelationKind kind)>();
             foreach (var f in Find.FactionManager.AllFactionsListForReading)
@@ -126,7 +126,7 @@ namespace HospitalTests
 
         // forceDowned alone does not down a pawn (it only matters inside the private MakeDowned / state update),
         // so call the vanilla MakeDowned itself, like vanilla does for lethal damage.
-        private static void Down(Pawn pawn)
+        internal static void Down(Pawn pawn)
         {
             var make = typeof(Pawn_HealthTracker).GetMethod("MakeDowned", BindingFlags.NonPublic | BindingFlags.Instance);
             Assert.NotNull(make, "Pawn_HealthTracker.MakeDowned not found");
