@@ -34,6 +34,8 @@ public class PatientData : IExposable
     public RecipeDef CureRecipe;
     public bool Dismissed;
     public bool HasPendingSurgeryBill;
+    // Not saved: tick of the last failed surgery. Vanilla still completes the bill after a failure, which must not be billed.
+    public int SurgeryFailedTick = -1;
     // Cured-externally tracking (see HospitalMapComponent.CheckExternallyCuredPatients). Defaults = not tracked.
     public bool PartMissingAtArrival;
     public float TrackedHediffSeverity = -1f;

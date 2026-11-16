@@ -328,12 +328,12 @@ namespace Hospital
                 {
                     int penalty = HospitalMod.Settings.SurgeryFailGoodwillPenalty;
                     Messages.Message("HospitalSurgeryFailed".Translate(pawn.NameFullColored, penalty, pawn.Faction.name),
-                        MessageTypeDefOf.PawnDeath);
+                        MessageTypeDefOf.NegativeEvent);
                     pawn.Faction.TryAffectGoodwillWith(Faction.OfPlayer, -penalty, false);
                 }
                 patientData.Bill = 0f;
-                RemoveFromPatientList(pawn);
-                PatientLeftTheMap(pawn);
+                patientData.SurgeryFailedTick = Find.TickManager.TicksGame;
+                // Temporary: the patient stays registered and recovers; Trigger_SentAway sends them home afterwards.
             }
             // else - was not a patient?
         }        

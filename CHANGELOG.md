@@ -14,6 +14,7 @@ Original code is © its author, licensed under GPLv3; modifications are © mgrTD
 - Fix "deaf" surgeries targeting a kidney, and special surgery rules discarding the chosen body part when the pawn lacks the special part.
 - Fix infection / lung rot patients arriving healthy with a diagnosis and a bill when no suitable body part exists (they now fall back to wounds).
 - Fix interrupted feeding jobs being billed, and a possible error when the food is gone.
+- After a failed surgery the patient now stays to recover instead of being sent away; the surgery can be re-added for another attempt.
 
 ## 2026-11-15
 - Detect conditions cured externally (MedPod compatibility).

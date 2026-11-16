@@ -262,6 +262,48 @@ namespace HospitalTests
             Assert.False(patient.IsPatient(out _), "arrested patient is still treated as a patient");
         }
 
+        // ---------- B6: failed surgery keeps the patient ----------
+
+        // Given: a registered patient (bill 50, guest of the player) who is downed; failure penalty set to 0.
+        // When:  the vanilla botched-surgery thought method runs (the patched failure path).
+        // Then:  the patient is still registered, not Dismissed, still a Guest, Bill is 0, and Trigger_SentAway.SentAway is false while downed;
+        //        once healed and back on their feet it is true (the patient is then sent home without paying for the failed attempt).
+        [HospitalTest("B6: after a failed surgery the patient stays registered and is not sent away while downed")]
+        public static void FailedSurgeryKeepsPatient(TestContext ctx)
+        {
+            VanillaCompatTests.ProtectGoodwill(ctx);
+            var hospital = VanillaCompatTests.HospitalOf(ctx);
+            int oldPenalty = HospitalMod.Settings.SurgeryFailGoodwillPenalty;
+            HospitalMod.Settings.SurgeryFailGoodwillPenalty = 0;
+            ctx.OnCleanup(() => HospitalMod.Settings.SurgeryFailGoodwillPenalty = oldPenalty);
+
+            var patient = VanillaCompatTests.Visitor(ctx, false);
+            var data = VanillaCompatTests.Register(ctx, patient, 50f);
+            VanillaCompatTests.Down(patient);
+
+            var fail = typeof(SurgeryOutcome_Failure).GetMethod("TryGainBotchedSurgeryThought", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(fail, "SurgeryOutcome_Failure.TryGainBotchedSurgeryThought not found");
+            fail.Invoke(new SurgeryOutcome_Failure(), new object[] { patient, VanillaCompatTests.Colonist(ctx) });
+
+            Assert.True(hospital.Patients.ContainsKey(patient), "patient was dropped from the roster after a failed surgery");
+            Assert.False(data.Dismissed, "patient was dismissed after a failed surgery");
+            Assert.True(patient.guest.GuestStatus == GuestStatus.Guest, "patient is no longer a guest");
+            Assert.Equal(0f, data.Bill, "failed surgery must zero the bill");
+
+            var sentAway = typeof(Trigger_SentAway).GetMethod("SentAway", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.NotNull(sentAway, "Trigger_SentAway.SentAway not found");
+            Assert.False((bool)sentAway.Invoke(null, new object[] { patient }), "downed patient would be sent away");
+
+            // Recovery: lift the forced downed state and re-evaluate (adding/removing a hediff triggers the vanilla state check).
+            if (PatientUtility.DangersOnMap(ctx.Map, out _)) return; // SentAway is always false with dangers on the map; recovery part not testable
+            patient.health.forceDowned = false;
+            var cut = HediffMaker.MakeHediff(HediffDefOf.Cut, patient, patient.RaceProps.body.GetPartsWithDef(BodyPartDefOf.Arm).First());
+            patient.health.AddHediff(cut);
+            patient.health.RemoveHediff(cut);
+            Assert.False(patient.Downed, "precondition: patient is still downed after recovery");
+            Assert.True((bool)sentAway.Invoke(null, new object[] { patient }), "recovered patient is not sent away");
+        }
+
         // ---------- B3: patients in flight vs RemoveLostPatients ----------
 
         // Given: a patient who just arrived and is still inside the drop pod (Skyfaller -> ActiveTransporter -> innerContainer -> pawn).

@@ -50,9 +50,12 @@ public class Billing_Surgery_Patch
         [HarmonyPostfix]
         public static void Postfix(Bill __instance, Pawn __state)
         {
-            // BillForSurgery no-ops for non-patients, so a failed surgery (whose patient was
-            // already removed from the roster) is naturally not billed.
-            if (__state != null) BillingHelper.BillForSurgery(__state, __instance);
+            if (__state == null) return;
+            // Vanilla completes the bill even after a failed surgery; the failed attempt is not billed
+            // (the failure and the completion happen in the same tick).
+            if (__state.IsPatient(out var hospital) && hospital.GetPatientData(__state, out var data)
+                && data.SurgeryFailedTick == Find.TickManager.TicksGame) return;
+            BillingHelper.BillForSurgery(__state, __instance);
         }
     }
 

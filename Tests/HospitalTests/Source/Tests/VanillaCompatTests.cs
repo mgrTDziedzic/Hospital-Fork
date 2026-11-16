@@ -558,8 +558,8 @@ namespace HospitalTests
 
         // Given: a non-patient visitor and a registered patient with bill 50 (failure penalty set to 0).
         // When:  the vanilla botched-surgery thought method runs.
-        // Then:  the visitor gets the BotchedMySurgery memory (vanilla) and nothing else changes; the patient's bill is zeroed and it leaves the roster.
-        [HospitalTest("Vanilla: a botched surgery on a non-patient only gives the vanilla thought; on a patient it zeroes the bill and removes it")]
+        // Then:  the visitor gets the BotchedMySurgery memory (vanilla) and nothing else changes; the patient's bill is zeroed and it stays registered (not dismissed).
+        [HospitalTest("Vanilla: a botched surgery on a non-patient only gives the vanilla thought; on a patient it zeroes the bill and keeps the patient")]
         public static void BotchedSurgery(TestContext ctx)
         {
             ProtectGoodwill(ctx);
@@ -581,7 +581,8 @@ namespace HospitalTests
             ctx.OnCleanup(() => HospitalMod.Settings.SurgeryFailGoodwillPenalty = oldPenalty);
             method.Invoke(outcome, new object[] { patient, surgeon });
             Assert.Equal(0f, data.Bill, "control: failed surgery must zero the bill");
-            Assert.False(HospitalOf(ctx).Patients.ContainsKey(patient), "control: patient still on the roster after failed surgery");
+            Assert.True(HospitalOf(ctx).Patients.ContainsKey(patient), "control: patient must stay registered after failed surgery");
+            Assert.False(data.Dismissed, "control: patient must not be dismissed after failed surgery");
         }
 
         // Given: a hostile raider with timesGuestTendedToByPlayer = 3, a neutral non-patient with 0, and a registered neutral patient with 3.
