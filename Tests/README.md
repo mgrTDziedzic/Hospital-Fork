@@ -19,6 +19,14 @@ Tests spawn and remove their own throwaway pawns/beds. Note: tests also run fine
 ## Run manually
 Dev mode -> debug actions menu -> "Hospital Tests" -> "Run all" (or "Run: <test>"). A results window opens.
 
+## Manual debug actions
+Dev mode -> debug actions menu -> "Hospital Debug":
+- "Patient arrives (forced)" - one patient arrives now (random type).
+- "Mass casualty event (forced)" - a mass casualty event now (random type, size based on hospital beds).
+
+Both ignore opening hours and danger settings (and the per-map mass casualty switch) for that one incident and restore them afterwards.
+They still need a free hospital bed and a friendly humanlike faction; otherwise a message says why nothing happened.
+
 ## Run automatically
 `powershell -File Tests\run-tests.ps1 [-SaveName HospitalTest] [-TimeoutMinutes 10] [-SaveDataFolder <path>] [-GameDir <path>] [-Dotnet <path>]`
 - builds both projects, starts the game with `-hospitaltest=<SaveName>`, which loads the save, runs all tests, writes the results file and quits.
