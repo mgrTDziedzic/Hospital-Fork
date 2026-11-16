@@ -11,6 +11,7 @@
 		<li>
 			<packageId>Adamas.Hospital</packageId>
 			<displayName>Hospital</displayName>
+			<downloadUrl>https://github.com/mgrTDziedzic/Hospital-Fork</downloadUrl>
 		</li>
 	</modDependencies>
 	<loadAfter>
