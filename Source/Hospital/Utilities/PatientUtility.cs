@@ -9,13 +9,15 @@ namespace Hospital.Utilities
 {
     public static class PatientUtility
     {
-        public static bool IsPatient(this Pawn pawn,out HospitalMapComponent hospital, bool includeDismissed = false)
+        // activeOnly = false (default): true for every registered patient on the pawn's map, also discharged (Dismissed) ones.
+        // activeOnly = true: true only for registered patients that are not Dismissed. Needs pawn.Map != null.
+        public static bool IsPatient(this Pawn pawn,out HospitalMapComponent hospital, bool activeOnly = false)
         {
             hospital = null;
             if (pawn?.Map == null) return false;
             hospital = pawn.Map.GetComponent<HospitalMapComponent>(); // TODO cache this?
             if (hospital == null) return false;
-            return hospital.GetPatientData(pawn, out var patientData) && (!patientData.Dismissed || !includeDismissed);
+            return hospital.GetPatientData(pawn, out var patientData) && (!activeOnly || !patientData.Dismissed);
         }
         public static void AddToBill(this Pawn pawn, HospitalMapComponent hospital, float silver)
         {

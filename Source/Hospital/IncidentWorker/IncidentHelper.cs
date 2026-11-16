@@ -78,7 +78,7 @@ public static class IncidentHelper
         if (faction.leader == pawn && faction.PlayerGoodwill < 80) return false;
         if (pawn.kindDef == PawnKindDefOf.Empire_Royal_Bestower) return false;
         if (QuestUtility.IsReservedByQuestOrQuestBeingGenerated(pawn)) return false;
-        if (pawn.IsPatient(out _, true)) return false;
+        if (pawn.IsPatient(out _, activeOnly: true)) return false;
         return true;
     }        
 

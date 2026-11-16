@@ -543,5 +543,59 @@ namespace HospitalTests
             if (patient != null) Assert.True(Hospital.Patches.JobGiver_Work_Patch.PawnCanUseWorkGiver.IsPatientWork(patient), "Patient work type");
             Assert.False(Hospital.Patches.JobGiver_Work_Patch.PawnCanUseWorkGiver.IsPatientWork(WorkTypeDefOf.Cleaning), "Cleaning is not patient work");
         }
+
+        // ---------- A10: IsPatient(activeOnly) semantics ----------
+
+        // Given: an active registered patient, a dismissed one, a non-registered visitor and an unspawned pawn.
+        // When:  IsPatient is called with the default and with activeOnly: true.
+        // Then:  default = any registered patient on the map (also dismissed); activeOnly = registered and not dismissed;
+        //        non-registered and unspawned (Map == null) are never patients.
+        [HospitalTest("A10: IsPatient default matches any registered patient (also dismissed); activeOnly: true excludes dismissed; non-registered/unspawned never match")]
+        public static void IsPatientActiveOnlySemantics(TestContext ctx)
+        {
+            VanillaCompatTests.ProtectGoodwill(ctx);
+            var active = VanillaCompatTests.Visitor(ctx, false);
+            var dismissed = VanillaCompatTests.Visitor(ctx, false);
+            var stranger = VanillaCompatTests.Visitor(ctx, false);
+            VanillaCompatTests.Register(ctx, active);
+            VanillaCompatTests.Register(ctx, dismissed).Dismissed = true;
+
+            Assert.True(active.IsPatient(out _), "active, default");
+            Assert.True(active.IsPatient(out _, activeOnly: true), "active, activeOnly");
+            Assert.True(dismissed.IsPatient(out _), "dismissed, default must still match");
+            Assert.False(dismissed.IsPatient(out _, activeOnly: true), "dismissed, activeOnly must not match");
+            Assert.False(stranger.IsPatient(out _), "non-registered, default");
+            Assert.False(stranger.IsPatient(out _, activeOnly: true), "non-registered, activeOnly");
+
+            var hospital = VanillaCompatTests.HospitalOf(ctx);
+            Assert.True(active.IsPatient(out var h), "precondition");
+            Assert.True(h == hospital, "out hospital is not the map component");
+
+            // Unspawned pawn (e.g. a world pawn candidate in IncidentHelper.ValidPatient): Map == null, so never a patient, hospital stays null.
+            var world = HospitalRegressionTests.MakePawn(ctx, VanillaCompatTests.Visitor(ctx, false).Faction, false);
+            Assert.False(world.IsPatient(out var none), "unspawned, default");
+            Assert.True(none == null, "unspawned: hospital must be null");
+            Assert.False(world.IsPatient(out _, activeOnly: true), "unspawned, activeOnly");
+        }
+
+        // Given: a downed registered patient, then the same patient marked Dismissed.
+        // When:  Trigger_SentAway.SentAway runs (call site using activeOnly: true).
+        // Then:  active downed patient: not sent away; dismissed one: sent away (no longer an active patient).
+        //        Skipped when there are dangers on the map (SentAway is always false then).
+        [HospitalTest("A10: SentAway keeps an active downed patient and sends away a dismissed one")]
+        public static void SentAwayUsesActiveOnly(TestContext ctx)
+        {
+            VanillaCompatTests.ProtectGoodwill(ctx);
+            var patient = VanillaCompatTests.Visitor(ctx, false);
+            var data = VanillaCompatTests.Register(ctx, patient);
+            VanillaCompatTests.Down(patient);
+            var sentAway = typeof(Trigger_SentAway).GetMethod("SentAway", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.NotNull(sentAway, "Trigger_SentAway.SentAway not found");
+            if (PatientUtility.DangersOnMap(ctx.Map, out _)) return;
+
+            Assert.False((bool)sentAway.Invoke(null, new object[] { patient }), "active downed patient would be sent away");
+            data.Dismissed = true;
+            Assert.True((bool)sentAway.Invoke(null, new object[] { patient }), "dismissed patient is not sent away");
+        }
     }
 }

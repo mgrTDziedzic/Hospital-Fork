@@ -18,6 +18,8 @@ Original code is © its author, licensed under GPLv3; modifications are © mgrTD
 - Fix a possible game freeze when generating a patient: attempts are capped (20); rejected pawns (androids, non-bleeding) are discarded instead of piling up in the world pawn pool; a faction without pawn kinds is skipped.
 - Mass casualty events now respect the faction blacklist and skip androids / non-bleeding pawns; with the plague blacklisted the pandemic type is not chosen. An event with no beds (0 pawns) no longer fires and no longer sends an empty letter; the letter shows the real patient count.
 - Fix payment silver: amounts are rounded, a stack of 0 is never created, and large payments are split by the silver stack limit.
+- Rename the inverted `includeDismissed` parameter of `PatientUtility.IsPatient` to `activeOnly` (true = only patients not yet discharged); behaviour of every call is unchanged.
+- Added an in-game test suite (`Tests/HospitalTests`, a separate dev-only mod that exists only in the repository and is not part of the Hospital mod) covering the fixed bugs; run it with Dev mode -> Debug actions -> "Hospital Tests" (see `Tests/README.md`).
 - Fix wound patients arriving without wounds when the wound severity multiplier is small (damage budget is at least 1 and rounded, not truncated).
 - Fix an error when a WorkGiverDef without a work type (some mods) is evaluated for a patient.
 - New per-map setting "Mass casualties during danger" (default on = unchanged behaviour: mass casualty events ignore manhunters etc.). Switch it off to make mass casualty events wait for a map without aggressive pawns; weather dangers still follow "Allow patients during danger". Translated for French, German and Spanish variants.
