@@ -63,6 +63,14 @@ namespace Hospital
             {
                 Log.Message(def.def.defName);
             } */
+            // Resolve the landing cell(s) before generating any pawn, so a failure leaves no half-created patients.
+            var landingCells = new List<IntVec3>();
+            for (int i = 0; i < parms.pawnCount; i++)
+            {
+                if (!IncidentHelper.TryFindPatientLandingCell(map, out var cell)) return false;
+                landingCells.Add(cell);
+            }
+
             List<Pawn> list = new List<Pawn>();
             list.AddRange(IncidentHelper.GetKnownPawns(parms).InRandomOrder().Take((int)Math.Floor(parms.pawnCount * 0.20f)).ToList());
             int pawnsToGenerate = parms.pawnCount - list.Count;
@@ -73,9 +81,10 @@ namespace Hospital
             
             MCEType type = (MCEType)Rand.Range(0, 4);
 
-            foreach (var pawn in list)
+            for (int i = 0; i < list.Count; i++)
             {
-                SpawnPatient(map, pawn, type);
+                var pawn = list[i];
+                SpawnPatient(map, pawn, type, landingCells[Math.Min(i, landingCells.Count - 1)]);
                 LordMaker.MakeNewLord(parms.faction, CreateLordJob(parms, list), map, new List<Pawn> { pawn });
             }
 
@@ -90,7 +99,7 @@ namespace Hospital
             return true;
         }
 
-        protected virtual PatientData SpawnPatient(Map map, Pawn pawn, MCEType type)
+        protected virtual PatientData SpawnPatient(Map map, Pawn pawn, MCEType type, IntVec3 loc)
         {
             IncidentHelper.SetUpNewPatient(pawn);
             
@@ -102,15 +111,6 @@ namespace Hospital
             PatientData data = new PatientData(GenDate.TicksGame, pawn.MarketValue, pawn.needs.mood.curLevelInt, ptype);
             //TryFindEntryCell(map, out var cell);
             //GenSpawn.Spawn(pawn, cell, map);
-            // RandomElementWithFallback (not RandomElement) so an empty result - i.e. the player
-            // has not built a Patient Landing Spot - falls back silently instead of warning.
-            var spot = map.listerBuildings.AllBuildingsColonistOfDef(ThingDef.Named("PatientLandingSpot")).RandomElementWithFallback();
-            var loc = DropCellFinder.TryFindSafeLandingSpotCloseToColony(map, IntVec2.Two);
-            if (spot != null)
-            {
-                loc = spot.Position;
-            }
-
             HospitalMapComponent hospital = map.GetComponent<HospitalMapComponent>();
 
             // Spawn the pawn on the map first so it has a valid Map while we apply damage/disease.

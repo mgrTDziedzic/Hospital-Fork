@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>HospitalTests</RootNamespace>
+        <AssemblyName>HospitalTests</AssemblyName>
+        <TargetFramework>net472</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <PlatformTarget>x64</PlatformTarget>
+        <RimWorldRefVersion>1.6.4633</RimWorldRefVersion>
+        <!-- Lands in Tests/HospitalTests/1.6/Assemblies -->
+        <OutputPath>..\1.6\Assemblies\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <DebugType>portable</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+        <Optimize>false</Optimize>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Krafs.Rimworld.Ref" Version="$(RimWorldRefVersion)" />
+        <PackageReference Include="Lib.Harmony" Version="2.*" ExcludeAssets="runtime" />
+        <!-- Hospital.dll is loaded by the game from the Hospital mod; never copy it here. -->
+        <Reference Include="Hospital">
+            <HintPath>..\..\..\1.6\Assemblies\Hospital.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+</Project>

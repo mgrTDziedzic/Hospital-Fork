@@ -34,6 +34,9 @@ public class PatientData : IExposable
     public RecipeDef CureRecipe;
     public bool Dismissed;
     public bool HasPendingSurgeryBill;
+    // Cured-externally tracking (see HospitalMapComponent.CheckExternallyCuredPatients). Defaults = not tracked.
+    public bool PartMissingAtArrival;
+    public float TrackedHediffSeverity = -1f;
 
     public void ExposeData()
     {
@@ -45,6 +48,8 @@ public class PatientData : IExposable
         Scribe_Values.Look(ref Diagnosis, "Diagnosis");
         Scribe_Values.Look(ref Dismissed, "Dismissed");
         Scribe_Values.Look(ref HasPendingSurgeryBill, "HasPendingSurgeryBill");
+        Scribe_Values.Look(ref PartMissingAtArrival, "PartMissingAtArrival");
+        Scribe_Values.Look(ref TrackedHediffSeverity, "TrackedHediffSeverity", -1f);
         Scribe_Defs.Look(ref CureRecipe, "CureRecipe");
     }
 }

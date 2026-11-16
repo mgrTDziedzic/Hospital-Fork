@@ -63,10 +63,13 @@ public class Billing_Surgery_Patch
     {
         public static void BillForSurgery(Pawn pawn, Bill bill)
         {
-            if (!pawn.IsPatient(out var hospital) || !hospital.GetPatientData(pawn, out var patientData)) return;
-            if (bill?.recipe == null) return;
+            BillForSurgery(pawn, bill?.recipe);
+        }
 
-            RecipeDef recipe = bill.recipe;
+        public static void BillForSurgery(Pawn pawn, RecipeDef recipe)
+        {
+            if (!pawn.IsPatient(out var hospital) || !hospital.GetPatientData(pawn, out var patientData)) return;
+            if (recipe == null) return;
 
             float timeCost = 0;
             if (recipe.skillRequirements != null)

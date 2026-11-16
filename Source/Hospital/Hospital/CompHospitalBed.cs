@@ -23,8 +23,8 @@ namespace Hospital;
             set
             {
                 if (value == hospitalInt) return;
-                RemoveAllOwners();
                 hospitalInt = value;
+                RemoveAllOwners();
                 parent.Notify_ColorChanged();
             }
         }        
@@ -37,7 +37,9 @@ namespace Hospital;
                 if (value == surgeryInt) return;
                 if (value)
                 {
+                    bool wasHospital = hospitalInt;
                     hospitalInt = true; // surgery means hospital as well
+                    if (!wasHospital) RemoveAllOwners();
                 }
                 surgeryInt = value;
                 parent.Notify_ColorChanged();
@@ -46,9 +48,11 @@ namespace Hospital;
         
         private void RemoveAllOwners(bool destroyed = false)
         {
-            for (int num = ((Building_Bed)parent).OwnersForReading.Count - 1; num >= 0; num--)
+            // iterate over a copy: UnclaimBed modifies the live owners list
+            List<Pawn> owners = new List<Pawn>(((Building_Bed)parent).OwnersForReading);
+            for (int num = owners.Count - 1; num >= 0; num--)
             {
-                Pawn pawn = ((Building_Bed)parent).OwnersForReading[num];
+                Pawn pawn = owners[num];
                 if ((!hospitalInt && pawn.IsPatient(out _)) || (hospitalInt && !pawn.IsPatient(out _)))
                 {
                     // pawns in the wrong bed should look for another one...

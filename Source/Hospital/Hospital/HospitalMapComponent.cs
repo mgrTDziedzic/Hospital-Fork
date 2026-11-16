@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hospital.Patches;
 using Hospital.Utilities;
 using RimWorld;
 using UnityEngine;
@@ -76,6 +77,147 @@ namespace Hospital
         {
             base.MapComponentTick();
             if (Find.TickManager.TicksGame % 2000 == 0) RemoveLostPatients();
+            if (Find.TickManager.TicksGame % 250 == 0) CheckExternallyCuredPatients();
+        }
+
+        // A tracked severity above this counts as "still sick" when the hediff disappears.
+        // Natural healing lowers severity gradually (a few hundredths per 250-tick check), so a
+        // hediff last seen at or below this value faded naturally; one last seen above it
+        // vanished abruptly (instant cure by another mod, healer serum, dev tools...).
+        private const float AbruptVanishSeverityThreshold = 0.1f;
+
+        // Purely state-based (no knowledge of any cure source). Scans hediffSet.hediffs directly
+        // because mods may remove hediffs from the list without refreshing caches.
+        private void CheckExternallyCuredPatients()
+        {
+            foreach (var pair in Patients.ToList())
+            {
+                Pawn pawn = pair.Key;
+                PatientData data = pair.Value;
+                if (pawn == null || data == null || data.Dismissed || !pawn.Spawned || pawn.health?.hediffSet == null) continue;
+                if (!data.HasPendingSurgeryBill || data.CureRecipe == null) continue;
+                try
+                {
+                    CheckExternallyCured(pawn, data);
+                }
+                catch (Exception e)
+                {
+                    Log.Warning($"Hospital: cured-externally check failed for {pawn}: {e.Message}");
+                }
+            }
+        }
+
+        private void CheckExternallyCured(Pawn pawn, PatientData data)
+        {
+            RecipeDef recipe = data.CureRecipe;
+            List<Hediff> hediffs = pawn.health.hediffSet.hediffs;
+            Bill_Medical bill = pawn.health.surgeryBills.Bills.OfType<Bill_Medical>().FirstOrDefault(b => b.recipe == recipe);
+
+            if (bill == null)
+            {
+                // The bill was removed without going through BillStack.Delete (e.g. the game drops
+                // a bill that is no longer valid after the condition was cured), so our Delete
+                // prefix never cleared the flag and the patient would wait forever.
+                ResolveVanishedBill(pawn, data, recipe, hediffs);
+                return;
+            }
+
+            bool cured = false;
+            bool faded = false;
+
+            if (recipe.removesHediff != null)
+            {
+                if (data.TrackedHediffSeverity < 0f) return;
+                BodyPartRecord part = bill?.Part;
+                Hediff found = hediffs.FirstOrDefault(h => h.def == recipe.removesHediff && (part == null || h.Part == part));
+                if (found != null)
+                {
+                    // Chronic hediffs (tumors) report ~0 severity and never fade: keep their floor.
+                    if (found is Hediff_Injury || found.Severity > AbruptVanishSeverityThreshold)
+                        data.TrackedHediffSeverity = Mathf.Max(found.Severity, 0.01f);
+                    return;
+                }
+                if (data.TrackedHediffSeverity > AbruptVanishSeverityThreshold) cured = true;
+                else faded = true;
+            }
+            else if (data.PartMissingAtArrival)
+            {
+                BodyPartRecord part = bill?.Part;
+                if (part == null) return;
+                if (pawn.health.hediffSet.PartOrAnyAncestorHasDirectlyAddedParts(part)) return;
+                bool stillMissing = false;
+                for (BodyPartRecord p = part; p != null && !stillMissing; p = p.parent)
+                {
+                    stillMissing = hediffs.Any(h => h is Hediff_MissingPart && h.Part == p);
+                }
+                if (stillMissing) return;
+                cured = true;
+            }
+            else if (data.TrackedHediffSeverity >= 0f)
+            {
+                BodyPartRecord part = bill?.Part;
+                if (part == null) return;
+                float sum = 0f;
+                bool any = false;
+                foreach (Hediff h in hediffs)
+                {
+                    if (h is Hediff_Injury && h.Part == part) { any = true; sum += h.Severity; }
+                }
+                if (any)
+                {
+                    data.TrackedHediffSeverity = sum;
+                    return;
+                }
+                // Faded naturally: the transplant bill stays valid, as before.
+                if (data.TrackedHediffSeverity > AbruptVanishSeverityThreshold) cured = true;
+                else return;
+            }
+            else return;
+
+            if (cured)
+            {
+                Billing_Surgery_Patch.BillingHelper.BillForSurgery(pawn, bill);
+                Messages.Message("HospitalConditionCuredExternally".Translate(pawn.NameShortColored), pawn, MessageTypeDefOf.PositiveEvent);
+            }
+            else if (faded)
+            {
+                // Surgery is impossible now; no charge. Release the patient instead of leaving them stuck.
+            }
+            // Deleting the bill fires the BillStack.Delete prefix (clears HasPendingSurgeryBill).
+            pawn.health.surgeryBills.Delete(bill);
+            data.TrackedHediffSeverity = -1f;
+            data.PartMissingAtArrival = false;
+        }
+
+        // Without the bill we no longer know the exact part, so judge by the recipe's target
+        // part defs. The surgery can't happen anymore either way, so the flag is always cleared;
+        // the surgery price is charged only when the condition is verifiably cured.
+        private void ResolveVanishedBill(Pawn pawn, PatientData data, RecipeDef recipe, List<Hediff> hediffs)
+        {
+            bool cured = false;
+            if (recipe.removesHediff != null)
+            {
+                cured = data.TrackedHediffSeverity > AbruptVanishSeverityThreshold
+                        && !hediffs.Any(h => h.def == recipe.removesHediff);
+            }
+            else if (data.PartMissingAtArrival)
+            {
+                List<BodyPartDef> targets = recipe.appliedOnFixedBodyParts;
+                bool Targeted(BodyPartRecord p) => p != null && (targets.NullOrEmpty() || targets.Contains(p.def));
+                bool stillMissing = hediffs.Any(h => h is Hediff_MissingPart && Targeted(h.Part));
+                bool prosthetic = hediffs.Any(h => h is Hediff_AddedPart && Targeted(h.Part));
+                cured = !stillMissing && !prosthetic;
+            }
+            // Organ injuries: the exact organ is unknown without the bill - release without charge.
+
+            if (cured)
+            {
+                Billing_Surgery_Patch.BillingHelper.BillForSurgery(pawn, recipe);
+                Messages.Message("HospitalConditionCuredExternally".Translate(pawn.NameShortColored), pawn, MessageTypeDefOf.PositiveEvent);
+            }
+            data.HasPendingSurgeryBill = false;
+            data.TrackedHediffSeverity = -1f;
+            data.PartMissingAtArrival = false;
         }
 
         // Safety net for patients that left without passing one of our hooks (kidnapped, carried

@@ -11,7 +11,6 @@ public class WoundsUtility
 {
     public static void AddRandomWounds(Pawn pawn, PatientData patientData)
     {
-        Rand.seed = (uint)pawn.health.summaryHealth.SummaryHealthPercent;
         float rnd = Rand.Value;
         int damage = (int)(Mathf.Lerp(5.0f, 50.0f, rnd) * HospitalMod.Settings.WoundSeverityMultiplier);
         DamageParts(pawn, damage, null);
@@ -25,26 +24,32 @@ public class WoundsUtility
         int it = 0;
         bool avoidDowning = HospitalMod.Settings.PreventIncapacitatedArrivals;
         p.health.forceDowned = true;
-        while (totalDamage > 0 && it < 300)
+        try
         {
-            it++;
-            IEnumerable<BodyPartRecord> source = from x in p.health.hediffSet.GetNotMissingParts()
-                where p.health.hediffSet.GetPartHealth(x) >= 2f && x.def.canScarify
-                select x;
-            if (!source.Any())
+            while (totalDamage > 0 && it < 300)
             {
-                break;
+                it++;
+                IEnumerable<BodyPartRecord> source = from x in p.health.hediffSet.GetNotMissingParts()
+                    where p.health.hediffSet.GetPartHealth(x) >= 2f && x.def.canScarify
+                    select x;
+                if (!source.Any())
+                {
+                    break;
+                }
+                BodyPartRecord bodyPartRecord = source.RandomElement();
+                if (DamagePart(p, totalDamage, bodyPartRecord, out var severity, damageDef)) break;
+                totalDamage -= severity;
+                // Stop wounding once the patient is on the verge of collapsing, so they arrive
+                // hurt-but-mobile instead of already incapacitated (a downed patient can't be
+                // dismissed either, so this also lets cured mass-casualty patients leave).
+                // We keep at least one wound so the pawn still needs treatment.
+                if (avoidDowning && NearlyDowned(p)) break;
             }
-            BodyPartRecord bodyPartRecord = source.RandomElement();
-            if (DamagePart(p, totalDamage, bodyPartRecord, out var severity, damageDef)) break;
-            totalDamage -= severity;
-            // Stop wounding once the patient is on the verge of collapsing, so they arrive
-            // hurt-but-mobile instead of already incapacitated (a downed patient can't be
-            // dismissed either, so this also lets cured mass-casualty patients leave).
-            // We keep at least one wound so the pawn still needs treatment.
-            if (avoidDowning && NearlyDowned(p)) break;
         }
-        p.health.forceDowned = false;
+        finally
+        {
+            p.health.forceDowned = false;
+        }
     }
 
     // Approximates the vanilla downing triggers (unconsciousness, immobility, pain shock)
@@ -62,6 +67,11 @@ public class WoundsUtility
     {
         float maxHealth = bodyPartRecord.def.GetMaxHealth(p);
         float partHealth = p.health.hediffSet.GetPartHealth(bodyPartRecord);
+        if (partHealth < 2f)
+        {
+            severity = 0;
+            return true; // part too weak to damage safely; callers treat true as "stop wounding"
+        }
         int min = Mathf.Clamp(Mathf.RoundToInt(maxHealth * 0.12f), 1, (int)partHealth - 1);
         int max = Mathf.Clamp(Mathf.RoundToInt(maxHealth * 0.27f), 1, (int)partHealth - 1);
         severity = Math.Min(Rand.RangeInclusive(min, max), totalDamage);
@@ -80,7 +90,6 @@ public class WoundsUtility
 
     public static void AddGunshotWounds(Pawn pawn, PatientData patientData)
     {
-        Rand.seed = (uint)pawn.health.summaryHealth.SummaryHealthPercent;
         float rnd = Rand.Value;
         int damage = (int)(Mathf.Lerp(5.0f, 50.0f, rnd) * HospitalMod.Settings.WoundSeverityMultiplier);
         DamageParts(pawn, damage, DamageDefOf.Bullet);
@@ -91,7 +100,6 @@ public class WoundsUtility
 
     public static void AddBruisesWounds(Pawn pawn, PatientData patientData)
     {
-        Rand.seed = (uint)pawn.health.summaryHealth.SummaryHealthPercent;
         float rnd = Rand.Value;
         int damage = (int)(Mathf.Lerp(5.0f, 50.0f, rnd) * HospitalMod.Settings.WoundSeverityMultiplier);
         DamageParts(pawn, damage, (new List<DamageDef>() {DamageDefOf.Crush, DamageDefOf.Scratch, DamageDefOf.Cut}).RandomElement());
@@ -102,7 +110,6 @@ public class WoundsUtility
 
     public static void AddBurnWounds(Pawn pawn, PatientData patientData)
     {
-        Rand.seed = (uint)pawn.health.summaryHealth.SummaryHealthPercent;
         float rnd = Rand.Value;
         int damage = (int)(Mathf.Lerp(5.0f, 50.0f, rnd) * HospitalMod.Settings.WoundSeverityMultiplier);
         DamageParts(pawn, damage, DamageDefOf.Burn);
