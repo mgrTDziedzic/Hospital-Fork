@@ -414,5 +414,109 @@ namespace HospitalTests
             float expected = UnityEngine.Mathf.Clamp(meal.MarketValue * 1.1f, 0, 70);
             Assert.True(Math.Abs(data.Bill - expected) < 0.01f, "completed feeding: expected bill " + expected + " but was " + data.Bill);
         }
+
+        // Given: a faction list and a predicate that rejects every generated pawn (a faction that only yields androids).
+        // When:  TryGenerateAcceptedPawn runs with a cap of 5 attempts.
+        // Then:  it returns false after exactly 5 generations (old code looped forever) and every rejected pawn is discarded.
+        [HospitalTest("A18: patient generation gives up after a bounded number of attempts and discards the rejected pawns")]
+        public static void PatientGenerationIsBounded(TestContext ctx)
+        {
+            var factions = Find.FactionManager.AllFactions.Where(f => !f.IsPlayer && !f.defeated && f.def.humanlikeFaction && f.RandomPawnKind() != null).ToList();
+            Assert.True(factions.Count > 0, "test save has no humanlike faction");
+            var generated = new List<Pawn>();
+            int calls = 0;
+            Pawn Gen(Faction f)
+            {
+                if (++calls > 50) throw new AssertException("generation did not stop (unbounded loop)");
+                var p = IncidentHelper.GeneratePawn(f);
+                generated.Add(p);
+                return p;
+            }
+            ctx.OnCleanup(() => { foreach (var p in generated) IncidentHelper.DiscardGeneratedPawn(p); });
+
+            bool ok = IncidentHelper.TryGenerateAcceptedPawn(factions, p => false, 5, out var pawn, out var faction, Gen);
+            Assert.False(ok, "should give up when every pawn is rejected");
+            Assert.True(pawn == null && faction == null, "no pawn expected");
+            Assert.Equal(5, calls, "attempt count");
+            foreach (var p in generated)
+                Assert.True(p.Discarded || !Find.WorldPawns.Contains(p), "rejected pawn leaked in the world pawn pool: " + p.LabelShort);
+        }
+
+        // Given: a generator that returns no pawn (faction without pawn kinds), then the real generator.
+        // Then:  the first gives up (bounded), the second returns an accepted pawn with its faction.
+        [HospitalTest("A18/B10: null pawn from the generator is skipped; an accepted pawn is returned with its faction")]
+        public static void PatientGenerationNullAndAccepted(TestContext ctx)
+        {
+            var factions = Find.FactionManager.AllFactions.Where(f => !f.IsPlayer && !f.defeated && f.def.humanlikeFaction && f.RandomPawnKind() != null).ToList();
+            Assert.True(factions.Count > 0, "test save has no humanlike faction");
+            int calls = 0;
+            bool ok = IncidentHelper.TryGenerateAcceptedPawn(factions, p => true, 4, out _, out _, f => { calls++; return null; });
+            Assert.False(ok, "null pawns must not count as success");
+            Assert.Equal(4, calls, "attempt count");
+
+            ok = IncidentHelper.TryGenerateAcceptedPawn(factions, IncidentHelper.IsSuitablePatient, 20, out var pawn, out var faction);
+            Assert.True(ok, "a normal humanlike pawn should be accepted within 20 attempts");
+            ctx.OnCleanup(() => IncidentHelper.DiscardGeneratedPawn(pawn));
+            Assert.True(pawn.Faction == faction, "returned faction must match the pawn");
+            Assert.False(IncidentHelper.TryGenerateAcceptedPawn(new List<Faction>(), p => true, 4, out _, out _), "empty faction list");
+        }
+
+        // Then: with 0 beds the MCE count is <= 0 (the worker refuses it), with beds it stays in [bed - bed/5, bed].
+        [HospitalTest("A19: MCE pawn count is <= 0 without beds and the worker returns false for it")]
+        public static void McePawnCountWithoutBeds(TestContext ctx)
+        {
+            Assert.True(IncidentWorker_MassCasualtyEvent.RollPawnCount(0) <= 0, "0 beds must not give a positive count");
+            for (int i = 0; i < 50; i++)
+            {
+                int n = IncidentWorker_MassCasualtyEvent.RollPawnCount(10);
+                Assert.True(n >= 8 && n <= 10, "10 beds -> count " + n);
+            }
+            var map = ctx.Map;
+            var hospital = map.GetComponent<HospitalMapComponent>();
+            var def = DefDatabase<IncidentDef>.GetNamedSilentFail("MassCasualtyEvent");
+            if (def == null) return; // incident def has another name; the helper checks above still apply
+            var worker = def.Worker as IncidentWorker_MassCasualtyEvent;
+            Assert.NotNull(worker, "MCE worker type");
+            bool mc = hospital.MassCasualties;
+            int patientsBefore = hospital.Patients.Count;
+            int lettersBefore = Find.LetterStack.LettersListForReading.Count;
+            ctx.OnCleanup(() => hospital.MassCasualties = mc);
+            hospital.MassCasualties = true;
+            bool fired = worker.TryExecuteWorker(new IncidentParms { target = map, forced = true, pawnCount = -1 });
+            Assert.False(fired, "MCE with a non-positive pawn count must not fire");
+            Assert.Equal(patientsBefore, hospital.Patients.Count, "patients created by an empty MCE");
+            Assert.Equal(lettersBefore, Find.LetterStack.LettersListForReading.Count, "letter sent by an empty MCE");
+        }
+
+        [HospitalTest("A6: silver payment is rounded, never a 0 stack, and split by the stack limit")]
+        public static void SilverStacksAreValid(TestContext ctx)
+        {
+            Assert.Equal(0, HospitalMapComponent.SilverStacks(0f, 100).Count, "0 silver");
+            Assert.Equal(0, HospitalMapComponent.SilverStacks(0.4f, 100).Count, "0.4 silver must not produce a 0 stack");
+            var one = HospitalMapComponent.SilverStacks(1.2f, 100);
+            Assert.True(one.Count == 1 && one[0] == 1, "1.2 silver -> one stack of 1");
+            var big = HospitalMapComponent.SilverStacks(250f, 100);
+            Assert.True(big.Count == 3 && big[0] == 100 && big[1] == 100 && big[2] == 50, "250 with limit 100 -> 100,100,50");
+            Assert.Equal(4000, HospitalMapComponent.SilverStacks(4000f, ThingDefOf.Silver.stackLimit).Sum(), "total preserved");
+            Assert.Equal(5, HospitalMapComponent.SilverStacks(5f, 0).Sum(), "stack limit 0 must not hang or lose silver");
+        }
+
+        [HospitalTest("A16: wound damage budget is at least 1 even with a tiny severity multiplier")]
+        public static void WoundDamageNeverZero(TestContext ctx)
+        {
+            Assert.True(WoundsUtility.RollDamage(0f, 0.01f) >= 1, "5 * 0.01 truncated to 0");
+            Assert.True(WoundsUtility.RollDamage(0f, 0.1f) >= 1, "5 * 0.1 truncated to 0");
+            Assert.Equal(50, WoundsUtility.RollDamage(1f, 1f), "full roll, multiplier 1");
+            Assert.Equal(100, WoundsUtility.RollDamage(1f, 2f), "full roll, multiplier 2");
+        }
+
+        [HospitalTest("B9: IsPatientWork handles a null workType and still accepts Patient / PatientBedRest")]
+        public static void PatientWorkNullWorkType(TestContext ctx)
+        {
+            Assert.False(Hospital.Patches.JobGiver_Work_Patch.PawnCanUseWorkGiver.IsPatientWork(null), "null workType");
+            var patient = DefDatabase<WorkTypeDef>.GetNamedSilentFail("Patient");
+            if (patient != null) Assert.True(Hospital.Patches.JobGiver_Work_Patch.PawnCanUseWorkGiver.IsPatientWork(patient), "Patient work type");
+            Assert.False(Hospital.Patches.JobGiver_Work_Patch.PawnCanUseWorkGiver.IsPatientWork(WorkTypeDefOf.Cleaning), "Cleaning is not patient work");
+        }
     }
 }

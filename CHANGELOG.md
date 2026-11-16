@@ -15,6 +15,11 @@ Original code is © its author, licensed under GPLv3; modifications are © mgrTD
 - Fix infection / lung rot patients arriving healthy with a diagnosis and a bill when no suitable body part exists (they now fall back to wounds).
 - Fix interrupted feeding jobs being billed, and a possible error when the food is gone.
 - After a failed surgery the patient now stays to recover instead of being sent away; the surgery can be re-added for another attempt.
+- Fix a possible game freeze when generating a patient: attempts are capped (20); rejected pawns (androids, non-bleeding) are discarded instead of piling up in the world pawn pool; a faction without pawn kinds is skipped.
+- Mass casualty events now respect the faction blacklist and skip androids / non-bleeding pawns; with the plague blacklisted the pandemic type is not chosen. An event with no beds (0 pawns) no longer fires and no longer sends an empty letter; the letter shows the real patient count.
+- Fix payment silver: amounts are rounded, a stack of 0 is never created, and large payments are split by the silver stack limit.
+- Fix wound patients arriving without wounds when the wound severity multiplier is small (damage budget is at least 1 and rounded, not truncated).
+- Fix an error when a WorkGiverDef without a work type (some mods) is evaluated for a patient.
 - Clarified the log message shown when no disease is eligible for a patient.
 - 1.7: added the missing English translation key for the externally-cured condition message.
 
