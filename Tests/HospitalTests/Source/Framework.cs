@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using RimWorld;
 using Verse;
+using Verse.AI.Group;
 
 namespace HospitalTests
 {
@@ -33,6 +36,26 @@ namespace HospitalTests
     public class TestContext
     {
         private readonly List<Action> cleanups = new List<Action>();
+        private readonly Map guardMap;
+        private readonly HashSet<Lord> lordsBefore = new HashSet<Lord>();
+        private readonly HashSet<Letter> lettersBefore = new HashSet<Letter>();
+
+        // Snapshot of lords and letters; RunCleanup removes what the test (or another mod reacting to it) left behind.
+        public TestContext()
+        {
+            guardMap = Find.CurrentMap;
+            if (guardMap?.lordManager != null) foreach (var l in guardMap.lordManager.lords) lordsBefore.Add(l);
+            if (Find.LetterStack != null) foreach (var l in Find.LetterStack.LettersListForReading) lettersBefore.Add(l);
+        }
+
+        /// <summary>Discards a pawn the right way: world pawns must go through WorldPawns (Pawn.Discard warns on them).</summary>
+        public static void DiscardPawn(Pawn p)
+        {
+            if (p == null || p.Discarded) return;
+            var wp = Find.WorldPawns;
+            if (wp != null && wp.Contains(p)) wp.RemoveAndDiscardPawnViaGC(p);
+            else p.Discard(true);
+        }
 
         public Map Map => Find.CurrentMap;
 
@@ -42,7 +65,7 @@ namespace HospitalTests
             {
                 if (thing == null) return;
                 if (!thing.Destroyed) thing.Destroy(DestroyMode.Vanish);
-                if (thing is Pawn p && !p.Discarded) p.Discard(true);
+                if (thing is Pawn p) DiscardPawn(p);
             });
             return thing;
         }
@@ -57,6 +80,30 @@ namespace HospitalTests
                 catch (Exception e) { Log.Warning("[HospitalTests] cleanup failed: " + e); }
             }
             cleanups.Clear();
+            GuardLeaks();
+        }
+
+        // After cleanup: warn about lords the test left behind (not an error: another mod may have created them), then remove them
+        // and any new letters so they do not pile up across tests.
+        private void GuardLeaks()
+        {
+            try
+            {
+                if (guardMap?.lordManager != null)
+                {
+                    var leaked = guardMap.lordManager.lords.Where(l => !lordsBefore.Contains(l)).ToList();
+                    if (leaked.Count > 0)
+                    {
+                        Log.Warning("[HospitalTests] test leaked " + leaked.Count + " lord(s), removing: "
+                            + string.Join(", ", leaked.Select(l => (l.LordJob?.GetType().Name ?? "?") + " (" + l.ownedPawns.Count + " pawns)")));
+                        foreach (var l in leaked) guardMap.lordManager.RemoveLord(l);
+                    }
+                }
+                if (Find.LetterStack != null)
+                    foreach (var letter in Find.LetterStack.LettersListForReading.Where(l => !lettersBefore.Contains(l)).ToList())
+                        Find.LetterStack.RemoveLetter(letter);
+            }
+            catch (Exception e) { Log.Warning("[HospitalTests] leak guard failed: " + e); }
         }
     }
 }

@@ -121,7 +121,7 @@ namespace HospitalTests
             {
                 if (p.Spawned) p.DeSpawn();
                 if (!p.Destroyed) p.Destroy(DestroyMode.Vanish);
-                if (!p.Discarded) p.Discard(true);
+                TestContext.DiscardPawn(p);
             }
             foreach (var letter in Find.LetterStack.LettersListForReading.Where(l => !lettersBefore.Contains(l)).ToList())
                 Find.LetterStack.RemoveLetter(letter);

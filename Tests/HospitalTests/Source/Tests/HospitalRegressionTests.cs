@@ -10,12 +10,15 @@ namespace HospitalTests
 {
     public static class HospitalRegressionTests
     {
-        internal static Pawn MakePawn(TestContext ctx, Faction faction, bool spawn)
+        internal static Pawn MakePawn(TestContext ctx, Faction faction, bool spawn, bool stripHealth = true)
         {
             var map = ctx.Map;
             var pawn = PawnGenerator.GeneratePawn(new PawnGenerationRequest(PawnKindDefOf.Colonist, faction,
                 PawnGenerationContext.NonPlayer, -1, forceGenerateNewPawn: true));
             ctx.Track(pawn);
+            // Generation may add age-related chronic diseases (carcinoma, bad back, cataract, ...), old injuries and
+            // missing parts. Tests assume a clean pawn (e.g. "no Carcinoma remains"), so they are removed by default.
+            if (stripHealth) pawn.health.RemoveAllHediffs();
             if (spawn)
             {
                 IntVec3 cell = CellFinder.RandomClosewalkCellNear(map.Center, map, 20);

@@ -10,6 +10,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.AI;
+using Verse.AI.Group;
 
 namespace HospitalTests
 {
@@ -53,10 +54,22 @@ namespace HospitalTests
         }
 
         // Registers a spawned pawn as an active patient (guest of the player), unregistered again on cleanup.
-        internal static PatientData Register(TestContext ctx, Pawn p, float bill = 0f)
+        // withLord: real patients always own a LordJob_VisitColonyAsPatient lord (IncidentWorker_PatientArrives). Without it,
+        // other mods (e.g. Hospitality's CheckForStateChange postfix) see a lordless recovered guest and react (letters, lords).
+        // Pass false when the test makes its own lord. Only non-player-faction pawns get a lord.
+        internal static PatientData Register(TestContext ctx, Pawn p, float bill = 0f, bool withLord = true)
         {
             var hospital = HospitalOf(ctx);
             Assert.True(p.Spawned, "patient must be spawned (IsPatient needs pawn.Map)");
+            var map = p.Map;
+            var faction = p.Faction;
+            if (withLord && p.GetLord() == null && faction != null && faction != Faction.OfPlayer)
+            {
+                var lord = LordMaker.MakeNewLord(faction, new LordJob_VisitColonyAsPatient(faction), map, new List<Pawn> { p });
+                // Cleanups run in reverse: added first, so the lord is removed AFTER the unregistration below
+                // (removing it for a registered patient runs PatientLeaves: silver, goodwill).
+                ctx.OnCleanup(() => { if (map.lordManager.lords.Contains(lord)) map.lordManager.RemoveLord(lord); });
+            }
             var data = new PatientData(Find.TickManager.TicksGame, 0f, 0.5f, PatientType.Wounds) { Bill = bill };
             hospital.Patients.Add(p, data);
             ctx.OnCleanup(() => hospital.Patients.Remove(p));
