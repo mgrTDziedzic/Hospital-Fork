@@ -65,7 +65,7 @@ surgery again and give your doctor another try.
 
 | Mod | What you get |
 |---|---|
-| **MedPod** | Patients healed in a MedPod are recognised as cured and pay for the treatment. Other mods' beds with "Pod" in the name now work as normal hospital beds. |
+| **MedPod** | A patient who needs a missing body part back is also counted as cured when the MedPod regrows it (a real regrown part, not a prosthetic), and pays for the treatment. Other mods' beds with "Pod" in the name now work as normal hospital beds. |
 | **Multi-Doctor Surgery** | Patients no longer leave right after arriving. To have a whole team operate on patients, turn on its **"(Beta) Fast Operation"** option and set a default surgery team. Patient surgeries then get that team automatically. Without Fast Operation, or if the team's lead surgeon can't do that operation, a single doctor operates as usual. |
 | **Plasteel Surgery (Continued)** | Cosmetic and body-shape surgeries are blocked for patients by default on new maps (you can change this in the surgery blacklist). Patients are never assigned a surgery they cannot actually receive. |
 
