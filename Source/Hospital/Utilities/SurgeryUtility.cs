@@ -181,6 +181,7 @@ public class SurgeryUtility
 		            && !recipe.isViolation
 		            && CanAssignAsIs(pawn, recipe)
 		            && IsAssignableByName(recipe)
+		            && Compat.SurgeryFilters.IsPlausibleRequest(pawn, recipe)
 					)
 		        {
 			        if (!ignoreRestrictions)
@@ -203,7 +204,8 @@ public class SurgeryUtility
         // so it can run on a freshly generated, unspawned pawn (used to pick a pawn that fits a forced surgery).
         public static bool CanForceOn(Pawn pawn, RecipeDef recipe)
         {
-	        return !recipe.isViolation && CanAssignAsIs(pawn, recipe) && IsAssignableByName(recipe);
+	        return !recipe.isViolation && CanAssignAsIs(pawn, recipe) && IsAssignableByName(recipe)
+		               && Compat.SurgeryFilters.IsPlausibleRequest(pawn, recipe);
         }
 
         public static bool AddRandomSurgeryBill(Pawn pawn, PatientData patientData, HospitalMapComponent hospital)
