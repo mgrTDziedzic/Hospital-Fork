@@ -27,6 +27,12 @@ namespace Hospital
         
         public override bool TryExecuteWorker(IncidentParms parms)
         {
+            return TryExecute(parms, null);
+        }
+
+        // spec == null: normal random arrival. Otherwise the spec fixes type / wounds / disease / surgery (debug).
+        public bool TryExecute(IncidentParms parms, PatientSpec spec)
+        {
             Map map = (Map)parms.target;
             if (!IncidentHelper.CanSpawnPatient(map))
             {
@@ -49,15 +55,41 @@ namespace Hospital
             if (!IncidentHelper.TryFindPatientLandingCell(map, out var loc)) return false;
 
             // Bounded retries: a faction that only yields androids / non-bleeding pawns must not freeze the game.
-            if (!IncidentHelper.TryGenerateAcceptedPawn(potentialPatientFactions, IncidentHelper.IsSuitablePatient,
-                    IncidentHelper.MaxPawnGenerationAttempts, out Pawn pawn, out Faction patientFaction))
+            Pawn pawn;
+            Faction patientFaction;
+            RecipeDef forcedSurgery = spec?.Surgery;
+            bool generated;
+            if (forcedSurgery == null)
             {
-                Log.Message("Hospital: could not generate a suitable patient, skipping this arrival");
+                generated = IncidentHelper.TryGenerateAcceptedPawn(potentialPatientFactions, IncidentHelper.IsSuitablePatient,
+                    IncidentHelper.MaxPawnGenerationAttempts, out pawn, out patientFaction);
+            }
+            else
+            {
+                // Debug: a forced surgery needs a pawn it can be done on (optional mod hints + validity check).
+                generated = IncidentHelper.TryGenerateAcceptedPawn(potentialPatientFactions,
+                    p => IncidentHelper.IsSuitablePatient(p) && SurgeryUtility.CanForceOn(p, forcedSurgery),
+                    IncidentHelper.MaxForcedSurgeryAttempts, out pawn, out patientFaction,
+                    f => IncidentHelper.GeneratePawn(f, forcedSurgery));
+            }
+            if (!generated)
+            {
+                if (forcedSurgery != null)
+                {
+                    string failText = "Hospital Debug: no pawn found that surgery " + forcedSurgery.defName + " can be done on";
+                    Log.Message(failText);
+                    Messages.Message(failText, MessageTypeDefOf.RejectInput, false);
+                    spec.FailureReported = true;
+                }
+                else
+                {
+                    Log.Message("Hospital: could not generate a suitable patient, skipping this arrival");
+                }
                 return false;
             }
             parms.faction = patientFaction;
 
-            PatientData patient = SpawnPatient(map, pawn, loc);
+            PatientData patient = SpawnPatient(map, pawn, loc, spec);
             var list = new List<Pawn> { pawn };
             LordMaker.MakeNewLord(parms.faction, CreateLordJob(parms, list), map, list);
             //pawn.mindState.duty = new PawnDuty(DefDatabase<DutyDef>.GetNamed("Patient"), pawn.Position, 1000);
@@ -81,11 +113,12 @@ namespace Hospital
             return true;
         }
 
-        protected virtual PatientData SpawnPatient(Map map, Pawn pawn, IntVec3 loc)
+        protected virtual PatientData SpawnPatient(Map map, Pawn pawn, IntVec3 loc, PatientSpec spec = null)
         {
             IncidentHelper.SetUpNewPatient(pawn);
             HospitalMapComponent hospital = map.GetComponent<HospitalMapComponent>();
-            PatientType type = (PatientType)Rand.Range(1, hospital.AcceptSurgery?4:3);
+            // A forced type ignores the AcceptSurgery setting. Without a spec the roll is unchanged.
+            PatientType type = spec?.Type ?? (PatientType)Rand.Range(1, hospital.AcceptSurgery?4:3);
             //type = PatientType.Surgery; // debug
             //Log.Message(pawn.Label + " -> " +type.ToString());
             PatientData data = new PatientData(GenDate.TicksGame, pawn.MarketValue, pawn.needs.mood.curLevelInt, type);
@@ -95,7 +128,7 @@ namespace Hospital
             // Damaging an unspawned pawn (pawn.Map == null) collides with hediff comps and other
             // mods' patches that dereference pawn.Map (sound makers, FleckMaker, CompPostPostAdd, ...).
             GenSpawn.Spawn(pawn, loc, map);
-            PatientUtility.DamagePawn(pawn, data, hospital);
+            PatientUtility.DamagePawn(pawn, data, hospital, spec);
 
             // Now scoop the (already damaged) pawn back into a drop pod for the arrival animation.
             if (pawn.Spawned) pawn.DeSpawn();

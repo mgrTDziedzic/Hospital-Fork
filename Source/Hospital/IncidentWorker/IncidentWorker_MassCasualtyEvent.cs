@@ -41,6 +41,12 @@ namespace Hospital
 
         public override bool TryExecuteWorker(IncidentParms parms)
         {
+            return TryExecute(parms, null);
+        }
+
+        // forcedType == null: random type (normal event). A forced Pandemic ignores the plague blacklist (debug).
+        public bool TryExecute(IncidentParms parms, MCEType? forcedType)
+        {
             Map map = (Map)parms.target;
             HospitalMapComponent hospital = map.GetComponent<HospitalMapComponent>();
             if (!hospital.MassCasualties)
@@ -86,11 +92,19 @@ namespace Hospital
             }
             if (list.Count == 0) return false;
 
-            MCEType type = (MCEType)Rand.Range(0, 4);
-            // MCE pandemics use the plague: honour the disease blacklist
-            if (type == MCEType.Pandemic && !hospital.IsDiseaseAllowed(HediffDefOf.Plague))
+            MCEType type;
+            if (forcedType.HasValue)
             {
-                type = (MCEType)Rand.Range(1, 4);
+                type = forcedType.Value;
+            }
+            else
+            {
+                type = (MCEType)Rand.Range(0, 4);
+                // MCE pandemics use the plague: honour the disease blacklist
+                if (type == MCEType.Pandemic && !hospital.IsDiseaseAllowed(HediffDefOf.Plague))
+                {
+                    type = (MCEType)Rand.Range(1, 4);
+                }
             }
 
             for (int i = 0; i < list.Count; i++)

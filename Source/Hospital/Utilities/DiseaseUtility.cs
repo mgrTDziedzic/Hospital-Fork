@@ -61,11 +61,14 @@ public class DiseaseUtility
     // A candidate that never needs tending (immune pawn, odd modded hediff) must not loop forever.
     private const int MaxDiseaseAttempts = 20;
 
-    public static bool AddRandomDisease(Pawn pawn, PatientData patientData, HospitalMapComponent hospital)
+    // forced != null: that disease is used (debug). ignoreBlacklist: the random pick ignores the map's disease blacklist.
+    public static bool AddRandomDisease(Pawn pawn, PatientData patientData, HospitalMapComponent hospital, HediffDef forced = null, bool ignoreBlacklist = false)
     {
         bool retry = true;
         float loweredSeverity = 0;
-        List<HediffDef> list = CandidateDiseases().Where(def => hospital.IsDiseaseAllowed(def)).ToList();
+        List<HediffDef> list = forced != null
+            ? new List<HediffDef> { forced }
+            : CandidateDiseases().Where(def => ignoreBlacklist || hospital.IsDiseaseAllowed(def)).ToList();
         if (list.Count == 0)
         {
             Log.Message("Hospital: no eligible disease (all blacklisted or filtered out), falling back to wounds");

@@ -136,7 +136,7 @@ public class SurgeryUtility
                 return true;
         }
 
-        private static bool IsPlasteelBodyWorker(System.Type type)
+        internal static bool IsPlasteelBodyWorker(System.Type type)
         {
                 for (; type != null; type = type.BaseType)
                 {
@@ -166,33 +166,76 @@ public class SurgeryUtility
                 return part;
         }
 
-        public static bool AddRandomSurgeryBill(Pawn pawn, PatientData patientData, HospitalMapComponent hospital)
+        // Recipes that can be given to this pawn as a patient surgery. ignoreRestrictions (debug) skips the mod
+        // settings (aggressive switch, surgery blacklist) and the colonist-skill / ingredient checks; the pawn
+        // validity checks always stay (without them vanilla deletes the bill and the patient gets stuck).
+        public static List<RecipeDef> EligibleSurgeries(Pawn pawn, HospitalMapComponent hospital, bool ignoreRestrictions = false)
         {
 	        List<RecipeDef> list = new List<RecipeDef>();
-	        bool allowAggressive = AllowsAggressive(hospital);
-	        //Log.Message($"pawn.def.AllRecipes " + pawn.def.AllRecipes.Count);
+	        bool allowAggressive = ignoreRestrictions || AllowsAggressive(hospital);
 	        foreach (RecipeDef recipe in pawn.def.AllRecipes)
 	        {
 		        if (!allowAggressive && IsAggressionSurgery(recipe)) continue;
-		        if (recipe.AvailableNow 
-		            && hospital.IsSurgeryRecipeAllowed(recipe)
+		        if ((ignoreRestrictions || recipe.AvailableNow) // debug: research / availability only matters for UI listings
+		            && (ignoreRestrictions || hospital.IsSurgeryRecipeAllowed(recipe))
 		            && !recipe.isViolation
 		            && CanAssignAsIs(pawn, recipe)
 		            && IsAssignableByName(recipe)
 					)
 		        {
-			        if (!(from p in pawn.MapHeld.mapPawns.PawnsInFaction(Faction.OfPlayer)
-				            where p.IsFreeColonist || p.IsColonyMechPlayerControlled
-				            select p).Any((Pawn col) => recipe.PawnSatisfiesSkillRequirements(col)))
+			        if (!ignoreRestrictions)
 			        {
-				        continue;
+				        if (!(from p in pawn.MapHeld.mapPawns.PawnsInFaction(Faction.OfPlayer)
+					            where p.IsFreeColonist || p.IsColonyMechPlayerControlled
+					            select p).Any((Pawn col) => recipe.PawnSatisfiesSkillRequirements(col)))
+				        {
+					        continue;
+				        }
+				        if (recipe.PotentiallyMissingIngredients(null, pawn.MapHeld).Any()) continue;
 			        }
-			        if (!recipe.PotentiallyMissingIngredients(null, pawn.MapHeld).Any())
-			        {
-				        list.Add(recipe);
-				        //Log.Message($"surgery recipe added:" + recipe.defName);
-			        }
+			        list.Add(recipe);
 		        }
+	        }
+	        return list;
+        }
+
+        // The pawn-validity part of EligibleSurgeries (ignoreRestrictions = true) for one recipe. Needs no map,
+        // so it can run on a freshly generated, unspawned pawn (used to pick a pawn that fits a forced surgery).
+        public static bool CanForceOn(Pawn pawn, RecipeDef recipe)
+        {
+	        return !recipe.isViolation && CanAssignAsIs(pawn, recipe) && IsAssignableByName(recipe);
+        }
+
+        public static bool AddRandomSurgeryBill(Pawn pawn, PatientData patientData, HospitalMapComponent hospital)
+        {
+	        return AddRandomSurgeryBill(pawn, patientData, hospital, null);
+        }
+
+        // spec?.Surgery != null: that recipe is used (debug); it must be valid for this pawn, otherwise fails (true).
+        // Returns true on failure (caller falls back to wounds), like before.
+        public static bool AddRandomSurgeryBill(Pawn pawn, PatientData patientData, HospitalMapComponent hospital, PatientSpec spec)
+        {
+	        bool ignore = spec != null && spec.IgnoreRestrictions;
+	        if (spec?.Surgery != null && ignore)
+	        {
+		        // Validate only the forced recipe: building the full list would run every recipe's worker on the pawn.
+		        if (!pawn.def.AllRecipes.Contains(spec.Surgery) || !CanForceOn(pawn, spec.Surgery))
+		        {
+			        Log.Message("Hospital Debug: surgery " + spec.Surgery.defName + " is not valid for " + pawn.LabelShort);
+			        return true;
+		        }
+		        return AddSurgeryBill(pawn, patientData, hospital, spec.Surgery);
+	        }
+
+	        List<RecipeDef> list = EligibleSurgeries(pawn, hospital, ignore);
+	        if (spec?.Surgery != null)
+	        {
+		        if (!list.Contains(spec.Surgery))
+		        {
+			        Log.Message("Hospital Debug: surgery " + spec.Surgery.defName + " is not valid for " + pawn.LabelShort);
+			        return true;
+		        }
+		        return AddSurgeryBill(pawn, patientData, hospital, spec.Surgery);
 	        }
 
 	        if (list.Count == 0) {
@@ -200,11 +243,16 @@ public class SurgeryUtility
 		        return true; // in case someone blacklisted all possible surgery recipes
 			}
 
-	        RecipeDef selectedRecipe = list.RandomElement();
-	        //Log.Message($"recipe selected:" + selectedRecipe.defName);
-	        
+	        return AddSurgeryBill(pawn, patientData, hospital, list.RandomElement());
+        }
+
+        // Prepares the pawn for the recipe (hediff / missing part), creates the bill and fills the patient data.
+        // Returns true on failure.
+        public static bool AddSurgeryBill(Pawn pawn, PatientData patientData, HospitalMapComponent hospital, RecipeDef selectedRecipe)
+        {
+
 	        BodyPartRecord part = null;
-	        if (selectedRecipe.appliedOnFixedBodyParts != null)
+	        if (!selectedRecipe.appliedOnFixedBodyParts.NullOrEmpty()) // vanilla initializes it to an empty list
 	        {
 		        BodyPartDef bpd = selectedRecipe.appliedOnFixedBodyParts.RandomElement();
 		        foreach (BodyPartRecord notMissingPart in pawn.health.hediffSet.GetNotMissingParts())

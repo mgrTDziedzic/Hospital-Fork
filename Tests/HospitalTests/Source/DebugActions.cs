@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Hospital;
+using Hospital.Utilities;
 using LudeonTK;
 using RimWorld;
 using Verse;
@@ -12,23 +14,105 @@ namespace HospitalTests
     // changed only for the duration of the incident and restored right after.
     public static class HospitalDebugActions
     {
-        [DebugAction("Hospital Debug", "Patient arrives (forced)", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        private const string Category = "Hospital Debug";
+
+        [DebugAction(Category, "Patient arrives (forced)", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         public static void PatientArrives()
         {
-            FireForced("PatientArrives", hospital => { });
+            FireForced("PatientArrives", (hospital, parms) => ((IncidentWorker_PatientArrives)IncidentWorkerOf("PatientArrives")).TryExecute(parms, null));
         }
 
-        [DebugAction("Hospital Debug", "Mass casualty event (forced)", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        [DebugAction(Category, "Mass casualty event (forced)", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         public static void MassCasualtyEvent()
         {
-            FireForced("MassCasualtyEvent", hospital =>
-            {
-                hospital.MassCasualties = true;
-                hospital.MceAcceptDanger = true;
-            });
+            FireForced("MassCasualtyEvent", (hospital, parms) => ((IncidentWorker_MassCasualtyEvent)IncidentWorkerOf("MassCasualtyEvent")).TryExecute(parms, null), mce: true);
         }
 
-        private static void FireForced(string incidentDefName, Action<HospitalMapComponent> extraSettings)
+        // All specific actions below ignore the mod settings (surgery switch, blacklists, aggressive switch,
+        // opening hours, danger, MCE toggle). Only pawn validity checks stay (a stuck or dead patient tests nothing).
+        [DebugActionYielder]
+        public static IEnumerable<DebugActionNode> SpecificYielder()
+        {
+            yield return new DebugActionNode("Patient (specific): Wounds...")
+            {
+                category = Category,
+                childGetter = () => Enum.GetValues(typeof(WoundKind)).Cast<WoundKind>()
+                    .Select(kind => Patient("Wounds: " + kind, new PatientSpec { Type = PatientType.Wounds, Wounds = kind })).ToList()
+            };
+            yield return new DebugActionNode("Patient (specific): Disease...")
+            {
+                category = Category,
+                childGetter = () => DiseaseUtility.CandidateDiseases()
+                    .OrderBy(d => d.LabelCap.ToString()).ThenBy(d => d.defName)
+                    .Select(d => Patient(d.LabelCap + " (" + d.defName + ")", new PatientSpec { Type = PatientType.Disease, Disease = d })).ToList()
+            };
+            yield return new DebugActionNode("Patient (specific): Surgery...")
+            {
+                category = Category,
+                childGetter = SurgeryNodes
+            };
+            yield return new DebugActionNode("Mass casualty (specific)...")
+            {
+                category = Category,
+                childGetter = () => Enum.GetValues(typeof(IncidentWorker_MassCasualtyEvent.MCEType)).Cast<IncidentWorker_MassCasualtyEvent.MCEType>()
+                    .Select(type => new DebugActionNode(type.ToString() + "...")
+                    {
+                        childGetter = () => new List<DebugActionNode>
+                        {
+                            Mce(type, "Default count", 0), Mce(type, "1 pawn", 1), Mce(type, "3 pawns", 3)
+                        }
+                    }).ToList()
+            };
+        }
+
+        private static List<DebugActionNode> SurgeryNodes()
+        {
+            var list = new List<DebugActionNode>
+            {
+                Patient("Random surgery", new PatientSpec { Type = PatientType.Surgery })
+            };
+            var recipes = SurgeryUtility.CandidateSurgeries(allowAggressive: true)
+                .OrderBy(r => r.LabelCap.ToString()).ThenBy(r => r.defName).ToList();
+            DebugActionNode Node(RecipeDef r) =>
+                Patient(r.LabelCap + " (" + r.defName + ")", new PatientSpec { Type = PatientType.Surgery, Surgery = r });
+            if (recipes.Count <= 40)
+            {
+                list.AddRange(recipes.Select(Node));
+            }
+            else
+            {
+                foreach (var group in recipes.GroupBy(r => char.ToUpperInvariant(r.LabelCap.ToString().FirstOrDefault())).OrderBy(g => g.Key))
+                {
+                    var recipesInGroup = group.ToList();
+                    list.Add(new DebugActionNode(group.Key + " (" + recipesInGroup.Count + ")...")
+                    {
+                        childGetter = () => recipesInGroup.Select(Node).ToList()
+                    });
+                }
+            }
+            return list;
+        }
+
+        private static DebugActionNode Patient(string label, PatientSpec spec)
+        {
+            spec.IgnoreRestrictions = true;
+            return new DebugActionNode(label, DebugActionType.Action, () =>
+                FireForced("PatientArrives", (hospital, parms) => ((IncidentWorker_PatientArrives)IncidentWorkerOf("PatientArrives")).TryExecute(parms, spec), spec: spec));
+        }
+
+        private static DebugActionNode Mce(IncidentWorker_MassCasualtyEvent.MCEType type, string label, int count)
+        {
+            return new DebugActionNode(label, DebugActionType.Action, () =>
+                FireForced("MassCasualtyEvent", (hospital, parms) =>
+                {
+                    parms.pawnCount = count; // 0 = default (bed based)
+                    return ((IncidentWorker_MassCasualtyEvent)IncidentWorkerOf("MassCasualtyEvent")).TryExecute(parms, type);
+                }, mce: true));
+        }
+
+        private static IncidentWorker IncidentWorkerOf(string defName) => DefDatabase<IncidentDef>.GetNamed(defName).Worker;
+
+        private static void FireForced(string incidentDefName, Func<HospitalMapComponent, IncidentParms, bool> fire, bool mce = false, PatientSpec spec = null)
         {
             Map map = Find.CurrentMap;
             var hospital = map?.GetComponent<HospitalMapComponent>();
@@ -42,7 +126,7 @@ namespace HospitalTests
             bool open = hospital.openForBusiness;
             var hours = hospital.openingHours;
             bool danger = hospital.AcceptDanger;
-            bool mce = hospital.MassCasualties;
+            bool mceSetting = hospital.MassCasualties;
             bool mceDanger = hospital.MceAcceptDanger;
             bool fired;
             try
@@ -50,27 +134,25 @@ namespace HospitalTests
                 hospital.openForBusiness = true;
                 hospital.openingHours = Enumerable.Repeat(true, GenDate.HoursPerDay).ToList();
                 hospital.AcceptDanger = true;
-                extraSettings(hospital);
+                if (mce)
+                {
+                    hospital.MassCasualties = true;
+                    hospital.MceAcceptDanger = true;
+                }
 
                 var parms = new IncidentParms { target = map };
-                // TryExecuteWorker is protected on IncidentWorker; the publicized Hospital overrides are public.
-                switch (def.Worker)
-                {
-                    case IncidentWorker_PatientArrives w: fired = w.TryExecuteWorker(parms); break;
-                    case IncidentWorker_MassCasualtyEvent w: fired = w.TryExecuteWorker(parms); break;
-                    default: fired = false; break;
-                }
+                fired = fire(hospital, parms);
             }
             finally
             {
                 hospital.openForBusiness = open;
                 hospital.openingHours = hours;
                 hospital.AcceptDanger = danger;
-                hospital.MassCasualties = mce;
+                hospital.MassCasualties = mceSetting;
                 hospital.MceAcceptDanger = mceDanger;
             }
 
-            if (!fired)
+            if (!fired && spec?.FailureReported != true)
             {
                 string reason = hospital.IsFull()
                     ? "no free hospital bed (medical bed with the Hospital toggle on)"

@@ -68,7 +68,9 @@ namespace Hospital.Utilities
         // yet at that point, so patches on other mods' damage reactions check this instead.
         public static Pawn PawnBeingInjured { get; private set; }
 
-        public static void DamagePawn(Pawn pawn, PatientData patientData, HospitalMapComponent hospital)
+        // spec == null: random problem exactly as before. With a spec, forced choices are used; if a forced
+        // choice cannot be applied to this pawn the usual fallback to wounds happens, with a warning.
+        public static void DamagePawn(Pawn pawn, PatientData patientData, HospitalMapComponent hospital, PatientSpec spec = null)
         {
             PawnBeingInjured = pawn;
             try
@@ -77,19 +79,26 @@ namespace Hospital.Utilities
                 switch (patientData.Type)
                 {
                     case PatientType.Disease:
-                        failed = DiseaseUtility.AddRandomDisease(pawn, patientData, hospital);
+                        failed = DiseaseUtility.AddRandomDisease(pawn, patientData, hospital, spec?.Disease, spec != null && spec.IgnoreRestrictions);
                         break;
                     case PatientType.Wounds:
-                        WoundsUtility.AddRandomWounds(pawn, patientData);
+                        AddWounds(pawn, patientData, spec?.Wounds ?? WoundKind.Random);
                         break;
                     case PatientType.Surgery:
-                        failed = SurgeryUtility.AddRandomSurgeryBill(pawn, patientData, hospital);
+                        failed = SurgeryUtility.AddRandomSurgeryBill(pawn, patientData, hospital, spec);
                         break;
                 }
                 if (failed)
                 {
+                    if (spec != null)
+                    {
+                        string text = "Hospital Debug: forced " + patientData.Type + " patient failed for " + pawn.LabelShort
+                                      + " (" + (spec.Disease?.defName ?? spec.Surgery?.defName ?? "random") + "), fell back to wounds";
+                        Log.Message(text);
+                        Messages.Message(text, MessageTypeDefOf.RejectInput, false);
+                    }
                     patientData.Type = PatientType.Wounds;
-                    WoundsUtility.AddRandomWounds(pawn, patientData);
+                    AddWounds(pawn, patientData, spec?.Wounds ?? WoundKind.Random);
                 }
             }
             finally
@@ -97,6 +106,18 @@ namespace Hospital.Utilities
                 PawnBeingInjured = null;
             }
         }
+
+        private static void AddWounds(Pawn pawn, PatientData patientData, WoundKind kind)
+        {
+            switch (kind)
+            {
+                case WoundKind.Gunshot: WoundsUtility.AddGunshotWounds(pawn, patientData); break;
+                case WoundKind.Bruises: WoundsUtility.AddBruisesWounds(pawn, patientData); break;
+                case WoundKind.Burns: WoundsUtility.AddBurnWounds(pawn, patientData); break;
+                default: WoundsUtility.AddRandomWounds(pawn, patientData); break;
+            }
+        }
+
         public static void DamagePawn(Pawn pawn, PatientData patientData, HospitalMapComponent hospital, IncidentWorker_MassCasualtyEvent.MCEType type)
         {
             PawnBeingInjured = pawn;

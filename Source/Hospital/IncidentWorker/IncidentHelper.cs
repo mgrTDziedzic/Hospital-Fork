@@ -12,18 +12,23 @@ public static class IncidentHelper
     // Upper bound for attempts to generate a pawn that can be a patient (see TryGenerateAcceptedPawn).
     public const int MaxPawnGenerationAttempts = 20;
 
-    public static Pawn GeneratePawn(Faction faction)
+    // Upper bound when a forced surgery needs a pawn that fits it (debug).
+    public const int MaxForcedSurgeryAttempts = 60;
+
+    // forSurgery != null (debug, forced surgery): optional per-mod hints shape the request (PawnGenHints).
+    public static Pawn GeneratePawn(Faction faction, RecipeDef forSurgery = null)
     {
         PawnKindDef kind = faction.RandomPawnKind();
         if (kind == null) return null; // faction without any pawn kind
-        Pawn p = PawnGenerator.GeneratePawn(new PawnGenerationRequest(kind, faction,
+        var request = new PawnGenerationRequest(kind, faction,
             PawnGenerationContext.NonPlayer, -1, forceGenerateNewPawn: true, allowDead: false, allowDowned: false,
             canGeneratePawnRelations: true, false, 1f,
             forceAddFreeWarmLayerIfNeeded: false, allowGay: true, allowPregnant: true, allowFood: true,
             allowAddictions: true, inhabitant: false, certainlyBeenInCryptosleep: false,
             forceRedressWorldPawnIfFormerColonist: false, worldPawnFactionDoesntMatter: false, 0f, 0f, null, 1f,
-            null, null, null, null, null, null, null, null, null, null, null, null));
-        return p;
+            null, null, null, null, null, null, null, null, null, null, null, null);
+        if (forSurgery != null) Compat.PawnGenHints.Apply(forSurgery, ref request);
+        return PawnGenerator.GeneratePawn(request);
     }
     
     // Pawns that cannot be patients: androids (VRE Android) and anything that cannot bleed.
@@ -38,7 +43,7 @@ public static class IncidentHelper
     public static bool TryGenerateAcceptedPawn(IList<Faction> factions, System.Func<Pawn, bool> accept, int maxAttempts,
         out Pawn pawn, out Faction faction, System.Func<Faction, Pawn> generate = null)
     {
-        generate = generate ?? GeneratePawn;
+        generate = generate ?? (f => GeneratePawn(f));
         pawn = null;
         faction = null;
         if (factions == null || factions.Count == 0) return false;
