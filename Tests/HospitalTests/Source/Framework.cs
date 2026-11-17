@@ -43,6 +43,7 @@ namespace HospitalTests
         private readonly Map guardMap;
         private readonly HashSet<Lord> lordsBefore = new HashSet<Lord>();
         private readonly HashSet<Letter> lettersBefore = new HashSet<Letter>();
+        private readonly HashSet<Thing> corpsesBefore = new HashSet<Thing>();
 
         // Snapshot of lords and letters; RunCleanup removes what the test (or another mod reacting to it) left behind.
         public TestContext()
@@ -50,6 +51,7 @@ namespace HospitalTests
             guardMap = Find.CurrentMap;
             if (guardMap?.lordManager != null) foreach (var l in guardMap.lordManager.lords) lordsBefore.Add(l);
             if (Find.LetterStack != null) foreach (var l in Find.LetterStack.LettersListForReading) lettersBefore.Add(l);
+            if (guardMap?.listerThings != null) foreach (var c in guardMap.listerThings.ThingsInGroup(ThingRequestGroup.Corpse)) corpsesBefore.Add(c);
         }
 
         /// <summary>Discards a pawn the right way: world pawns must go through WorldPawns (Pawn.Discard warns on them).</summary>
@@ -68,7 +70,10 @@ namespace HospitalTests
             cleanups.Add(() =>
             {
                 if (thing == null) return;
+                // A pawn killed during the test is Destroyed already, but its corpse stays on the map: remove it too.
+                var corpse = (thing as Pawn)?.Corpse;
                 if (!thing.Destroyed) thing.Destroy(DestroyMode.Vanish);
+                if (corpse != null && !corpse.Destroyed) corpse.Destroy(DestroyMode.Vanish);
                 if (thing is Pawn p) DiscardPawn(p);
             });
             return thing;
@@ -101,6 +106,20 @@ namespace HospitalTests
                         Log.Warning("[HospitalTests] test leaked " + leaked.Count + " lord(s), removing: "
                             + string.Join(", ", leaked.Select(l => (l.LordJob?.GetType().Name ?? "?") + " (" + l.ownedPawns.Count + " pawns)")));
                         foreach (var l in leaked) guardMap.lordManager.RemoveLord(l);
+                    }
+                }
+                if (guardMap?.listerThings != null)
+                {
+                    var corpses = guardMap.listerThings.ThingsInGroup(ThingRequestGroup.Corpse).Where(c => !corpsesBefore.Contains(c)).ToList();
+                    if (corpses.Count > 0)
+                    {
+                        Log.Warning("[HospitalTests] test leaked " + corpses.Count + " corpse(s), removing");
+                        foreach (var c in corpses)
+                        {
+                            var inner = (c as Corpse)?.InnerPawn;
+                            if (!c.Destroyed) c.Destroy(DestroyMode.Vanish);
+                            DiscardPawn(inner);
+                        }
                     }
                 }
                 if (Find.LetterStack != null)
