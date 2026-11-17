@@ -12,9 +12,12 @@ public class SurgeryUtility
         // Mods patch that method for the player's health tab: Multi-Doctor Surgery swaps in its own bill and
         // opens an "assign doctors" window, and closing that window without confirming deletes the bill -
         // a surgery patient then had nothing left to treat and went home right after arrival.
+        // Multi-Doctor Surgery with Fast Operation ON: the bill gets its default surgery team instead
+        // (MultiDoctorCompat). Otherwise a plain Bill_Medical, as below.
         // Empty ingredient list rather than null (other mods' Bill_Medical code iterates it).
         public static Bill_Medical CreatePatientBill(Pawn pawn, RecipeDef recipe, BodyPartRecord part)
         {
+                if (Compat.MultiDoctorCompat.TryCreateTeamBill(pawn, recipe, part, out var teamBill)) return teamBill;
                 var bill = new Bill_Medical(recipe, new List<Thing>());
                 pawn.health.surgeryBills.AddBill(bill);
                 bill.Part = part; // after AddBill, same order as vanilla
@@ -54,16 +57,23 @@ public class SurgeryUtility
         {
                 return recipe.IsSurgery
                        && !recipe.isViolation
-                       && !recipe.defName.ToLower().Contains("abasia")
-                       && !recipe.defName.ToLower().Contains("coma")
-                       && !recipe.defName.ToLower().Contains("remove")
-                       && !recipe.defName.ToLower().Contains("anesthetize")
-                       && !recipe.defName.ToLower().Contains("blood")
-                       && !recipe.defName.ToLower().Contains("admin")
-                       && !recipe.defName.ToLower().Contains("rib")
-                       && !recipe.defName.ToLower().Contains("harvest")
-                       && !recipe.defName.ToUpper().Contains("VREA") // androids expanded
-                       && !recipe.defName.ToUpper().Contains("GR"); // weird genetics expanded surgeries
+                       && IsAssignableByName(recipe);
+        }
+
+        // Name-based exclusions shared by the blacklist picker and the random assignment: generic vanilla words
+        // plus other mods' surgeries (android parts, Genetic Rim implants; exact prefixes, see ModDefFilters).
+        private static bool IsAssignableByName(RecipeDef recipe)
+        {
+                var name = recipe.defName.ToLower();
+                return !name.Contains("abasia")
+                       && !name.Contains("coma")
+                       && !name.Contains("remove")
+                       && !name.Contains("anesthetize")
+                       && !name.Contains("blood")
+                       && !name.Contains("admin")
+                       && !name.Contains("rib")
+                       && !name.Contains("harvest")
+                       && !Compat.ModDefFilters.IsExcludedSurgery(recipe);
         }
 
         // All surgeries applicable to humanlike patients that may be randomly assigned.
@@ -135,16 +145,7 @@ public class SurgeryUtility
 		            && hospital.IsSurgeryRecipeAllowed(recipe)
 		            && !recipe.isViolation
 		            && CanAssignAsIs(pawn, recipe)
-		            && !recipe.defName.ToLower().Contains("abasia")
-		            && !recipe.defName.ToLower().Contains("coma")
-		            && !recipe.defName.ToLower().Contains("remove")
-		            && !recipe.defName.ToLower().Contains("anesthetize")
-		            && !recipe.defName.ToLower().Contains("blood")
-		            && !recipe.defName.ToLower().Contains("admin")
-		            && !recipe.defName.ToLower().Contains("rib")
-		            && !recipe.defName.ToLower().Contains("harvest")
-		            && !recipe.defName.ToUpper().Contains("VREA") // androids expanded
-		            && !recipe.defName.ToUpper().Contains("GR") // weird genetics expanded surgeries
+		            && IsAssignableByName(recipe)
 					)
 		        {
 			        if (!(from p in pawn.MapHeld.mapPawns.PawnsInFaction(Faction.OfPlayer)

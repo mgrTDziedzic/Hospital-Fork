@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Patch>
-    <Operation Class="PatchOperationFindMod">
-    <mods>
-        <li>MedPod</li>
-    </mods>
-    <match Class="PatchOperationAdd">
+    <!-- MedPod (sumghai.Medpod). The list item carries MayRequireAnyOf, which the def loader checks (ignoring the
+         _steam suffix) before it resolves the Class, so without MedPod the item is skipped and nothing is logged. -->
+    <Operation Class="PatchOperationAdd">
         <xpath>Defs/DutyDef[defName="Patient"]/thinkNode/subNodes/li[@Class="ThinkNode_Tagger"]/subNodes</xpath>
         <value>
-            <li Class="MedPod.JobGiver_PatientGoToMedPod" />
+            <li Class="MedPod.JobGiver_PatientGoToMedPod" MayRequireAnyOf="sumghai.medpod" />
         </value>
         <order>Prepend</order>
-    </match>
     </Operation>
 </Patch>

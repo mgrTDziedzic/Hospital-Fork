@@ -27,9 +27,9 @@ namespace HospitalTests
 
         public override void DoWindowContents(Rect inRect)
         {
-            int pass = results.Count(r => r.Passed);
+            int pass = results.Count(r => r.Passed), skipped = results.Count(r => r.Skipped);
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(0, 0, inRect.width, 32f), "Hospital tests: " + pass + "/" + results.Count + " passed");
+            Widgets.Label(new Rect(0, 0, inRect.width, 32f), "Hospital tests: " + pass + "/" + (results.Count - skipped) + " passed" + (skipped > 0 ? ", " + skipped + " skipped" : ""));
             Text.Font = GameFont.Small;
             if (Widgets.ButtonText(new Rect(inRect.width - 120f, 34f, 120f, 28f), "Run all again"))
             {
@@ -45,12 +45,12 @@ namespace HospitalTests
             float y = 0;
             foreach (var r in results)
             {
-                string text = (r.Passed ? "PASS  " : "FAIL  ") + r.Name + "  (" + r.Millis + " ms)"
+                string text = (r.Skipped ? "SKIP  " : r.Passed ? "PASS  " : "FAIL  ") + r.Name + "  (" + r.Millis + " ms)"
                               + (r.Description != null ? "\n" + r.Description : "")
-                              + (r.Passed ? "" : "\n" + r.Message);
+                              + (r.Skipped ? "\nrequires " + r.SkipReason : r.Passed ? "" : "\n" + r.Message);
                 float h = Text.CalcHeight(text, view.width - 8f) + 6f;
                 var row = new Rect(0, y, view.width, h);
-                Widgets.DrawBoxSolid(row, r.Passed ? new Color(0.1f, 0.35f, 0.1f, 0.6f) : new Color(0.45f, 0.1f, 0.1f, 0.6f));
+                Widgets.DrawBoxSolid(row, r.Skipped ? new Color(0.3f, 0.3f, 0.3f, 0.6f) : r.Passed ? new Color(0.1f, 0.35f, 0.1f, 0.6f) : new Color(0.45f, 0.1f, 0.1f, 0.6f));
                 Widgets.Label(new Rect(4f, y + 3f, view.width - 8f, h), text);
                 y += h + 2f;
             }

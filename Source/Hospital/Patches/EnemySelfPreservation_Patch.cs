@@ -15,10 +15,18 @@ namespace Hospital.Patches;
 public static class EnemySelfPreservation_Patch
 {
     private static MethodBase target;
+    private static bool logged;
 
     public static bool Prepare()
     {
         target ??= AccessTools.TypeByName("MUR_ESP.Pawn_PostApplyDamage")?.GetMethod("Postfix", AccessTools.all);
+        if (target != null && !logged)
+        {
+            logged = true; // Prepare can run more than once
+            var id = Compat.SupportedMods.ActiveId(Compat.SupportedMods.EnemySelfPreservation);
+            Log.Message("[Hospital] " + Compat.SupportedMods.DisplayName(Compat.SupportedMods.EnemySelfPreservation)
+                        + (id != null ? " (" + id + ")" : "") + " detected, compatibility enabled");
+        }
         return target != null;
     }
 

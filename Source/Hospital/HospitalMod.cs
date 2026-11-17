@@ -17,6 +17,14 @@ namespace Hospital
 
 			harmonyInstance = new Harmony("Adamas.Hospital");
             harmonyInstance.PatchAll();
+
+            // Optional mods: one info line each when detected, nothing otherwise.
+            LongEventHandler.ExecuteWhenFinished(() =>
+            {
+                Compat.MultiDoctorCompat.Startup();
+                Compat.PlasteelCompat.Startup();
+                Compat.MedPodCompat.Startup();
+            });
         }
         /// <summary>
         /// The (optional) GUI part to set your settings.

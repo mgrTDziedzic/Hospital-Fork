@@ -14,7 +14,7 @@ namespace Hospital;
         public override void PostPostMake()
         {
             base.PostPostMake();
-            hospitalInt = !parent.def.defName.Contains("Pod");
+            hospitalInt = !Compat.MedPodCompat.IsMedPodBed(parent.def);
         }
         
         public bool Hospital
@@ -87,15 +87,11 @@ namespace Hospital;
                 commandToggle2.toggleAction = delegate
                 {
                     Hospital = !Hospital;
-                    //if (ModsConfig.IsActive("sumghai.Medpod"))
-                    //{
-                        // TODO if Building_BedMedPod set allowGuests to the same value
-                    //}
                 };
                 commandToggle2.hotKey = KeyBindingDefOf.Misc4;
                 yield return commandToggle2;
 
-                if (!parent.def.defName.Contains("Pod")) // medpods no surgery
+                if (!Compat.MedPodCompat.IsMedPodBed(parent.def)) // medpods no surgery
                 {
                     Command_Toggle commandToggle3 = new Command_Toggle();
                     commandToggle3.defaultLabel = "CommandBedSetAsSurgeryLabel".Translate();

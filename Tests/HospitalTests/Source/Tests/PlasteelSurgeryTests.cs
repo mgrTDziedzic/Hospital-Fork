@@ -13,18 +13,13 @@ namespace HospitalTests
     // Test pawns are discarded in cleanup, so trait / body type / gender changes need no explicit revert.
     public static class PlasteelSurgeryTests
     {
+        private const string PlasteelId = global::Hospital.Compat.SupportedMods.PlasteelSurgery;
+
         // ---------- helpers ----------
 
         private static RecipeDef Recipe(string defName)
         {
             return DefDatabase<RecipeDef>.GetNamedSilentFail(defName);
-        }
-
-        private static bool HasPlasteel()
-        {
-            if (Recipe("PS_IncreaseBeautyMid") != null) return true;
-            Log.Message("[HospitalTests] Plasteel Surgery not loaded, test skipped");
-            return false;
         }
 
         private static Pawn Adult(TestContext ctx)
@@ -56,11 +51,10 @@ namespace HospitalTests
 
         // Given: Plasteel Surgery loaded. When: the default list is resolved.
         // Then: face worsening and body-type recipes are in it; Masculinize, Feminize and Sex Change are not.
-        [HospitalTest("PS1: default refused recipes hold Decrease Beauty and body-type mods, not Masculinize/Feminize/Sex Change")]
+        [HospitalTest("PS1: default refused recipes hold Decrease Beauty and body-type mods, not Masculinize/Feminize/Sex Change", RequiresMod = PlasteelId)]
         public static void DefaultListContents(TestContext ctx)
         {
-            if (!HasPlasteel()) return;
-
+            
             var list = HospitalMapComponent.DefaultRefusedRecipes();
 
             foreach (var name in new[] { "PS_DecreaseBeautyBasic", "PS_DecreaseBeautyMid", "PS_MakeThin", "PS_MakeStandard", "PS_MakeHulk", "PS_MakeFat" })
@@ -77,11 +71,10 @@ namespace HospitalTests
 
         // Given: a freshly constructed component (not registered on the map, new-map case).
         // When: its blacklist is read. Then: defaults are in refusedOperations; Decrease Beauty refused, Feminize allowed.
-        [HospitalTest("PS2: a new HospitalMapComponent refuses the defaults; Feminize stays allowed")]
+        [HospitalTest("PS2: a new HospitalMapComponent refuses the defaults; Feminize stays allowed", RequiresMod = PlasteelId)]
         public static void NewComponentHasDefaults(TestContext ctx)
         {
-            if (!HasPlasteel()) return;
-
+            
             var fresh = new HospitalMapComponent(ctx.Map);
 
             foreach (var def in HospitalMapComponent.DefaultRefusedRecipes())
@@ -95,11 +88,10 @@ namespace HospitalTests
 
         // Given: a Beautiful (+2) pawn. Then: no Increase Beauty recipe is assignable.
         // When the pawn has Beauty 0: only Mid is.
-        [HospitalTest("PS3: Increase Beauty is not assigned when the worker rejects the pawn's beauty")]
+        [HospitalTest("PS3: Increase Beauty is not assigned when the worker rejects the pawn's beauty", RequiresMod = PlasteelId)]
         public static void BeautyRules(TestContext ctx)
         {
-            if (!HasPlasteel()) return;
-            var pawn = Adult(ctx);
+                        var pawn = Adult(ctx);
 
             SetBeauty(pawn, 2);
             Assert.False(Can(pawn, "PS_IncreaseBeautyBasic"), "Basic on Beautiful");
@@ -114,10 +106,10 @@ namespace HospitalTests
 
         // Given: a Staggeringly ugly (-2) pawn. Then: neither Decrease Beauty recipe is assignable (nothing left to worsen).
         // When the pawn is Ugly (-1): Mid is assignable, Basic is not.
-        [HospitalTest("PS10: Decrease Beauty is not assigned when the worker rejects the pawn's beauty (Basic at 0/+1, Mid at -1/+2)")]
+        [HospitalTest("PS10: Decrease Beauty is not assigned when the worker rejects the pawn's beauty (Basic at 0/+1, Mid at -1/+2)", RequiresMod = PlasteelId)]
         public static void DecreaseBeautyRules(TestContext ctx)
         {
-            if (!HasPlasteel() || Recipe("PS_DecreaseBeautyBasic") == null || Recipe("PS_DecreaseBeautyMid") == null) return;
+            if (Recipe("PS_DecreaseBeautyBasic") == null || Recipe("PS_DecreaseBeautyMid") == null) return;
             var pawn = Adult(ctx);
 
             SetBeauty(pawn, -2);
@@ -131,10 +123,10 @@ namespace HospitalTests
 
         // Given: a pawn without Annoying Voice / Creepy Breathing. Then: Laryngoplasty is not assignable.
         // When the pawn gets Creepy Breathing: it is.
-        [HospitalTest("PS4: Laryngoplasty is only assigned to a pawn with Annoying Voice or Creepy Breathing")]
+        [HospitalTest("PS4: Laryngoplasty is only assigned to a pawn with Annoying Voice or Creepy Breathing", RequiresMod = PlasteelId)]
         public static void LaryngoplastyRules(TestContext ctx)
         {
-            if (!HasPlasteel() || Recipe("PS_Recipes_Surgery_Laryngoplasty") == null) return;
+            if (Recipe("PS_Recipes_Surgery_Laryngoplasty") == null) return;
             var pawn = Adult(ctx);
             SetTrait(pawn, TraitDefOf.AnnoyingVoice, null);
             SetTrait(pawn, TraitDefOf.CreepyBreathing, null);
@@ -146,10 +138,10 @@ namespace HospitalTests
         }
 
         // Given: a Super-immune (degree +1) pawn. Then: Immunity Boost is not assignable; without the trait it is.
-        [HospitalTest("PS5: Immunity Boost is not assigned to a Super-immune pawn")]
+        [HospitalTest("PS5: Immunity Boost is not assigned to a Super-immune pawn", RequiresMod = PlasteelId)]
         public static void ImmunityBoostRules(TestContext ctx)
         {
-            if (!HasPlasteel() || Recipe("PS_Recipes_Surgery_ImmunityBoost") == null) return;
+            if (Recipe("PS_Recipes_Surgery_ImmunityBoost") == null) return;
             var pawn = Adult(ctx);
             var immunity = DefDatabase<TraitDef>.GetNamed("Immunity");
 
@@ -161,10 +153,10 @@ namespace HospitalTests
         }
 
         // Given: a Thin male adult. Then: Make Thin not assignable (current type), Make Fat is, Make BB (female only) is not.
-        [HospitalTest("PS6: body-type recipes reject the current body type and the wrong gender")]
+        [HospitalTest("PS6: body-type recipes reject the current body type and the wrong gender", RequiresMod = PlasteelId)]
         public static void BodyTypeRules(TestContext ctx)
         {
-            if (!HasPlasteel() || Recipe("PS_MakeThin") == null) return;
+            if (Recipe("PS_MakeThin") == null) return;
             var pawn = Adult(ctx);
             pawn.gender = Gender.Male;
             pawn.story.bodyType = BodyTypeDefOf.Thin;
@@ -174,30 +166,17 @@ namespace HospitalTests
             if (Recipe("PS_MakeBB") != null) Assert.False(Can(pawn, "PS_MakeBB"), "Make BB on a male pawn");
         }
 
-        // Given: a child (generated at age 8; skipped when the game gives an adult stage). Then: no body-type recipe is assignable,
+        // Given: a child (generated at age 8; the test fails if the game gives an adult stage). Then: no body-type recipe is assignable,
         // although the Plasteel worker itself would accept them.
-        [HospitalTest("PS7: body-type recipes are never assigned to a child")]
+        [HospitalTest("PS7: body-type recipes are never assigned to a child", RequiresMod = PlasteelId, RequiresDlc = "Ludeon.RimWorld.Biotech")]
         public static void BodyTypeNotForChildren(TestContext ctx)
         {
-            if (!HasPlasteel() || Recipe("PS_MakeThin") == null) return;
-            Pawn child;
-            try
-            {
-                child = PawnGenerator.GeneratePawn(new PawnGenerationRequest(PawnKindDefOf.Colonist, Faction.OfPlayer,
-                    PawnGenerationContext.NonPlayer, -1, forceGenerateNewPawn: true, fixedBiologicalAge: 8, fixedChronologicalAge: 8));
-            }
-            catch (System.Exception e)
-            {
-                Log.Message("[HospitalTests] PS7 skipped, cannot generate a child: " + e.Message);
-                return;
-            }
+            if (Recipe("PS_MakeThin") == null) return;
+            var child = PawnGenerator.GeneratePawn(new PawnGenerationRequest(PawnKindDefOf.Colonist, Faction.OfPlayer,
+                PawnGenerationContext.NonPlayer, -1, forceGenerateNewPawn: true, fixedBiologicalAge: 8, fixedChronologicalAge: 8));
             ctx.Track(child);
-            if (child.DevelopmentalStage.Adult())
-            {
-                Log.Message("[HospitalTests] PS7 skipped, generated pawn is not a child");
-                return;
-            }
-            if (child.story?.bodyType == null) { Log.Message("[HospitalTests] PS7 skipped, child has no body type"); return; }
+            Assert.False(child.DevelopmentalStage.Adult(), "precondition: generated pawn is not a child");
+            Assert.NotNull(child.story?.bodyType, "precondition: child has no body type");
 
             foreach (var name in new[] { "PS_MakeThin", "PS_MakeStandard", "PS_MakeHulk", "PS_MakeFat" })
             {
@@ -207,38 +186,14 @@ namespace HospitalTests
             }
         }
 
-        // ---------- vanilla ----------
-
-        // Given: a pawn without a Joywire. Then: InstallJoywire is assignable; once the pawn has the implant it is not
-        // (vanilla would remove the bill). A removesHediff recipe stays assignable without the hediff (preparation adds it).
-        [HospitalTest("PS8: an implant the pawn already has is not assigned; removesHediff recipes always are")]
-        public static void ExistingImplantAndPreparedRecipe(TestContext ctx)
-        {
-            var joywire = Recipe("InstallJoywire");
-            var joywireHediff = DefDatabase<HediffDef>.GetNamedSilentFail("Joywire");
-            var excise = Recipe("ExciseCarcinoma");
-            Assert.NotNull(joywire, "recipe InstallJoywire missing");
-            Assert.NotNull(joywireHediff, "hediff Joywire missing");
-            Assert.NotNull(excise, "recipe ExciseCarcinoma missing");
-            var pawn = Adult(ctx);
-            Assert.True(SurgeryUtility.CanAssignAsIs(pawn, joywire), "precondition: Joywire not assignable to a clean pawn");
-
-            var brain = pawn.RaceProps.body.GetPartsWithDef(DefDatabase<BodyPartDef>.GetNamed("Brain")).First();
-            pawn.health.AddHediff(HediffMaker.MakeHediff(joywireHediff, pawn, brain), brain);
-
-            Assert.False(SurgeryUtility.CanAssignAsIs(pawn, joywire), "Joywire already installed");
-            Assert.True(SurgeryUtility.CanAssignAsIs(pawn, excise), "removesHediff recipe without the hediff");
-        }
-
         // ---------- end to end ----------
 
         // Given: a Beautiful pawn and every recipe except Increase Beauty refused (list swapped, restored in cleanup).
         // When: AddRandomSurgeryBill runs. Then: it returns true (caller falls back to wounds), adds no bill and sets no pending flag.
-        [HospitalTest("PS9: AddRandomSurgeryBill adds no bill when the only candidates are impossible for the pawn")]
+        [HospitalTest("PS9: AddRandomSurgeryBill adds no bill when the only candidates are impossible for the pawn", RequiresMod = PlasteelId)]
         public static void NoImpossibleBill(TestContext ctx)
         {
-            if (!HasPlasteel()) return;
-            var hospital = VanillaCompatTests.HospitalOf(ctx);
+                        var hospital = VanillaCompatTests.HospitalOf(ctx);
             var pawn = Adult(ctx);
             SetBeauty(pawn, 2);
             var saved = hospital.refusedOperations;

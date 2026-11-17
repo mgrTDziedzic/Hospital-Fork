@@ -184,7 +184,7 @@ namespace Hospital.MainTab
         private static IEnumerable<Def> CandidateFactions()
         {
             return DefDatabase<FactionDef>.AllDefs
-                .Where(f => f.humanlikeFaction && !f.isPlayer && !f.hidden && !f.defName.ToUpper().Contains("VREA"));
+                .Where(f => f.humanlikeFaction && !f.isPlayer && !f.hidden && !Compat.ModDefFilters.IsAndroidDef(f));
         }
 
         public override void PostClose()

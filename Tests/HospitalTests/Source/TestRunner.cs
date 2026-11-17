@@ -14,7 +14,8 @@ namespace HospitalTests
     public class TestResult
     {
         public string Name, Description, Message, Stack;
-        public bool Passed;
+        public bool Passed, Skipped;
+        public string RequiresMod, SkipReason;
         public long Millis;
     }
 
@@ -49,6 +50,18 @@ namespace HospitalTests
         {
             var attr = m.GetCustomAttribute<HospitalTestAttribute>();
             var r = new TestResult { Name = m.DeclaringType.Name + "." + m.Name, Description = attr?.Description };
+            if (!string.IsNullOrEmpty(attr?.RequiresMod) && !global::Hospital.Compat.SupportedMods.IsActive(attr.RequiresMod))
+            {
+                r.Skipped = true;
+                r.SkipReason = attr.RequiresMod + ": " + global::Hospital.Compat.SupportedMods.IdsText(attr.RequiresMod);
+                return r;
+            }
+            if (!string.IsNullOrEmpty(attr?.RequiresDlc) && ModLister.GetActiveModWithIdentifier(attr.RequiresDlc, ignorePostfix: true) == null)
+            {
+                r.Skipped = true;
+                r.SkipReason = "DLC " + attr.RequiresDlc;
+                return r;
+            }
             var ctx = new TestContext();
             var sw = Stopwatch.StartNew();
             LogCapture.Begin();
@@ -83,12 +96,13 @@ namespace HospitalTests
 
         public static void Report(List<TestResult> results, string fatal = null)
         {
-            int pass = results.Count(r => r.Passed), fail = results.Count - pass;
+            int skipped = results.Count(r => r.Skipped), pass = results.Count(r => r.Passed), fail = results.Count - pass - skipped;
             var sb = new StringBuilder();
             sb.AppendLine("Hospital tests " + DateTime.Now.ToString("s"));
             if (fatal != null) sb.AppendLine("FAIL <setup>: " + fatal);
             foreach (var r in results)
             {
+                if (r.Skipped) { sb.AppendLine("SKIP " + r.Name + " (requires " + r.SkipReason + ")"); continue; }
                 sb.AppendLine((r.Passed ? "PASS " : "FAIL ") + r.Name + " (" + r.Millis + " ms)" + (r.Description != null ? " - " + r.Description : ""));
                 if (!r.Passed)
                 {
@@ -97,11 +111,11 @@ namespace HospitalTests
                 }
             }
             if (fatal != null) fail++;
-            sb.AppendLine("RESULT: " + pass + " passed, " + fail + " failed");
+            sb.AppendLine("RESULT: " + pass + " passed, " + fail + " failed, " + skipped + " skipped");
             try { File.WriteAllText(ResultsPath, sb.ToString()); }
             catch (Exception e) { Log.Error("[HospitalTests] cannot write results: " + e.Message); }
 
-            string summary = "[HospitalTests] " + pass + " passed, " + fail + " failed. Results: " + ResultsPath;
+            string summary = "[HospitalTests] " + pass + " passed, " + fail + " failed, " + skipped + " skipped. Results: " + ResultsPath;
             if (fail > 0) Log.Error(summary + "\n" + sb); else Log.Message(summary);
         }
     }

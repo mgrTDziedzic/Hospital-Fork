@@ -624,5 +624,26 @@ namespace HospitalTests
             Assert.True(patient.health.surgeryBills.Bills.Contains(bill), "bill is not on the patient");
             Assert.True(bill.Part == jaw, "bill part is not the jaw");
         }
+
+        // Given: a pawn without a Joywire. Then: InstallJoywire is assignable; once the pawn has the implant it is not
+        // (vanilla would remove the bill). A removesHediff recipe stays assignable without the hediff (preparation adds it).
+        [HospitalTest("AsIs1: CanAssignAsIs: an implant the pawn already has is not assigned; removesHediff recipes always are")]
+        public static void CanAssignAsIsExistingImplant(TestContext ctx)
+        {
+            var joywire = DefDatabase<RecipeDef>.GetNamedSilentFail("InstallJoywire");
+            var joywireHediff = DefDatabase<HediffDef>.GetNamedSilentFail("Joywire");
+            var excise = DefDatabase<RecipeDef>.GetNamedSilentFail("ExciseCarcinoma");
+            Assert.NotNull(joywire, "recipe InstallJoywire missing");
+            Assert.NotNull(joywireHediff, "hediff Joywire missing");
+            Assert.NotNull(excise, "recipe ExciseCarcinoma missing");
+            var pawn = VanillaCompatTests.Visitor(ctx, false);
+            Assert.True(SurgeryUtility.CanAssignAsIs(pawn, joywire), "precondition: Joywire not assignable to a clean pawn");
+
+            var brain = pawn.RaceProps.body.GetPartsWithDef(DefDatabase<BodyPartDef>.GetNamed("Brain")).First();
+            pawn.health.AddHediff(HediffMaker.MakeHediff(joywireHediff, pawn, brain), brain);
+
+            Assert.False(SurgeryUtility.CanAssignAsIs(pawn, joywire), "Joywire already installed");
+            Assert.True(SurgeryUtility.CanAssignAsIs(pawn, excise), "removesHediff recipe without the hediff");
+        }
     }
 }

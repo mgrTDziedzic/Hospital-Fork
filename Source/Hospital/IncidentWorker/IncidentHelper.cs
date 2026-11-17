@@ -26,10 +26,10 @@ public static class IncidentHelper
         return p;
     }
     
-    // Pawns that cannot be patients: androids (VREA) and anything that cannot bleed.
+    // Pawns that cannot be patients: androids (VRE Android) and anything that cannot bleed.
     public static bool IsSuitablePatient(Pawn pawn)
     {
-        return pawn.kindDef != null && !pawn.kindDef.defName.Contains("VREA") && pawn.health.CanBleed;
+        return pawn.kindDef != null && !Compat.ModDefFilters.IsAndroidDef(pawn.kindDef) && pawn.health.CanBleed;
     }
 
     // Generates a pawn from a random one of the factions that passes `accept`. Gives up after maxAttempts

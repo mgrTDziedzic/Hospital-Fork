@@ -58,7 +58,7 @@ namespace Hospital
                 parms.pawnCount = RollPawnCount(hospital.BedCount());
             }
             if (parms.pawnCount <= 0) return false; // no beds: an empty event would only send a letter about 0 pawns
-            List<Faction> factions = Find.FactionManager.AllFactions.Where(f => !f.IsPlayer && !f.defeated && !f.def.hidden && !f.HostileTo(Faction.OfPlayer) && f.def.humanlikeFaction && !f.def.defName.ToUpper().Contains("VREA") && hospital.IsFactionAllowed(f.def)).ToList();
+            List<Faction> factions = Find.FactionManager.AllFactions.Where(f => !f.IsPlayer && !f.defeated && !f.def.hidden && !f.HostileTo(Faction.OfPlayer) && f.def.humanlikeFaction && !Compat.ModDefFilters.IsAndroidDef(f.def) && hospital.IsFactionAllowed(f.def)).ToList();
             if (factions.Count == 0) return false;
             parms.faction = factions.RandomElement();
             /*foreach (Faction def in factions)

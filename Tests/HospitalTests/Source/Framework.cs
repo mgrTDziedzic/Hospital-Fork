@@ -11,6 +11,10 @@ namespace HospitalTests
     public class HospitalTestAttribute : Attribute
     {
         public string Description;
+        /// <summary>SupportedMods key of an optional mod the test needs; the test is skipped (not run, nothing logged) when it is not active.</summary>
+        public string RequiresMod;
+        /// <summary>Package ID of a DLC the test needs (e.g. "Ludeon.RimWorld.Biotech" for children); skipped silently without it.</summary>
+        public string RequiresDlc;
         public HospitalTestAttribute(string description = null) { Description = description; }
     }
 
