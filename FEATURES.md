@@ -1,88 +1,81 @@
-# What's new in Hospital (Fork)
+# Changes in this fork
 
-A player-friendly overview of what this fork adds to [Hospital](https://github.com/tomvd/Hospital).
-For the full, detailed list of every change see [CHANGELOG.md](CHANGELOG.md).
+An overview of the changes this fork makes to [Hospital](https://github.com/tomvd/Hospital) by tomvd,
+which remains the basis for everything below. For the detailed list see [CHANGELOG.md](CHANGELOG.md).
 
 Supported game versions: RimWorld 1.6 and 1.7.
 
 ---
 
-## New features
+## Additions
 
 ### Patient drugs
-You can now decide which drugs your patients receive while they are in your care.
+Lets you choose which drugs patients receive while in your care.
 
-- Open **Hospital Policies → Patient drugs** and pick a drug policy for each kind of patient:
+- **Hospital Policies → Patient drugs** has a drug policy for each kind of patient:
   - **All patients**
   - **Infection** – sick patients who are not yet immune
   - **Surgery** – patients waiting for an operation
   - **Injuries** – patients with fresh wounds or blood loss
   - **Scars** – patients with permanent injuries
-- A patient gets the drugs of **every** list that applies to them.
-- Only drugs marked **Scheduled** in the policy are given. Your doctors administer them as
-  medical bills, respecting the policy's frequency and mood/joy limits.
-- **Teetotalers too** – choose per list whether teetotaler patients should also get those drugs.
-- Drugs are billed to the patient like any other treatment.
-- Use **Manage drug policies...** to create policies just for your hospital. For example:
-  - **All patients** (with "Teetotalers too" off): psychite tea to keep them in a good mood.
-  - **Infection**: Masala Chai from Vanilla Brewing Expanded for patients fighting an infection.
-  - **Scars**: Neoderm from Remedies (Continued) for patients with scars. For now this is a
-    small bonus: a scar alone does not keep a patient in your hospital, so the drug only works
-    while they are being treated for something else. In practice the scars usually heal before
-    the patient leaves.
+- A patient gets the drugs of every list that applies to them.
+- Only drugs marked **Scheduled** in the policy are given. Doctors administer them as
+  medical bills, following the policy's frequency and mood/joy limits.
+- **Teetotalers too** – per list, whether teetotaler patients also get those drugs.
+- Drugs are billed to the patient like other treatment.
+- **Manage drug policies...** creates policies for the hospital. Examples:
+  - **All patients** ("Teetotalers too" off): psychite tea for mood.
+  - **Infection**: Masala Chai from Vanilla Brewing Expanded.
+  - **Scars**: Neoderm from Remedies (Continued). A scar alone does not keep a patient in the
+    hospital, so the drug only applies while they are being treated for something else.
 
-  The base game has only a few drugs that fit, so most useful ones come from other mods.
+  The base game has few suitable drugs, so most options come from other mods.
 
-### Smarter bed choice
-Patients now pick the hospital bed that suits them best, not just the first one you built:
+### Bed choice
+Patients pick a hospital bed based on what they need:
 
-- Surgery patients go to the bed with the best surgery success chance (bed quality, cleanliness,
+- Surgery patients: the bed with the highest surgery success chance (bed quality, cleanliness,
   light, vitals monitor).
-- Sick patients go to the bed where they gain immunity fastest.
-- Everyone else gets the bed with the best tend quality.
-
-So it is now worth building one really good operating room.
+- Sick patients: the bed with the fastest immunity gain.
+- Others: the bed with the best tend quality.
 
 ### Mass casualties during danger
-New hospital setting. Untick it and mass casualty events will wait until there are no manhunters
-or other aggressive animals on your map. Ticked (the default) keeps the old behaviour.
+New hospital setting. When unticked, mass casualty events wait until there are no manhunters
+or other aggressive animals on the map. Ticked (the default) keeps the original behaviour.
 
-### Sedated aggressive patients (optional challenge)
-Patients no longer arrive with scaria and attack your colonists (a bug in earlier versions). If you want
-the risk, tick **Allow aggressive patients** in Hospital Policies (needs "Accept surgery"). Such a patient
-arrives sedated by their faction and lies helpless where the pod landed. Get them to a bed and cure them
-before the sedation wears off; the arrival letter tells you how long you have. Too late, and they wake up
-berserk. If they die, you lose goodwill as for any dead patient. The sedation time (default 8 hours) is a
-slider in the mod settings.
+### Sedated aggressive patients (optional)
+Patients no longer arrive with scaria. **Allow aggressive patients** in Hospital Policies (requires
+"Accept surgery") re-enables this as an optional challenge: the patient arrives sedated by their faction
+and lies where the pod landed. They need to be brought to a bed and cured before the sedation wears off;
+the arrival letter shows the remaining time. If it runs out, they wake up berserk. A death costs goodwill
+as for any patient. The sedation time (default 8 hours) is set in the mod settings.
 
-### Failed surgery is not the end
-If an operation fails, the patient now stays to recover instead of walking away. You can add the
-surgery again and give your doctor another try.
+### Failed surgery
+After a failed operation the patient stays to recover instead of leaving, so the surgery can be
+added again.
 
 ---
 
 ## Compatibility with other mods
 
-| Mod | What you get |
+| Mod | Change |
 |---|---|
-| **MedPod** | A patient who needs a missing body part back is also counted as cured when the MedPod regrows it (a real regrown part, not a prosthetic), and pays for the treatment. Other mods' beds with "Pod" in the name now work as normal hospital beds. |
-| **Multi-Doctor Surgery** | Patients no longer leave right after arriving. To have a whole team operate on patients, turn on its **"(Beta) Fast Operation"** option and set a default surgery team. Patient surgeries then get that team automatically. Without Fast Operation, or if the team's lead surgeon can't do that operation, a single doctor operates as usual. |
-| **Plasteel Surgery (Continued)** | On new maps, patients are not given Decrease Beauty or the body-type changes (Make Thin, Standard, Hulk, Fat, Bodybuilder) by default. Every other Plasteel operation, including Masculinize, Feminize and Sex Change, stays available. You can change this in the surgery blacklist. Patients are never assigned a surgery they cannot actually receive. |
+| **MedPod** | A patient who needs a missing body part restored counts as cured when the MedPod regrows it (a natural part, not a prosthetic), and pays for the treatment. Other mods' beds with "Pod" in the name work as normal hospital beds. |
+| **Multi-Doctor Surgery** | Patients no longer leave right after arriving. With its **"(Beta) Fast Operation"** option on and a default surgery team set, patient surgeries are assigned that team. Without Fast Operation, or if the lead surgeon can't perform the operation, a single doctor operates. |
+| **Plasteel Surgery (Continued)** | On new maps, Decrease Beauty and the body-type changes (Make Thin, Standard, Hulk, Fat, Bodybuilder) are blacklisted for patients by default. Other Plasteel operations, including Masculinize, Feminize and Sex Change, remain available. This can be changed in the surgery blacklist. Patients are only assigned surgeries they can receive. |
 
-All of these are optional. Nothing changes if you don't use them.
+All of these are optional; nothing changes if the mods are not installed.
 
 ---
 
-## Fewer bugs, smoother games
+## Fixes and adjustments
 
-- **No more freezes** when the game creates certain disease, plague or wound patients.
-- **No more stuck patients** – patients are no longer given surgeries that the game silently
-  cancels, which used to leave them waiting forever.
-- **Patients arrive with what they came for** – wound patients really have wounds, and infection
-  patients are not healthy on arrival.
-- **Fair payment** – no more empty or broken silver stacks; large payments arrive in proper stacks.
-- **Mass casualty events** respect your faction blacklist, never fire when you have no free beds,
-  and the letter shows the real number of patients.
-- **Arrested patients** are removed from the hospital list.
-- **Old saves load cleanly**, even from earlier versions of the mod.
-- **Better performance** with many pawns on the map.
+- Fixed freezes when generating certain disease, plague or wound patients.
+- Patients are no longer assigned surgeries that the game cancels, which could leave them waiting.
+- Wound and infection patients arrive with the condition they came for.
+- Payment: empty silver stacks are no longer created; large payments are split into proper stacks.
+- Mass casualty events respect the faction blacklist, don't fire without free beds,
+  and the letter shows the actual number of patients.
+- Arrested patients are removed from the hospital list.
+- Saves from earlier versions of the mod load correctly.
+- Performance improvements with many pawns on the map.
