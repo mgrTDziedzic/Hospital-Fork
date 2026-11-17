@@ -5,6 +5,9 @@ relative to the original [Hospital](https://github.com/tomvd/Hospital) by Adamas
 Original code is © its author, licensed under GPLv3; modifications are © mgrTDziedzic, also GPLv3.
 
 ## 2026-11-17
+- Plasteel Surgery (Continued) compatibility: new maps start with these recipes in the surgery blacklist: Decrease Beauty (Basic/Mid) and the body-type mods (Make Thin/Standard/Hulk/Fat/BB). Masculinize, Feminize and Sex Change stay allowed. Existing maps keep their saved list (`HospitalMapComponent.DefaultRefusedRecipes`).
+- Fix: patients are no longer given a surgery that its recipe worker rejects for them (Plasteel Increase Beauty on a Beautiful pawn, Laryngoplasty without the trait, Immunity Boost on a Super-immune pawn, body-type mods for the current body type, an implant the pawn already has, etc.). Vanilla deleted such bills without clearing the pending-surgery flag, so the patient stayed stuck until dismissed. New `SurgeryUtility.CanAssignAsIs` / `IsAsIsRecipe`; the chosen body part is also checked against the worker's valid parts. Body-type mods are never assigned to children.
+- Tests: added `PlasteelSurgeryTests` (PS1-PS10).
 - Fix a surgery patient leaving right after arrival when Multi-Doctor Surgery is active: its "assign doctors" window opened for the mod-made cure bill, and closing it deleted the bill. Patient bills (cure surgery, administered drugs) are now created directly (`SurgeryUtility.CreatePatientBill`) instead of through `HealthCardUtility.CreateSurgeryBill`, so no other mod's health-tab UI runs on them.
 - Tests: added "MultiDoctor" test to `BugFixTests`; test helpers create bills the same way.
 

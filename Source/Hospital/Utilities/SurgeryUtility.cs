@@ -72,6 +72,38 @@ public class SurgeryUtility
                 return ThingDefOf.Human.AllRecipes.Where(IsBlacklistableSurgery).Distinct();
         }
 
+        // Recipes the mod does not prepare the pawn for (no hediff added first, no part removed first):
+        // the surgery is assigned as it is, so the pawn must already be a valid target.
+        public static bool IsAsIsRecipe(RecipeDef recipe)
+        {
+                return recipe.removesHediff == null
+                       && recipe.workerClass != typeof(Recipe_InstallArtificialBodyPart)
+                       && recipe.workerClass != typeof(Recipe_InstallNaturalBodyPart);
+        }
+
+        // Vanilla Bill_Medical.CompletableEver rejects a bill whose part is not in GetPartsToApplyOn, and
+        // BillStack.RemoveIncompletableBills then deletes it without BillStack.Delete (so HasPendingSurgeryBill
+        // stays true and the patient is stuck). Never assign a recipe the worker would reject.
+        public static bool CanAssignAsIs(Pawn pawn, RecipeDef recipe)
+        {
+                if (!IsAsIsRecipe(recipe)) return true;
+                var worker = recipe.Worker;
+                if (recipe.targetsBodyPart && !worker.GetPartsToApplyOn(pawn, recipe).Any()) return false;
+                if (worker is Recipe_Surgery surgery && !surgery.CompletableEver(pawn)) return false;
+                // Plasteel Surgery body-type mods put an adult body type on a child (checked by name, no assembly reference).
+                if (!pawn.DevelopmentalStage.Adult() && IsPlasteelBodyWorker(recipe.workerClass)) return false;
+                return true;
+        }
+
+        private static bool IsPlasteelBodyWorker(System.Type type)
+        {
+                for (; type != null; type = type.BaseType)
+                {
+                        if (type.FullName == "PlasteelSurgery.BaseAlterBody") return true;
+                }
+                return false;
+        }
+
         // Hardcoded parts for modded recipes (disease overhauled etc.) whose target is not derivable from the recipe.
         // A rule overrides `part` only when the pawn really has that part; otherwise the part chosen so far is kept.
         public static BodyPartRecord ApplyNameBasedPartOverrides(RecipeDef recipe, Pawn pawn, BodyPartRecord part)
@@ -102,7 +134,7 @@ public class SurgeryUtility
 		        if (recipe.AvailableNow 
 		            && hospital.IsSurgeryRecipeAllowed(recipe)
 		            && !recipe.isViolation
-		            //&& recipe.Worker.GetPartsToApplyOn(pawn, recipe).Any()
+		            && CanAssignAsIs(pawn, recipe)
 		            && !recipe.defName.ToLower().Contains("abasia")
 		            && !recipe.defName.ToLower().Contains("coma")
 		            && !recipe.defName.ToLower().Contains("remove")
@@ -156,6 +188,13 @@ public class SurgeryUtility
 		        //Log.Message($"part selected2:" + part.def.defName);
 	        }
 	        part = ApplyNameBasedPartOverrides(selectedRecipe, pawn, part);
+	        if (IsAsIsRecipe(selectedRecipe) && selectedRecipe.targetsBodyPart)
+	        {
+		        // The worker must accept the chosen part, otherwise vanilla removes the bill again.
+		        var validParts = selectedRecipe.Worker.GetPartsToApplyOn(pawn, selectedRecipe).ToList();
+		        if (validParts.Count > 0 && (part == null || !validParts.Contains(part)))
+			        part = validParts.RandomElement();
+	        }
 	        if (part == null)
 	        {
 		        IEnumerable<BodyPartRecord> source = from x in pawn.health.hediffSet.GetNotMissingParts()

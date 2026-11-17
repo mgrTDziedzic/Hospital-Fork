@@ -43,6 +43,28 @@ namespace Hospital
         {
             Patients = new Dictionary<Pawn, PatientData>();
             PatientFoodPolicy = Current.Game.foodRestrictionDatabase.DefaultFoodRestriction();
+            // New maps only: on load Scribe_Collections replaces this list with the saved one.
+            refusedOperations.AddRange(DefaultRefusedRecipes());
+        }
+
+        // Cosmetic surgeries (Plasteel Surgery) refused on new maps: face worsening and body-type mods.
+        // Masculinize / Feminize / Sex Change are deliberately not listed.
+        static readonly string[] DefaultRefusedOperations =
+        {
+            "PS_DecreaseBeautyBasic", "PS_DecreaseBeautyMid",
+            "PS_MakeThin", "PS_MakeStandard", "PS_MakeHulk", "PS_MakeFat", "PS_MakeBB"
+        };
+
+        // Resolves the default names; recipes of mods that are not loaded are skipped.
+        public static List<RecipeDef> DefaultRefusedRecipes()
+        {
+            var result = new List<RecipeDef>();
+            foreach (var name in DefaultRefusedOperations)
+            {
+                var def = DefDatabase<RecipeDef>.GetNamedSilentFail(name);
+                if (def != null) result.Add(def);
+            }
+            return result;
         }
         
         public override void ExposeData()
