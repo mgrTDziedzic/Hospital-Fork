@@ -8,6 +8,19 @@ namespace Hospital.Utilities;
 
 public class SurgeryUtility
 {
+        // Bills the mod puts on a patient are built directly, not through HealthCardUtility.CreateSurgeryBill.
+        // Mods patch that method for the player's health tab: Multi-Doctor Surgery swaps in its own bill and
+        // opens an "assign doctors" window, and closing that window without confirming deletes the bill -
+        // a surgery patient then had nothing left to treat and went home right after arrival.
+        // Empty ingredient list rather than null (other mods' Bill_Medical code iterates it).
+        public static Bill_Medical CreatePatientBill(Pawn pawn, RecipeDef recipe, BodyPartRecord part)
+        {
+                var bill = new Bill_Medical(recipe, new List<Thing>());
+                pawn.health.surgeryBills.AddBill(bill);
+                bill.Part = part; // after AddBill, same order as vanilla
+                return bill;
+        }
+
         // Bills on the pawn that are real treatment; automatic "Administer drug" bills do not count
         // (they must not keep a patient in bed or move them to a surgery bed).
         public static bool HasRealSurgeryBills(Pawn pawn)
@@ -215,9 +228,7 @@ public class SurgeryUtility
 			        TranslatorFormattedStringExtensions.Translate("DiagnosisSurgeryOnPart", part.Label);
 	        }
 
-	        // Pass an empty ingredient list rather than null: vanilla accepts null, but other mods'
-	        // CreateSurgeryBill patches (e.g. Multi-Doctor Surgery) iterate it and throw.
-	        HealthCardUtility.CreateSurgeryBill(pawn, selectedRecipe, part, new List<Thing>(), false);
+	        CreatePatientBill(pawn, selectedRecipe, part);
 	        patientData.Cure = selectedRecipe.Worker.GetLabelWhenUsedOn(pawn, part);
 	        patientData.CureRecipe = selectedRecipe;
 

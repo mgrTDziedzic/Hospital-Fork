@@ -597,5 +597,32 @@ namespace HospitalTests
             data.Dismissed = true;
             Assert.True((bool)sentAway.Invoke(null, new object[] { patient }), "dismissed patient is not sent away");
         }
+
+        // Given: a spawned registered patient (Multi-Doctor Surgery customizes bills only for pawns with a Map).
+        // When:  the mod adds the cure bill (install denture on the jaw) via SurgeryUtility.CreatePatientBill.
+        // Then:  the bill is a plain Bill_Medical on the right part and no window was opened. Before the fix the bill went
+        //        through HealthCardUtility.CreateSurgeryBill; Multi-Doctor opened "assign doctors" and deleted the bill when
+        //        that window was closed, so the patient was sent home right after arrival.
+        [HospitalTest("MultiDoctor: a patient cure bill is a plain Bill_Medical created without opening any window")]
+        public static void PatientBillOpensNoWindow(TestContext ctx)
+        {
+            var recipe = DefDatabase<RecipeDef>.GetNamedSilentFail("InstallDenture");
+            Assert.NotNull(recipe, "RecipeDef InstallDenture not found");
+            var patient = VanillaCompatTests.Visitor(ctx, false);
+            VanillaCompatTests.Register(ctx, patient);
+            Assert.True(patient.Spawned && patient.Map != null, "patient must be spawned with a Map");
+            var jaw = patient.RaceProps.body.AllParts.FirstOrDefault(p => p.def.defName == "Jaw");
+            Assert.NotNull(jaw, "test pawn has no jaw");
+
+            int windowsBefore = Find.WindowStack.Count;
+            var bill = SurgeryUtility.CreatePatientBill(patient, recipe, jaw);
+            ctx.OnCleanup(() => { if (patient.health.surgeryBills.Bills.Contains(bill)) patient.health.surgeryBills.Delete(bill); });
+
+            Assert.Equal(windowsBefore, Find.WindowStack.Count, "a window was opened while creating the patient bill");
+            Assert.False(Find.WindowStack.Windows.Any(w => w.GetType().Name == "Dialog_AssignDoctors"), "Multi-Doctor assign window is open");
+            Assert.True(bill.GetType() == typeof(Bill_Medical), "bill type is " + bill.GetType().FullName + ", expected plain Bill_Medical");
+            Assert.True(patient.health.surgeryBills.Bills.Contains(bill), "bill is not on the patient");
+            Assert.True(bill.Part == jaw, "bill part is not the jaw");
+        }
     }
 }

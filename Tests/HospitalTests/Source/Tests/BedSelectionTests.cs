@@ -49,7 +49,7 @@ namespace HospitalTests
             var recipe = DefDatabase<RecipeDef>.GetNamedSilentFail("InstallPegLeg");
             Assert.NotNull(recipe, "recipe InstallPegLeg missing");
             var part = pawn.RaceProps.body.GetPartsWithDef(BodyPartDefOf.Leg).First();
-            HealthCardUtility.CreateSurgeryBill(pawn, recipe, part, new List<Thing>(), false);
+            global::Hospital.Utilities.SurgeryUtility.CreatePatientBill(pawn, recipe, part);
             Assert.True(pawn.health.surgeryBills.Count > 0, "precondition: surgery bill was not created");
         }
 

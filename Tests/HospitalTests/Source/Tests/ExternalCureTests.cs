@@ -56,7 +56,7 @@ namespace HospitalTests
             hospital.Patients.Add(pawn, data);
             ctx.OnCleanup(() => hospital.Patients.Remove(pawn));
 
-            HealthCardUtility.CreateSurgeryBill(pawn, recipe, part, new System.Collections.Generic.List<Thing>(), false);
+            global::Hospital.Utilities.SurgeryUtility.CreatePatientBill(pawn, recipe, part);
             var bill = pawn.health.surgeryBills.Bills.OfType<Bill_Medical>().FirstOrDefault(b => b.recipe == recipe);
             Assert.NotNull(bill, "surgery bill was not created");
             return new Setup { Hospital = hospital, Pawn = pawn, Data = data, Bill = bill, Hediff = hediff };

@@ -421,7 +421,7 @@ namespace HospitalTests
             var part = pawn.RaceProps.body.GetPartsWithDef(BodyPartDefOf.Torso).First();
             var hediff = HediffMaker.MakeHediff(hediffDef, pawn, part);
             pawn.health.AddHediff(hediff, part);
-            HealthCardUtility.CreateSurgeryBill(pawn, recipe, part, new List<Thing>(), false);
+            global::Hospital.Utilities.SurgeryUtility.CreatePatientBill(pawn, recipe, part);
             var bill = pawn.health.surgeryBills.Bills.OfType<Bill_Medical>().FirstOrDefault(b => b.recipe == recipe);
             Assert.NotNull(bill, "surgery bill was not created");
             pawn.health.hediffSet.hediffs.Remove(hediff);

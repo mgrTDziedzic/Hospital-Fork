@@ -118,7 +118,7 @@ namespace HospitalTests
             Assert.NotNull(hediffDef, "HediffDef Carcinoma not found");
             var part = rig.Pawn.RaceProps.body.GetPartsWithDef(BodyPartDefOf.Torso).First();
             rig.Pawn.health.AddHediff(HediffMaker.MakeHediff(hediffDef, rig.Pawn, part), part);
-            HealthCardUtility.CreateSurgeryBill(rig.Pawn, recipe, part, new List<Thing>(), false);
+            global::Hospital.Utilities.SurgeryUtility.CreatePatientBill(rig.Pawn, recipe, part);
             rig.CureBill = rig.Pawn.health.surgeryBills.Bills.OfType<Bill_Medical>().First(b => b.recipe == recipe);
             rig.Data.CureRecipe = recipe;
             rig.Data.HasPendingSurgeryBill = true;
@@ -585,7 +585,7 @@ namespace HospitalTests
 
             if (!Check()) return; // baseline: a healthy patient must be sent away; if not, the map/pawn state is not testable here
 
-            HealthCardUtility.CreateSurgeryBill(rig.Pawn, DrugUtility.AdministerRecipeFor(tea), null, new List<Thing>(), false);
+            global::Hospital.Utilities.SurgeryUtility.CreatePatientBill(rig.Pawn, DrugUtility.AdministerRecipeFor(tea), null);
             Assert.Equal(1, DrugBills(rig.Pawn, tea).Count, "precondition: drug bill added" + Diag(rig));
 
             Assert.True(Check(), "an unfinished drug bill kept the patient in the hospital" + Diag(rig));

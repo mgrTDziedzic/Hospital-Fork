@@ -175,7 +175,7 @@ public static class DrugUtility
             if (HasPendingBillFor(pawn, drug)) continue;
             var recipe = AdministerRecipeFor(drug);
             if (recipe == null || !recipe.AvailableOnNow(pawn)) continue;
-            var bill = HealthCardUtility.CreateSurgeryBill(pawn, recipe, null, new List<Thing>(), false);
+            var bill = SurgeryUtility.CreatePatientBill(pawn, recipe, null);
             // Doctors take bills top to bottom: the drug goes before the surgery.
             var bills = pawn.health.surgeryBills.Bills;
             if (bills.Remove(bill)) bills.Insert(0, bill);
