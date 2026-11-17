@@ -4,7 +4,8 @@
 > Adamas ([tomvd](https://github.com/tomvd)), licensed under the GNU GPLv3.
 > Modified by [mgrTDziedzic](https://github.com/mgrTDziedzic) since November 2026.
 > All credit for the original mod goes to its author. Changes made in this fork are listed in
-> [CHANGELOG.md](CHANGELOG.md).
+> [CHANGELOG.md](CHANGELOG.md); a player-friendly overview of new features is in
+> [FEATURES.md](FEATURES.md).
 >
 > Original mod on Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2992224079
 
