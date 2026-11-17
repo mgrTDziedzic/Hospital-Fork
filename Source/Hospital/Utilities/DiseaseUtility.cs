@@ -16,13 +16,12 @@ public class DiseaseUtility
         return DefDatabase<HediffDef>.defsList.Where(def => def.tendable && def.makesSickThought
         && def.lethalSeverity > 0f // severity is derived from lethalSeverity; 0 would add a harmless hediff that never needs tending
         //&& def.defName.ToLower().Contains("infection") //debug
-        && !CausesAggroMentalState(def)
+        && !IsAggressionHediff(def)
         && !def.defName.ToLower().Contains("abasia")
         && !def.defName.ToLower().Contains("sepsis")
         && !def.defName.ToLower().Contains("animal")
         && !def.defName.ToLower().Contains("gene")
         && !def.defName.ToLower().Contains("infant")
-        && !def.defName.ToLower().Contains("scaria")
         && !Compat.ModDefFilters.IsExcludedDisease(def) // Genetic Rim (mostly lethal) diseases, separation sickness
         );
     }
@@ -33,8 +32,17 @@ public class DiseaseUtility
     // faction), so colonists set to "attack" gun down a friendly visitor and the player eats
     // the goodwill penalty plus the revenge raid.
     //
-    // The defName blacklist in CandidateDiseases only catches vanilla scaria by name; this
-    // checks what the disease actually does, so modded equivalents are excluded too.
+    // Vanilla scaria sets its berserk state in the Hediff_Scaria class, not through mentalStateGivers,
+    // so it is caught by name / hediff class; modded equivalents by their mentalStateGivers.
+    // Also used for surgeries (SurgeryUtility.IsAggressionSurgery): CureScaria would add Scaria to the patient.
+    public static bool IsAggressionHediff(HediffDef def)
+    {
+        if (def == null) return false;
+        return def.defName.ToLower().Contains("scaria")
+               || (def.hediffClass != null && typeof(Hediff_Scaria).IsAssignableFrom(def.hediffClass))
+               || CausesAggroMentalState(def);
+    }
+
     private static bool CausesAggroMentalState(HediffDef def)
     {
         if (def.stages == null) return false;

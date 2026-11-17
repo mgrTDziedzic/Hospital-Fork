@@ -63,6 +63,10 @@ namespace Hospital
             //pawn.mindState.duty = new PawnDuty(DefDatabase<DutyDef>.GetNamed("Patient"), pawn.Position, 1000);
             var diagnosis = patient.Diagnosis;
             TaggedString text = def.letterText.Formatted(pawn.Named("PAWN"), diagnosis).AdjustedFor(pawn);
+            if (patient.Sedated)
+            {
+                text += "\n\n" + "PatientSedatedWarning".Translate(HospitalMod.Settings.SedationHours.ToString("0.#"));
+            }
             //text += " " + patient.baseCost.ToStringMoney();
             TaggedString title = def.letterLabel.Formatted(pawn.Named("PAWN")).AdjustedFor(pawn);
             if (HospitalMod.Settings.ShowMessageAtArrival)

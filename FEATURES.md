@@ -47,6 +47,14 @@ So it is now worth building one really good operating room.
 New hospital setting. Untick it and mass casualty events will wait until there are no manhunters
 or other aggressive animals on your map. Ticked (the default) keeps the old behaviour.
 
+### Sedated aggressive patients (optional challenge)
+Patients no longer arrive with scaria and attack your colonists (a bug in earlier versions). If you want
+the risk, tick **Allow aggressive patients** in Hospital Policies (needs "Accept surgery"). Such a patient
+arrives sedated by their faction and lies helpless where the pod landed. Get them to a bed and cure them
+before the sedation wears off; the arrival letter tells you how long you have. Too late, and they wake up
+berserk. If they die, you lose goodwill as for any dead patient. The sedation time (default 8 hours) is a
+slider in the mod settings.
+
 ### Failed surgery is not the end
 If an operation fails, the patient now stays to recover instead of walking away. You can add the
 surgery again and give your doctor another try.

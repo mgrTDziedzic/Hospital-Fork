@@ -47,6 +47,8 @@
     <AcceptPatientsTooltip>uncheck this if you want to stop patients from visiting</AcceptPatientsTooltip>
     <AcceptSurgery>Accept surgery</AcceptSurgery>
     <AcceptSurgeryTooltip>uncheck this if you do not want to get surgery events</AcceptSurgeryTooltip>
+    <AcceptAggressive>Allow aggressive patients</AcceptAggressive>
+    <AcceptAggressiveTooltip>Challenge. Needs "Accept surgery". Patients may arrive needing a cure for an aggression-causing condition (e.g. scaria). Their faction sedates them for transport; if the cure does not come in time, they wake up berserk and your colonists must deal with them. Sedation lasts {0} hours (set in the mod settings).</AcceptAggressiveTooltip>
     <AcceptDanger>Allow patients during danger</AcceptDanger>
     <AcceptDangerTooltip>check this if you want to override the check if the map if safe for patients to arrive</AcceptDangerTooltip>
     <MceAcceptDanger>Mass casualties during danger</MceAcceptDanger>
@@ -65,6 +67,9 @@
     <DiseaseSeverityMultiplierTooltip>Scales how severe arriving patients' diseases are. Higher is harder. (default: 100%)</DiseaseSeverityMultiplierTooltip>
     <WoundSeverityMultiplier>Wound severity multiplier</WoundSeverityMultiplier>
     <WoundSeverityMultiplierTooltip>Scales how badly wounded arriving patients are. Higher is harder. (default: 100%)</WoundSeverityMultiplierTooltip>
+    <SedationHours>Aggressive patient sedation (hours)</SedationHours>
+    <SedationHoursTooltip>How long an aggressive patient stays sedated after arriving, before turning berserk if not cured. Only used when "Allow aggressive patients" is on. (default: 8)</SedationHoursTooltip>
+    <PatientSedatedWarning>Sedated by their faction. They wake up in about {0} hours and will turn berserk unless cured first.</PatientSedatedWarning>
     <ResetToDefaults>Reset to defaults</ResetToDefaults>
     <BedsReserved>Beds reserved for colonists</BedsReserved>
     <BedsReservedTooltip>To make sure your beds are not all filled up with patients</BedsReservedTooltip>

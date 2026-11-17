@@ -53,11 +53,42 @@ public class SurgeryUtility
         // True for surgery recipes the mod is willing to assign as a random "needs an operation" event.
         // Mirrors the per-pawn filtering in AddRandomSurgeryBill, minus the runtime checks, so the
         // blacklist picker dialog shows exactly the recipes that could otherwise show up.
-        public static bool IsBlacklistableSurgery(RecipeDef recipe)
+        // Surgeries that cure an aggression-causing hediff (CureScaria). The mod adds that hediff to the patient
+        // first, so they are only offered when the map's "aggressive patients" challenge is on (allowAggressive).
+        public static bool IsBlacklistableSurgery(RecipeDef recipe, bool allowAggressive = false)
         {
                 return recipe.IsSurgery
                        && !recipe.isViolation
+                       && (allowAggressive || !IsAggressionSurgery(recipe))
                        && IsAssignableByName(recipe);
+        }
+
+        public static bool IsAggressionSurgery(RecipeDef recipe)
+        {
+                return recipe.removesHediff != null && DiseaseUtility.IsAggressionHediff(recipe.removesHediff);
+        }
+
+        // Aggressive patients are only generated when surgery is accepted AND the challenge is on.
+        public static bool AllowsAggressive(HospitalMapComponent hospital)
+        {
+                return hospital != null && hospital.AcceptSurgery && hospital.AcceptAggressive;
+        }
+
+        // Puts the patient under transport sedation (downed, unconscious) for SedationHours; Scaria does nothing
+        // while the pawn is downed, so the berserk only starts when it wears off.
+        public static void AddTransportSedation(Pawn pawn, PatientData patientData)
+        {
+                var def = Hospital.HospitalDefOf.Hospital_TransportSedation;
+                var sedation = HediffMaker.MakeHediff(def, pawn);
+                pawn.health.AddHediff(sedation);
+                var disappears = sedation.TryGetComp<HediffComp_Disappears>();
+                if (disappears != null)
+                {
+                        int ticks = Mathf.RoundToInt(HospitalMod.Settings.SedationHours * GenDate.TicksPerHour);
+                        disappears.disappearsAfterTicks = ticks;
+                        disappears.ticksToDisappear = ticks;
+                }
+                patientData.Sedated = true;
         }
 
         // Name-based exclusions shared by the blacklist picker and the random assignment: generic vanilla words
@@ -77,9 +108,9 @@ public class SurgeryUtility
         }
 
         // All surgeries applicable to humanlike patients that may be randomly assigned.
-        public static IEnumerable<RecipeDef> CandidateSurgeries()
+        public static IEnumerable<RecipeDef> CandidateSurgeries(bool allowAggressive = false)
         {
-                return ThingDefOf.Human.AllRecipes.Where(IsBlacklistableSurgery).Distinct();
+                return ThingDefOf.Human.AllRecipes.Where(r => IsBlacklistableSurgery(r, allowAggressive)).Distinct();
         }
 
         // Recipes the mod does not prepare the pawn for (no hediff added first, no part removed first):
@@ -138,9 +169,11 @@ public class SurgeryUtility
         public static bool AddRandomSurgeryBill(Pawn pawn, PatientData patientData, HospitalMapComponent hospital)
         {
 	        List<RecipeDef> list = new List<RecipeDef>();
+	        bool allowAggressive = AllowsAggressive(hospital);
 	        //Log.Message($"pawn.def.AllRecipes " + pawn.def.AllRecipes.Count);
 	        foreach (RecipeDef recipe in pawn.def.AllRecipes)
 	        {
+		        if (!allowAggressive && IsAggressionSurgery(recipe)) continue;
 		        if (recipe.AvailableNow 
 		            && hospital.IsSurgeryRecipeAllowed(recipe)
 		            && !recipe.isViolation
@@ -212,6 +245,8 @@ public class SurgeryUtility
 	        //Log.Message($"part selected:" + part.Label);
 	        if (selectedRecipe.removesHediff != null)
 	        {
+		        // Sedate first: Hediff_Scaria starts the berserk on its first tick unless the pawn is downed.
+		        if (IsAggressionSurgery(selectedRecipe)) AddTransportSedation(pawn, patientData);
 		        /*
 		         * if the operation removes a hediff, we need to add it first...
 		         */

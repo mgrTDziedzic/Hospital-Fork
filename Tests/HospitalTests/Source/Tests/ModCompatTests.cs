@@ -99,7 +99,9 @@ namespace HospitalTests
         public static void MergedSurgeryFilterNoRegression(TestContext ctx)
         {
             var rejected = DefDatabase<RecipeDef>.AllDefsListForReading
-                .Where(r => OldAccepted(r) && !SurgeryUtility.IsBlacklistableSurgery(r)).Select(r => r.defName).ToList();
+                // Aggression surgeries (CureScaria) were accepted by the old filter but are now deliberately rejected
+                // unless the aggressive patients challenge is on, so they are not regressions.
+                .Where(r => OldAccepted(r) && !SurgeryUtility.IsAggressionSurgery(r) && !SurgeryUtility.IsBlacklistableSurgery(r)).Select(r => r.defName).ToList();
             Assert.True(rejected.Count == 0, "newly rejected recipes: " + string.Join(", ", rejected));
         }
     }

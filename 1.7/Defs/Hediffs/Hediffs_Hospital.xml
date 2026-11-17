@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <!-- Aggressive patients challenge: their faction sedates them for transport. The patient is downed and
+       unconscious until this wears off (Hediff_Scaria does nothing while the pawn is downed). -->
+  <HediffDef>
+    <defName>Hospital_TransportSedation</defName>
+    <hediffClass>HediffWithComps</hediffClass>
+    <label>transport sedation</label>
+    <description>Sedated by their faction for the trip to the hospital, because their condition makes them dangerous. They are unconscious until it wears off.</description>
+    <isBad>false</isBad>
+    <comps>
+      <li Class="HediffCompProperties_Disappears">
+        <disappearsAfterTicks>20000~20000</disappearsAfterTicks>
+        <showRemainingTime>true</showRemainingTime>
+      </li>
+    </comps>
+    <stages>
+      <li>
+        <capMods>
+          <li>
+            <capacity>Consciousness</capacity>
+            <setMax>0.01</setMax>
+          </li>
+        </capMods>
+      </li>
+    </stages>
+  </HediffDef>
+</Defs>

@@ -24,7 +24,7 @@ namespace Hospital.MainTab
             absorbInputAroundWindow = true;
         }
 
-        public override Vector2 InitialSize => new Vector2(450f, 780f);
+        public override Vector2 InitialSize => new Vector2(450f, 805f);
 
         public override void DoWindowContents(Rect inRect)
         {
@@ -45,10 +45,11 @@ namespace Hospital.MainTab
                 "BedsReservedTooltip".Translate());*/
             listingStandard.CheckboxLabeled("MassCasualties".Translate(), ref hospital.MassCasualties, "MassCasualtiesTooltip".Translate());
             listingStandard.CheckboxLabeled("AcceptSurgery".Translate(), ref hospital.AcceptSurgery, "AcceptSurgeryTooltip".Translate());
+            listingStandard.CheckboxLabeled("AcceptAggressive".Translate(), ref hospital.AcceptAggressive, "AcceptAggressiveTooltip".Translate(HospitalMod.Settings.SedationHours.ToString("0")));
             listingStandard.CheckboxLabeled("AcceptDanger".Translate(), ref hospital.AcceptDanger, "AcceptDangerTooltip".Translate());
             listingStandard.CheckboxLabeled("MceAcceptDanger".Translate(), ref hospital.MceAcceptDanger, "MceAcceptDangerTooltip".Translate());
             listingStandard.End();
-            int y = 150;
+            int y = 175;
             TimetableUtility.DoHeader(new Rect(0, y, inRect.width, 50));
             y += 60;
             TimetableUtility.DoCell(new Rect(0, y, inRect.width, 20), hospital.openingHours, map);
@@ -103,7 +104,7 @@ namespace Hospital.MainTab
                     "BlacklistSurgeries".Translate(hospital.refusedOperations.Count)))
             {
                 OpenBlacklist("BlacklistSurgeriesTitle".Translate(),
-                    SurgeryUtility.CandidateSurgeries(),
+                    SurgeryUtility.CandidateSurgeries(hospital.AcceptSurgery && hospital.AcceptAggressive),
                     d => !hospital.IsSurgeryRecipeAllowed((RecipeDef)d),
                     (d, refused) => hospital.SetRefusedOperation((RecipeDef)d, refused));
             }

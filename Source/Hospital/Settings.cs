@@ -14,6 +14,8 @@ public class Settings : ModSettings
     public float GoodwillGainMultiplier = 1f;
     public int DeathGoodwillPenalty = 10;
     public int SurgeryFailGoodwillPenalty = 1;
+    // Hours an aggressive patient stays sedated after arrival (aggressive patients challenge).
+    public float SedationHours = 8f;
     public float DiseaseSeverityMultiplier = 1f;
     public float WoundSeverityMultiplier = 1f;
 
@@ -25,6 +27,7 @@ public class Settings : ModSettings
         Scribe_Values.Look(ref GoodwillGainMultiplier, "goodwillGainMultiplier", 1f);
         Scribe_Values.Look(ref DeathGoodwillPenalty, "deathGoodwillPenalty", 10);
         Scribe_Values.Look(ref SurgeryFailGoodwillPenalty, "surgeryFailGoodwillPenalty", 1);
+        Scribe_Values.Look(ref SedationHours, "sedationHours", 8f);
         Scribe_Values.Look(ref DiseaseSeverityMultiplier, "diseaseSeverityMultiplier", 1f);
         Scribe_Values.Look(ref WoundSeverityMultiplier, "woundSeverityMultiplier", 1f);
         base.ExposeData();
@@ -58,6 +61,10 @@ public class Settings : ModSettings
             "SurgeryFailGoodwillPenaltyTooltip".Translate());
         SurgeryFailGoodwillPenalty = Mathf.RoundToInt(surgeryFailPenalty);
 
+        listingStandard.SliderLabeled("SedationHours".Translate(), ref SedationHours, SedationHours.ToString("0.#") + "h", 2f, 24f,
+            "SedationHoursTooltip".Translate());
+        SedationHours = Mathf.Clamp(Mathf.Round(SedationHours * 2f) / 2f, 2f, 24f);
+
         listingStandard.SliderLabeled("DiseaseSeverityMultiplier".Translate(), ref DiseaseSeverityMultiplier, DiseaseSeverityMultiplier.ToString("0%"), 0.25f, 2f,
             "DiseaseSeverityMultiplierTooltip".Translate());
         listingStandard.SliderLabeled("WoundSeverityMultiplier".Translate(), ref WoundSeverityMultiplier, WoundSeverityMultiplier.ToString("0%"), 0.25f, 2f,
@@ -78,6 +85,7 @@ public class Settings : ModSettings
         GoodwillGainMultiplier = 1f;
         DeathGoodwillPenalty = 10;
         SurgeryFailGoodwillPenalty = 1;
+        SedationHours = 8f;
         DiseaseSeverityMultiplier = 1f;
         WoundSeverityMultiplier = 1f;
     }
