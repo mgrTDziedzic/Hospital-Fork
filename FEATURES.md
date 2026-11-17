@@ -67,7 +67,7 @@ surgery again and give your doctor another try.
 |---|---|
 | **MedPod** | A patient who needs a missing body part back is also counted as cured when the MedPod regrows it (a real regrown part, not a prosthetic), and pays for the treatment. Other mods' beds with "Pod" in the name now work as normal hospital beds. |
 | **Multi-Doctor Surgery** | Patients no longer leave right after arriving. To have a whole team operate on patients, turn on its **"(Beta) Fast Operation"** option and set a default surgery team. Patient surgeries then get that team automatically. Without Fast Operation, or if the team's lead surgeon can't do that operation, a single doctor operates as usual. |
-| **Plasteel Surgery (Continued)** | Cosmetic and body-shape surgeries are blocked for patients by default on new maps (you can change this in the surgery blacklist). Patients are never assigned a surgery they cannot actually receive. |
+| **Plasteel Surgery (Continued)** | On new maps, patients are not given Decrease Beauty or the body-type changes (Make Thin, Standard, Hulk, Fat, Bodybuilder) by default. Every other Plasteel operation, including Masculinize, Feminize and Sex Change, stays available. You can change this in the surgery blacklist. Patients are never assigned a surgery they cannot actually receive. |
 
 All of these are optional. Nothing changes if you don't use them.
 
