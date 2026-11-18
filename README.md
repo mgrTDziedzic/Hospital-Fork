@@ -25,6 +25,12 @@ report any problems with this fork here, not to the original author.
 - [NEW_FEATURES.md](NEW_FEATURES.md) - an overview of what the fork adds and changes
 - [PLANNED_FEATURES.md](PLANNED_FEATURES.md) - features and ideas planned for the future
 
+## Ideas and suggestions
+
+Have an idea for the mod? Feel free to suggest it on
+[GitHub Issues](https://github.com/mgrTDziedzic/Hospital-Fork/issues). One caveat: I don't
+own any of the official DLCs, so ideas involving them won't be implemented for now.
+
 ## AI use
 
 This fork was developed with the help of AI coding tools (Claude). I'm a professional
