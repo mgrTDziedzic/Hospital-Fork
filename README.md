@@ -8,6 +8,10 @@
 >
 > Original mod on Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2992224079
 
+> [!WARNING]
+> **Early stage.** This fork is a work in progress and may contain bugs. I strongly
+> recommend backing up your save before trying it.
+
 A RimWorld mod that triggers events to receive patients you have to care for.
 
 The goal of this fork is to build on the great Hospital mod by tomvd: new features, wider
