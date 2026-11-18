@@ -7,6 +7,8 @@
 > [CHANGELOG.md](CHANGELOG.md).
 >
 > Original mod on Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2992224079
+> If you enjoy Hospital, please consider supporting its original author; details are on the
+> original mod's Steam Workshop page.
 
 > [!WARNING]
 > **Early stage.** This fork is a work in progress and may contain bugs. I strongly

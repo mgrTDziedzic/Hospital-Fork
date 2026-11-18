@@ -5,7 +5,7 @@ relative to the original [Hospital](https://github.com/tomvd/Hospital) by Adamas
 Original code is © its author, licensed under GPLv3; modifications are © mgrTDziedzic, also GPLv3.
 
 ## 2026-11-18
-- README: removed the Compatibility list inherited from the original (not verified for this fork; fork compatibility is described in FEATURES.md) and added a short statement of the fork's goals (original author not involved) and an "AI use" section. Links to FEATURES.md and PLANNED_FEATURES.md moved from the fork notice to the main text. Added an early-stage warning recommending a save backup.
+- README: removed the Compatibility list inherited from the original (not verified for this fork; fork compatibility is described in FEATURES.md) and added a short statement of the fork's goals (original author not involved) and an "AI use" section. Links to FEATURES.md and PLANNED_FEATURES.md moved from the fork notice to the main text. Added an early-stage warning recommending a save backup, and a note encouraging support for the original author (details on the original mod's Steam page).
 
 ## 2026-11-17
 - Plasteel Surgery: patients only request Feminize (target body Female) from women and Masculinize (target body Male) from men. New `Compat/SurgeryFilters.IsPlausibleRequest`, used by `SurgeryUtility.EligibleSurgeries` and `CanForceOn`; Plasteel side in `PlasteelCompat` (reflection on `SurgeryDef`, decided by body type; recipes with an explicit gender, other body types and manual bills are unaffected). Pawn-generation hints for forced Feminize/Masculinize set the matching gender. No change without the mod.
