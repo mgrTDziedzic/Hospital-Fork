@@ -12,7 +12,8 @@
 
 > [!WARNING]
 > **Early stage.** This fork is a work in progress and may contain bugs. I strongly
-> recommend backing up your save before trying it.
+> recommend backing up your save before trying it. The fork has not been released on the
+> Steam Workshop yet.
 
 A RimWorld mod that triggers events to receive patients you have to care for.
 
