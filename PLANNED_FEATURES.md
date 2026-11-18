@@ -53,5 +53,6 @@ Ideas under consideration. They might not be worth doing, or might not be possib
 - **Hospital environment affects the rating.** The hospital's cleanliness, beauty and wealth would affect the patient's rating directly, on top of the usual mood effects they cause.
 - **Per-condition frequency settings.** Mod settings that give more control over how often each condition appears.
 - **Patients arriving on foot.** Patients walk to the hospital instead of arriving by transport pod. To decide: should this apply only to lightly injured patients and planned surgeries, or to every kind of condition? Having to send a pawn to fetch a patient who collapsed on the way could add variety, but it could also mean too much micromanagement for the player.
+  - Fetching patients who collapsed on the way may be a good task for animals trained in rescue.
 - **Patients leaving by transport pod.** Discharged patients leave the hospital in transport pods. Open questions: is it feasible, how should the player be compensated for the resources spent on the pods, and can the process be automated?
 - **Patient teleporter (new research).** Once researched and built, discharged patients leave through a teleporter instead of walking to the map edge, which eliminates the risk of them being attacked on the way. Open questions: is it feasible, and does it make sense?
