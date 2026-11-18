@@ -34,7 +34,7 @@ own any of the official DLCs, so ideas involving them won't be implemented for n
 
 ## AI use
 
-This fork was developed with the help of AI coding tools (Claude). I'm a professional
+This fork is being developed with the help of AI coding tools (Claude). I'm a professional
 software developer (ERP systems), though new to C# and RimWorld modding. Most of the code
 is written by AI; I decide what to change and test every change in-game.
 
