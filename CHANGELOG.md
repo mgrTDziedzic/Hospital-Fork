@@ -5,6 +5,8 @@ relative to the original [Hospital](https://github.com/tomvd/Hospital) by Adamas
 Original code is © its author, licensed under GPLv3; modifications are © mgrTDziedzic, also GPLv3.
 
 ## 2026-11-18
+- Added OVERVIEW.md: a player-facing list of everything the mod currently offers (original and fork features, no history or fixes) and mod compatibility, split into tested in the fork / supported but untested / listed by the original. Linked from README.
+- Renamed FEATURES.md to NEW_FEATURES.md (links in README and OVERVIEW.md updated).
 - README: removed the Compatibility list inherited from the original (not verified for this fork; fork compatibility is described in FEATURES.md) and added a short statement of the fork's goals (original author not involved) and an "AI use" section. Links to FEATURES.md and PLANNED_FEATURES.md moved from the fork notice to the main text. Added an early-stage warning recommending a save backup, and a note encouraging support for the original author (details on the original mod's Steam page).
 
 ## 2026-11-17

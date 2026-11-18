@@ -21,7 +21,8 @@ compatibility with other mods, bug fixes and performance improvements. The work 
 the original author's permission, but he is not involved in its development. Please
 report any problems with this fork here, not to the original author.
 
-- [FEATURES.md](FEATURES.md) - a player-friendly overview of what the fork adds and changes
+- [OVERVIEW.md](OVERVIEW.md) - everything the mod currently offers, plus mod compatibility
+- [NEW_FEATURES.md](NEW_FEATURES.md) - an overview of what the fork adds and changes
 - [PLANNED_FEATURES.md](PLANNED_FEATURES.md) - features and ideas planned for the future
 
 ## AI use
