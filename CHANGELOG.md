@@ -4,6 +4,9 @@ Changes made in this fork ([mgrTDziedzic/Hospital-Fork](https://github.com/mgrTD
 relative to the original [Hospital](https://github.com/tomvd/Hospital) by Adamas (tomvd).
 Original code is © its author, licensed under GPLv3; modifications are © mgrTDziedzic, also GPLv3.
 
+## 2026-11-18
+- README: removed the Compatibility list inherited from the original (not verified for this fork; fork compatibility is described in FEATURES.md) and added a short statement of the fork's goals (original author not involved) and an "AI use" section.
+
 ## 2026-11-17
 - Plasteel Surgery: patients only request Feminize (target body Female) from women and Masculinize (target body Male) from men. New `Compat/SurgeryFilters.IsPlausibleRequest`, used by `SurgeryUtility.EligibleSurgeries` and `CanForceOn`; Plasteel side in `PlasteelCompat` (reflection on `SurgeryDef`, decided by body type; recipes with an explicit gender, other body types and manual bills are unaffected). Pawn-generation hints for forced Feminize/Masculinize set the matching gender. No change without the mod.
 - Internal: patient generation can be steered by an optional `PatientSpec` (type, wound kind, disease, surgery recipe, ignore-restrictions flag; new `Hospital/PatientSpec.cs`). `IncidentWorker_PatientArrives.TryExecute(parms, spec)` and `IncidentWorker_MassCasualtyEvent.TryExecute(parms, forcedType)` are new public entry points; the normal events call them without a spec and behave as before. `SurgeryUtility.AddRandomSurgeryBill` is split into `EligibleSurgeries` and `AddSurgeryBill`; `DiseaseUtility.AddRandomDisease` takes an optional forced disease. Used by new dev-only debug actions in the test mod (specific wounds / disease / surgery patient, specific mass casualty type).
