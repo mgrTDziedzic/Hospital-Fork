@@ -63,9 +63,19 @@ public static class IncidentHelper
         return false;
     }
 
-    public static void DiscardGeneratedPawn(Pawn pawn)
+    // silent: vanilla's silentlyRemoveReferences (as used by the world pawn GC): battle log entries, play log
+    // entries and tales that mention the pawn are removed without a warning. Used by the debug sampler.
+    public static void DiscardGeneratedPawn(Pawn pawn, bool silent = false)
     {
         if (pawn == null || pawn.Discarded) return;
+        if (silent)
+        {
+            if (Find.WorldPawns.Contains(pawn)) Find.WorldPawns.RemovePawn(pawn);
+            if (PawnComponentsUtility.HasSpawnedComponents(pawn)) PawnComponentsUtility.RemoveComponentsOnDespawned(pawn);
+            if (!pawn.Destroyed) pawn.Destroy();
+            pawn.Discard(true);
+            return;
+        }
         if (Find.WorldPawns.Contains(pawn)) Find.WorldPawns.RemovePawn(pawn);
         Find.WorldPawns.PassToWorld(pawn, PawnDiscardDecideMode.Discard);
     }
@@ -120,6 +130,44 @@ public static class IncidentHelper
         return CellFinder.TryFindRandomEdgeCellWith(
             (IntVec3 c) => map.reachability.CanReachColony(c) && !c.Fogged(map), map,
             CellFinder.EdgeRoadChance_Neutral, out cell);
+    }
+
+    // Factions a patient can come from right now (normal play rules). manhunterOnMap: an active pawn on the map is in an
+    // aggressive mental state; the incident then skips the arrival unless AcceptDanger is on (caller decides).
+    public static List<Faction> GetPotentialPatientFactions(Map map, HospitalMapComponent hospital, out bool manhunterOnMap)
+    {
+        List<Faction> potentialPatientFactions = Find.FactionManager.AllFactions.Where(f => !f.IsPlayer && !f.defeated && !f.def.hidden && f.AllyOrNeutralTo(Faction.OfPlayer) && f.def.humanlikeFaction && !Compat.ModDefFilters.IsAndroidDef(f.def) && hospital.IsFactionAllowed(f.def)).ToList();
+
+        var activePawns = map.mapPawns.AllPawnsSpawned.Where(p => !p.Dead && !p.IsPrisoner && !p.Downed && !PatientUtility.IsFogged(p) && !p.InContainerEnclosed).ToArray();
+        manhunterOnMap = activePawns.Any(p => p.InAggroMentalState);
+
+        // remove all factions that could get hostile with a pawn on the map - or if the player is currently has hostile pawns visiting
+        potentialPatientFactions.RemoveAll(faction =>
+            activePawns.Where(p => p.Faction != null).Select(p => p.Faction).Any(f => f.HostileTo(Faction.OfPlayer) || f.HostileTo(faction)));
+        return potentialPatientFactions;
+    }
+
+    // Normal-play roll of the patient type: surgery only when the hospital accepts it.
+    public static PatientType RollPatientType(HospitalMapComponent hospital)
+    {
+        return (PatientType)Rand.Range(1, hospital.AcceptSurgery ? 4 : 3);
+    }
+
+    // Shared by the arrival incident and the debug sampler: set up the pawn, pick the type (spec?.Type overrides the
+    // roll), spawn it so it has a Map and apply the arrival wounds/disease/surgery. Leaves the pawn spawned at loc.
+    public static PatientData PrepareAndInjure(Map map, HospitalMapComponent hospital, Pawn pawn, IntVec3 loc, PatientSpec spec, out PatientType rolledType)
+    {
+        SetUpNewPatient(pawn);
+        // A forced type ignores the AcceptSurgery setting. Without a spec the roll is unchanged.
+        PatientType type = spec?.Type ?? RollPatientType(hospital);
+        rolledType = type;
+        PatientData data = new PatientData(GenDate.TicksGame, pawn.MarketValue, pawn.needs.mood.curLevelInt, type);
+        // Spawn the pawn on the map first so it has a valid Map while we apply damage/disease.
+        // Damaging an unspawned pawn (pawn.Map == null) collides with hediff comps and other
+        // mods' patches that dereference pawn.Map (sound makers, FleckMaker, CompPostPostAdd, ...).
+        GenSpawn.Spawn(pawn, loc, map);
+        PatientUtility.DamagePawn(pawn, data, hospital, spec);
+        return data;
     }
 
     public static void SetUpNewPatient(Pawn pawn)

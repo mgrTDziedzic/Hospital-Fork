@@ -51,6 +51,16 @@ namespace HospitalTests
                 category = Category,
                 childGetter = SurgeryNodes
             };
+            // Normal-play rules (no spec): what do patients get with the current settings?
+            yield return new DebugActionNode("Patient distribution sample...")
+            {
+                category = Category,
+                childGetter = () => new List<DebugActionNode>
+                {
+                    new DebugActionNode("100 patients", DebugActionType.Action, () => PatientSampler.Run(100)),
+                    new DebugActionNode("500 patients", DebugActionType.Action, () => PatientSampler.Run(500))
+                }
+            };
             yield return new DebugActionNode("Mass casualty (specific)...")
             {
                 category = Category,

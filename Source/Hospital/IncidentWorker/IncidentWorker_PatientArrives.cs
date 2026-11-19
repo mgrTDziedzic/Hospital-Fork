@@ -39,16 +39,9 @@ namespace Hospital
                 return false;
             }
             HospitalMapComponent hospital = map.GetComponent<HospitalMapComponent>();
-            List<Faction> potentialPatientFactions = Find.FactionManager.AllFactions.Where(f => !f.IsPlayer && !f.defeated && !f.def.hidden && f.AllyOrNeutralTo(Faction.OfPlayer) && f.def.humanlikeFaction && !Compat.ModDefFilters.IsAndroidDef(f.def) && hospital.IsFactionAllowed(f.def)).ToList();
-            
-            var activePawns = map.mapPawns.AllPawnsSpawned.Where(p => !p.Dead && !p.IsPrisoner && !p.Downed && !PatientUtility.IsFogged(p) && !p.InContainerEnclosed).ToArray();
-            var manhunters = activePawns.Where(p => p.InAggroMentalState);
-            if (manhunters.Any() && !map.GetComponent<HospitalMapComponent>().AcceptDanger) return false; // not a good idea to visit now :)
-            
-            // remove all factions that could get hostile with a pawn on the map - or if the player is currently has hostile pawns visiting
-            potentialPatientFactions.RemoveAll(faction => 
-                activePawns.Where(p => p.Faction != null).Select(p => p.Faction).Any(f => f.HostileTo(Faction.OfPlayer) || f.HostileTo(faction)));
-            
+            List<Faction> potentialPatientFactions = IncidentHelper.GetPotentialPatientFactions(map, hospital, out bool manhunterOnMap);
+            if (manhunterOnMap && !hospital.AcceptDanger) return false; // not a good idea to visit now :)
+
             if (potentialPatientFactions.Count == 0) return false;
 
             // Resolve the landing cell before generating anything, so a failure leaves no half-created patient.
@@ -115,20 +108,8 @@ namespace Hospital
 
         protected virtual PatientData SpawnPatient(Map map, Pawn pawn, IntVec3 loc, PatientSpec spec = null)
         {
-            IncidentHelper.SetUpNewPatient(pawn);
             HospitalMapComponent hospital = map.GetComponent<HospitalMapComponent>();
-            // A forced type ignores the AcceptSurgery setting. Without a spec the roll is unchanged.
-            PatientType type = spec?.Type ?? (PatientType)Rand.Range(1, hospital.AcceptSurgery?4:3);
-            //type = PatientType.Surgery; // debug
-            //Log.Message(pawn.Label + " -> " +type.ToString());
-            PatientData data = new PatientData(GenDate.TicksGame, pawn.MarketValue, pawn.needs.mood.curLevelInt, type);
-            //TryFindEntryCell(map, out var cell);
-            //GenSpawn.Spawn(pawn, cell, map);
-            // Spawn the pawn on the map first so it has a valid Map while we apply damage/disease.
-            // Damaging an unspawned pawn (pawn.Map == null) collides with hediff comps and other
-            // mods' patches that dereference pawn.Map (sound makers, FleckMaker, CompPostPostAdd, ...).
-            GenSpawn.Spawn(pawn, loc, map);
-            PatientUtility.DamagePawn(pawn, data, hospital, spec);
+            PatientData data = IncidentHelper.PrepareAndInjure(map, hospital, pawn, loc, spec, out _);
 
             // Now scoop the (already damaged) pawn back into a drop pod for the arrival animation.
             if (pawn.Spawned) pawn.DeSpawn();
