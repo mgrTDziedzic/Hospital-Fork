@@ -108,7 +108,7 @@ All of these are optional: nothing changes if a mod is not installed.
 |---|---|
 | **MedPod** | Patients use MedPods. A condition cured by a MedPod counts as treated and is paid for, including a missing body part regrown by the MedPod. |
 | **Multi-Doctor Surgery** | With its "(Beta) Fast Operation" option on and a default surgery team set, patient surgeries get that team. Otherwise a single doctor operates. |
-| **Plasteel Surgery (Continued)** | Patients only request surgeries they can actually receive. Decrease Beauty and most body-type changes are blacklisted by default on new maps (can be re-enabled). Feminize is requested only by women, Masculinize only by men. |
+| **Plasteel Surgery (Continued)** | Patients only request surgeries they can actually receive. Decrease Beauty and most body-type changes are blacklisted by default on new maps (can be re-enabled). Feminize is requested only by women, Masculinize only by men. Laryngoplasty patients can arrive (given Annoying voice or Creepy breathing). |
 
 ### Supported, not yet tested in this fork
 

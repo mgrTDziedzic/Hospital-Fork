@@ -115,6 +115,8 @@ public class SurgeryUtility
 
         // Recipes the mod does not prepare the pawn for (no hediff added first, no part removed first):
         // the surgery is assigned as it is, so the pawn must already be a valid target.
+        // Exception: Plasteel Laryngoplasty is prepared by adding a voice/breathing trait (see CanAssignAsIs and
+        // AddSurgeryBill); it stays "as is" here because the generic checks still apply once the trait exists.
         public static bool IsAsIsRecipe(RecipeDef recipe)
         {
                 return recipe.removesHediff == null
@@ -128,6 +130,9 @@ public class SurgeryUtility
         public static bool CanAssignAsIs(Pawn pawn, RecipeDef recipe)
         {
                 if (!IsAsIsRecipe(recipe)) return true;
+                // Plasteel Laryngoplasty: a pawn that can be given Annoying voice / Creepy breathing is eligible
+                // (AddSurgeryBill adds the trait). Mod absent: always false.
+                if (Compat.PlasteelCompat.CanPrepareLaryngoplasty(pawn, recipe)) return true;
                 var worker = recipe.Worker;
                 if (recipe.targetsBodyPart && !worker.GetPartsToApplyOn(pawn, recipe).Any()) return false;
                 if (worker is Recipe_Surgery surgery && !surgery.CompletableEver(pawn)) return false;
@@ -172,32 +177,42 @@ public class SurgeryUtility
         public static List<RecipeDef> EligibleSurgeries(Pawn pawn, HospitalMapComponent hospital, bool ignoreRestrictions = false)
         {
 	        List<RecipeDef> list = new List<RecipeDef>();
-	        bool allowAggressive = ignoreRestrictions || AllowsAggressive(hospital);
 	        foreach (RecipeDef recipe in pawn.def.AllRecipes)
 	        {
-		        if (!allowAggressive && IsAggressionSurgery(recipe)) continue;
-		        if ((ignoreRestrictions || recipe.AvailableNow) // debug: research / availability only matters for UI listings
-		            && (ignoreRestrictions || hospital.IsSurgeryRecipeAllowed(recipe))
-		            && !recipe.isViolation
-		            && CanAssignAsIs(pawn, recipe)
-		            && IsAssignableByName(recipe)
-		            && Compat.SurgeryFilters.IsPlausibleRequest(pawn, recipe)
-					)
-		        {
-			        if (!ignoreRestrictions)
-			        {
-				        if (!(from p in pawn.MapHeld.mapPawns.PawnsInFaction(Faction.OfPlayer)
-					            where p.IsFreeColonist || p.IsColonyMechPlayerControlled
-					            select p).Any((Pawn col) => recipe.PawnSatisfiesSkillRequirements(col)))
-				        {
-					        continue;
-				        }
-				        if (recipe.PotentiallyMissingIngredients(null, pawn.MapHeld).Any()) continue;
-			        }
-			        list.Add(recipe);
-		        }
+		        if (PawnStageRejection(pawn, hospital, recipe, ignoreRestrictions) != SurgeryFilter.None) continue;
+		        if (!ignoreRestrictions && MapStageRejection(pawn.MapHeld, recipe) != SurgeryFilter.None) continue;
+		        list.Add(recipe);
 	        }
 	        return list;
+        }
+
+        // The checks of EligibleSurgeries, in order. Also used by the debug patient sampler to report which check
+        // rejects which recipe (first failing check wins).
+        public enum SurgeryFilter { None, Aggressive, Research, Blacklist, Violation, DoesNotFit, Name, Implausible, Skill, Ingredients }
+
+        // Checks that need only the pawn, the settings and the recipe (no map state besides research).
+        public static SurgeryFilter PawnStageRejection(Pawn pawn, HospitalMapComponent hospital, RecipeDef recipe, bool ignoreRestrictions)
+        {
+	        bool allowAggressive = ignoreRestrictions || AllowsAggressive(hospital);
+	        if (!allowAggressive && IsAggressionSurgery(recipe)) return SurgeryFilter.Aggressive;
+	        if (!ignoreRestrictions && !recipe.AvailableNow) return SurgeryFilter.Research; // debug: research / availability only matters for UI listings
+	        if (!ignoreRestrictions && !hospital.IsSurgeryRecipeAllowed(recipe)) return SurgeryFilter.Blacklist;
+	        if (recipe.isViolation) return SurgeryFilter.Violation;
+	        if (!CanAssignAsIs(pawn, recipe)) return SurgeryFilter.DoesNotFit;
+	        if (!IsAssignableByName(recipe)) return SurgeryFilter.Name;
+	        if (!Compat.SurgeryFilters.IsPlausibleRequest(pawn, recipe)) return SurgeryFilter.Implausible;
+	        return SurgeryFilter.None;
+        }
+
+        // Checks that depend on the colony: someone with the skill, and the ingredients in stock (skipped in debug ignore mode).
+        public static SurgeryFilter MapStageRejection(Map map, RecipeDef recipe)
+        {
+	        if (!(from p in map.mapPawns.PawnsInFaction(Faction.OfPlayer)
+		            where p.IsFreeColonist || p.IsColonyMechPlayerControlled
+		            select p).Any((Pawn col) => recipe.PawnSatisfiesSkillRequirements(col)))
+		        return SurgeryFilter.Skill;
+	        if (recipe.PotentiallyMissingIngredients(null, map).Any()) return SurgeryFilter.Ingredients;
+	        return SurgeryFilter.None;
         }
 
         // The pawn-validity part of EligibleSurgeries (ignoreRestrictions = true) for one recipe. Needs no map,
@@ -252,6 +267,15 @@ public class SurgeryUtility
         // Returns true on failure.
         public static bool AddSurgeryBill(Pawn pawn, PatientData patientData, HospitalMapComponent hospital, RecipeDef selectedRecipe)
         {
+	        // Plasteel Laryngoplasty: give the pawn a voice/breathing trait first (the worker needs it to offer any part).
+	        // If the worker still offers no part, undo and fail (caller falls back to wounds).
+	        var addedTrait = Compat.PlasteelCompat.TryPrepareLaryngoplasty(pawn, selectedRecipe);
+	        if (addedTrait != null && !selectedRecipe.Worker.GetPartsToApplyOn(pawn, selectedRecipe).Any())
+	        {
+		        Compat.PlasteelCompat.RemoveLaryngoplastyTrait(pawn, addedTrait);
+		        Log.Message("tried to prepare Laryngoplasty but the recipe has no valid part");
+		        return true;
+	        }
 
 	        BodyPartRecord part = null;
 	        if (!selectedRecipe.appliedOnFixedBodyParts.NullOrEmpty()) // vanilla initializes it to an empty list

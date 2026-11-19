@@ -5,6 +5,8 @@ namespace Hospital.Compat;
 // Optional per-mod hints that shape the PawnGenerationRequest for a forced surgery (debug actions), so the
 // generated pawn is likely to fit the surgery. Hints only raise the hit rate: the pawn is always validated
 // afterwards (SurgeryUtility.CanForceOn), so a wrong or missing hint only costs a retry.
+// Current hints (Plasteel Surgery): adult / gender / body type for body surgeries, a forced voice or breathing
+// trait for Laryngoplasty.
 // No supported mod active, or no rule for the recipe: the request is left as it is.
 public static class PawnGenHints
 {

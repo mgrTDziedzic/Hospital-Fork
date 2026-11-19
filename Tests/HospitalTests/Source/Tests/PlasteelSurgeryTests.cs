@@ -121,9 +121,19 @@ namespace HospitalTests
             Assert.True(Can(pawn, "PS_DecreaseBeautyMid"), "Mid on Ugly");
         }
 
-        // Given: a pawn without Annoying Voice / Creepy Breathing. Then: Laryngoplasty is not assignable.
-        // When the pawn gets Creepy Breathing: it is.
-        [HospitalTest("PS4: Laryngoplasty is only assigned to a pawn with Annoying Voice or Creepy Breathing", RequiresMod = PlasteelId)]
+        private static bool HasVoiceTrait(Pawn pawn)
+        {
+            return pawn.story.traits.allTraits.Any(t => t.def == TraitDefOf.AnnoyingVoice || t.def == TraitDefOf.CreepyBreathing);
+        }
+
+        private static List<TraitDef> VoiceTraits()
+        {
+            return new List<TraitDef> { TraitDefOf.AnnoyingVoice, TraitDefOf.CreepyBreathing };
+        }
+
+        // Laryngoplasty is a prepared surgery (Hospital adds the trait). Given: an adult without either trait.
+        // Then: assignable; with a trait already: assignable too (as before).
+        [HospitalTest("PS4: Laryngoplasty is assignable to an adult without the traits and to one that has a trait", RequiresMod = PlasteelId)]
         public static void LaryngoplastyRules(TestContext ctx)
         {
             if (Recipe("PS_Recipes_Surgery_Laryngoplasty") == null) return;
@@ -131,10 +141,54 @@ namespace HospitalTests
             SetTrait(pawn, TraitDefOf.AnnoyingVoice, null);
             SetTrait(pawn, TraitDefOf.CreepyBreathing, null);
 
-            Assert.False(Can(pawn, "PS_Recipes_Surgery_Laryngoplasty"), "without the traits");
+            Assert.True(Can(pawn, "PS_Recipes_Surgery_Laryngoplasty"), "without the traits (prepared)");
+            Assert.False(HasVoiceTrait(pawn), "checking eligibility must not add a trait");
             SetTrait(pawn, TraitDefOf.CreepyBreathing, 0);
 
             Assert.True(Can(pawn, "PS_Recipes_Surgery_Laryngoplasty"), "with Creepy Breathing");
+        }
+
+        // Given: an adult whose traits conflict with both voice traits (simulated by a conflicting-trait def list on the
+        // trait defs, restored in cleanup). Then: Laryngoplasty is not assignable. Skipped when no conflicting trait can be built.
+        [HospitalTest("PS11: Laryngoplasty is not assignable when neither trait can be added", RequiresMod = PlasteelId)]
+        public static void LaryngoplastyNotGrantable(TestContext ctx)
+        {
+            if (Recipe("PS_Recipes_Surgery_Laryngoplasty") == null) return;
+            var pawn = Adult(ctx);
+            SetTrait(pawn, TraitDefOf.AnnoyingVoice, null);
+            SetTrait(pawn, TraitDefOf.CreepyBreathing, null);
+            // Any trait the pawn has becomes conflicting with both voice traits via their conflictingTraits lists.
+            var other = pawn.story.traits.allTraits.FirstOrDefault()?.def;
+            if (other == null) return;
+            var voice = VoiceTraits();
+            var saved = voice.Select(d => d.conflictingTraits).ToList();
+            ctx.OnCleanup(() => { for (int i = 0; i < voice.Count; i++) voice[i].conflictingTraits = saved[i]; });
+            foreach (var d in voice)
+            {
+                d.conflictingTraits = new List<TraitDef>(d.conflictingTraits ?? new List<TraitDef>()) { other };
+            }
+
+            Assert.False(Can(pawn, "PS_Recipes_Surgery_Laryngoplasty"), "neither trait can be added");
+        }
+
+        // Given: an adult without the traits and a free voice part. When: AddSurgeryBill runs for Laryngoplasty.
+        // Then: it returns false, the pawn has exactly one of the two traits and a bill exists (no double trait on a second run).
+        [HospitalTest("PS12: AddSurgeryBill gives a Laryngoplasty patient exactly one voice trait", RequiresMod = PlasteelId)]
+        public static void LaryngoplastyPrepared(TestContext ctx)
+        {
+            var recipe = Recipe("PS_Recipes_Surgery_Laryngoplasty");
+            if (recipe == null) return;
+            var hospital = VanillaCompatTests.HospitalOf(ctx);
+            var pawn = Adult(ctx);
+            SetTrait(pawn, TraitDefOf.AnnoyingVoice, null);
+            SetTrait(pawn, TraitDefOf.CreepyBreathing, null);
+            var data = new PatientData(Find.TickManager.TicksGame, 0f, 0.5f, PatientType.Surgery);
+
+            bool failed = SurgeryUtility.AddSurgeryBill(pawn, data, hospital, recipe);
+
+            Assert.False(failed, "AddSurgeryBill failed");
+            Assert.Equal(1, pawn.story.traits.allTraits.Count(t => t.def == TraitDefOf.AnnoyingVoice || t.def == TraitDefOf.CreepyBreathing), "voice traits");
+            Assert.True(data.HasPendingSurgeryBill, "pending flag");
         }
 
         // Given: a Super-immune (degree +1) pawn. Then: Immunity Boost is not assignable; without the trait it is.

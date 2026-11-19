@@ -4,6 +4,10 @@ Changes made in this fork ([mgrTDziedzic/Hospital-Fork](https://github.com/mgrTD
 relative to the original [Hospital](https://github.com/tomvd/Hospital) by Adamas (tomvd).
 Original code is © its author, licensed under GPLv3; modifications are © mgrTDziedzic, also GPLv3.
 
+## 2026-11-19
+- Plasteel Surgery: pawn-generation hints for a forced Laryngoplasty (debug actions only) now generate an adult with the Annoying voice or Creepy breathing trait (`PlasteelCompat.TryApplyHints`, worker detected by type name). No change without the mod.
+- Plasteel Surgery: Laryngoplasty patients now appear in normal play. The recipe only fits pawns with Annoying voice or Creepy breathing, so it is treated as a prepared surgery: `SurgeryUtility.CanAssignAsIs` accepts an adult humanlike pawn that can be given one of the traits (`PlasteelCompat.CanPrepareLaryngoplasty`: no conflicting trait, not disallowed by backstory or pawn kind, voice body part present), and `SurgeryUtility.AddSurgeryBill` adds one at random before choosing the part (`PlasteelCompat.TryPrepareLaryngoplasty`); if the worker still offers no part the trait is removed and the wounds fallback is used. Pawns that already have a trait or the botched hediff are handled as before. Silent and unchanged without the mod.
+
 ## 2026-11-18
 - Added OVERVIEW.md: a player-facing list of everything the mod currently offers (original and fork features, no history or fixes) and mod compatibility, split into tested in the fork / supported but untested / listed by the original. Linked from README.
 - Renamed FEATURES.md to NEW_FEATURES.md (links in README and OVERVIEW.md updated).
