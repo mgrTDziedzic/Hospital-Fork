@@ -10,7 +10,7 @@
 	</supportedVersions>
 	<description>
 		Fork of Hospital by Adamas (original: https://steamcommunity.com/sharedfiles/filedetails/?id=2992224079), maintained by mgrTDziedzic. Licensed under GPLv3, source: https://github.com/mgrTDziedzic/Hospital-Fork
-			Copyright (C) 2023-2026 Tom Van Dyck (Adamas) and contributors; fork changes (C) 2026 mgrTDziedzic (Niejeden).
+			Copyright (C) 2023-2026 Adamas (tomvd) and contributors; fork changes (C) 2026 mgrTDziedzic (Niejeden).
 
 		Run a hospital: if you have this mod enabled (and settings allow you to receive patients) and you have plenty of medical beds
 		patients will knock on your door asking for help with their disease, wounds or a surgery.

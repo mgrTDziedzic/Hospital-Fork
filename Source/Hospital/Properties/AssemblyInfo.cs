@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Hospital")]
-[assembly: AssemblyCopyright("Copyright (C) 2023-2026 Tom Van Dyck and contributors; fork (C) 2026 mgrTDziedzic")]
+[assembly: AssemblyCopyright("Copyright (C) 2023-2026 Adamas (tomvd) and contributors; fork (C) 2026 mgrTDziedzic")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

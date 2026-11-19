@@ -46,13 +46,13 @@ and is playtested manually. If you run into a bug, please report it on GitHub Is
 
 ## Credits
 
-- Original mod: Tom Van Dyck (tomvd / Adamas).
+- Original mod: Adamas (tomvd).
 - Contributors to the original: Average Otter, MCOfficer, Sakura-TA, Spagles.
 - Settings UI helper code: AlexTD and Why_is_that (as credited in `SettingsHelper.cs`).
 
 ## License
 
-Copyright (C) 2023–2026 Tom Van Dyck (tomvd, Adamas) and contributors.
+Copyright (C) 2023–2026 Adamas (tomvd) and contributors.
 Fork modifications Copyright (C) 2026 mgrTDziedzic (Niejeden).
 
 This project is licensed under the GNU General Public License v3.0, the same as the original — see [LICENSE](LICENSE).
