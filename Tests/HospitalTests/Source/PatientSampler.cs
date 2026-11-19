@@ -88,7 +88,7 @@ namespace HospitalTests
                 {
                     if (p.Spawned || p.Discarded) continue;
                     IncidentHelper.DiscardGeneratedPawn(p, silent: true);
-                    relatives++;
+                    if (p.Discarded) relatives++;
                 }
             }
             catch (Exception e)

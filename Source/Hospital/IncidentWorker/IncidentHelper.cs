@@ -65,15 +65,17 @@ public static class IncidentHelper
 
     // silent: vanilla's silentlyRemoveReferences (as used by the world pawn GC): battle log entries, play log
     // entries and tales that mention the pawn are removed without a warning. Used by the debug sampler.
+    // The silent path uses vanilla's GC route (RemoveAndDiscardPawnViaGC): it destroys and discards the pawn inside
+    // WorldPawns' "being discarded" guard. Calling Destroy() directly would pass the pawn back to the world pool as dead
+    // (Pawn.Destroy does that when no guard is set), and Discard would then refuse to discard a world pawn.
     public static void DiscardGeneratedPawn(Pawn pawn, bool silent = false)
     {
         if (pawn == null || pawn.Discarded) return;
         if (silent)
         {
-            if (Find.WorldPawns.Contains(pawn)) Find.WorldPawns.RemovePawn(pawn);
-            if (PawnComponentsUtility.HasSpawnedComponents(pawn)) PawnComponentsUtility.RemoveComponentsOnDespawned(pawn);
-            if (!pawn.Destroyed) pawn.Destroy();
-            pawn.Discard(true);
+            if (pawn.Spawned) pawn.DeSpawn(); // PassToWorld errors on spawned pawns; it also removes leftover spawned components
+            if (!Find.WorldPawns.Contains(pawn)) Find.WorldPawns.PassToWorld(pawn); // Decide mode: just adds the pawn
+            Find.WorldPawns.RemoveAndDiscardPawnViaGC(pawn);
             return;
         }
         if (Find.WorldPawns.Contains(pawn)) Find.WorldPawns.RemovePawn(pawn);
