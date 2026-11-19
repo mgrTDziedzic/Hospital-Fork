@@ -44,3 +44,5 @@ A test also fails if the game logs an error while it runs.
 ## Writing tests
 Add a `public static void` method with `[HospitalTest("description")]` in `Tests/HospitalTests/Source/Tests/`; optional `TestContext ctx` parameter.
 Use `ctx.Track(thing)` / `ctx.OnCleanup(action)` for anything you create or change.
+Put a `// Given: ... / // When: ... / // Then: ...` comment directly above the attribute (continuation lines start with `//` too).
+`Tests/TESTS.md` is a generated overview of all tests (do not edit by hand). After adding or changing tests regenerate it with `powershell -ExecutionPolicy Bypass -File Tests\gen-test-list.ps1`; the script warns about tests without a Given/When/Then comment.

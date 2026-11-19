@@ -830,6 +830,9 @@ namespace HospitalTests
         // So: push a known seed (12345), run each wound generator on a fresh pawn, and assert the seed is still 12345.
         // The old bug (Rand.seed = (uint)SummaryHealthPercent, i.e. 0 or 1) would show up as a seed != 12345.
         // We also assert the iterations counter advanced, so we know the generator really consumed RNG (the test is not vacuous).
+        // Given: Rand pushed to a known seed (12345) and a fresh pawn for each wound generator (random, gunshot, bruises, burn).
+        // When:  each generator runs on its pawn.
+        // Then:  the global Rand seed is still 12345 afterwards and the iterations counter advanced (RNG was consumed, not reseeded).
         [HospitalTest("A1: generating patient wounds does not reseed the global Rand (seed stays, counter only advances)")]
         public static void WoundsDoNotReseedRand(TestContext ctx)
         {

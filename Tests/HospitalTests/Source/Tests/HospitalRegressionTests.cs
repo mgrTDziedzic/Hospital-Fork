@@ -45,6 +45,9 @@ namespace HospitalTests
             return (bed, comp);
         }
 
+        // Given: a normal-mode bed assigned to a colonist.
+        // When:  the bed is switched to hospital mode.
+        // Then:  the colonist loses the bed.
         [HospitalTest("A3: switching a bed to hospital mode removes colonist owners")]
         public static void BedHospitalModeRemovesColonistOwner(TestContext ctx)
         {
@@ -84,6 +87,9 @@ namespace HospitalTests
 
         private static readonly MethodInfo DamageParts = typeof(WoundsUtility).GetMethod("DamageParts", BindingFlags.NonPublic | BindingFlags.Static);
 
+        // Given: a healthy pawn with forceDowned false.
+        // When:  WoundsUtility.DamageParts (private, by reflection) deals 20 damage.
+        // Then:  forceDowned is still false afterwards.
         [HospitalTest("A14: DamageParts leaves forceDowned false")]
         public static void DamagePartsResetsForceDowned(TestContext ctx)
         {

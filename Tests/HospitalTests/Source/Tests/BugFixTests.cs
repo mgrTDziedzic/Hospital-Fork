@@ -461,7 +461,10 @@ namespace HospitalTests
             Assert.False(IncidentHelper.TryGenerateAcceptedPawn(new List<Faction>(), p => true, 4, out _, out _), "empty faction list");
         }
 
-        // Then: with 0 beds the MCE count is <= 0 (the worker refuses it), with beds it stays in [bed - bed/5, bed].
+        // Given: RollPawnCount for 0 and for 10 beds, and the MCE worker with MassCasualties on and a forced pawnCount of -1.
+        // When:  the count is rolled (50 times for 10 beds) and TryExecuteWorker runs.
+        // Then:  with 0 beds the MCE count is <= 0 (the worker refuses it), with beds it stays in [bed - bed/5, bed];
+        //        the worker does not fire and creates no patients or letters.
         [HospitalTest("A19: MCE pawn count is <= 0 without beds and the worker returns false for it")]
         public static void McePawnCountWithoutBeds(TestContext ctx)
         {
@@ -513,6 +516,9 @@ namespace HospitalTests
             Assert.True(new HospitalMapComponent(ctx.Map).MceAcceptDanger, "default must be on");
         }
 
+        // Given: SilverStacks called with 0, 0.4, 1.2, 250 and 4000 silver and various stack limits (including 0).
+        // When:  the stacks are computed.
+        // Then:  amounts are rounded, no stack is 0, stacks are split by the limit (250/100 -> 100,100,50), the total is kept and limit 0 does not hang.
         [HospitalTest("A6: silver payment is rounded, never a 0 stack, and split by the stack limit")]
         public static void SilverStacksAreValid(TestContext ctx)
         {
@@ -526,6 +532,9 @@ namespace HospitalTests
             Assert.Equal(5, HospitalMapComponent.SilverStacks(5f, 0).Sum(), "stack limit 0 must not hang or lose silver");
         }
 
+        // Given: WoundsUtility.RollDamage with a tiny severity multiplier (0.01, 0.1) and with full rolls (multiplier 1 and 2).
+        // When:  the damage budget is rolled.
+        // Then:  tiny multipliers still give at least 1; full rolls give 50 and 100.
         [HospitalTest("A16: wound damage budget is at least 1 even with a tiny severity multiplier")]
         public static void WoundDamageNeverZero(TestContext ctx)
         {
@@ -535,6 +544,9 @@ namespace HospitalTests
             Assert.Equal(100, WoundsUtility.RollDamage(1f, 2f), "full roll, multiplier 2");
         }
 
+        // Given: the Patient work type, Cleaning and a null work type.
+        // When:  IsPatientWork is called with each.
+        // Then:  null and Cleaning are not patient work, the Patient work type is; no exception on null.
         [HospitalTest("B9: IsPatientWork handles a null workType and still accepts Patient / PatientBedRest")]
         public static void PatientWorkNullWorkType(TestContext ctx)
         {
