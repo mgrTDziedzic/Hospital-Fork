@@ -44,6 +44,17 @@ To reduce risk, the fork adds:
 
 and is playtested manually. If you run into a bug, please report it on GitHub Issues.
 
+## Credits
+
+- Original mod: Tom Van Dyck (tomvd / Adamas).
+- Contributors to the original: Average Otter, MCOfficer, Sakura-TA, Spagles.
+- Settings UI helper code: AlexTD and Why_is_that (as credited in `SettingsHelper.cs`).
+
 ## License
 
+Copyright (C) 2023–2026 Tom Van Dyck (tomvd, Adamas) and contributors.
+Fork modifications Copyright (C) 2026 mgrTDziedzic (Niejeden).
+
 This project is licensed under the GNU General Public License v3.0, the same as the original — see [LICENSE](LICENSE).
+
+Third-party: `0MultiplayerAPI.dll` is the RimWorld Multiplayer API (MIT, © 2018 Zetrith) — see [LICENSES/MultiplayerAPI-LICENSE.txt](LICENSES/MultiplayerAPI-LICENSE.txt).
