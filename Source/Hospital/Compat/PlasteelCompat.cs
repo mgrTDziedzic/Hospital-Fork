@@ -131,6 +131,154 @@ public static class PlasteelCompat
                 if (trait != null && pawn.story.traits.allTraits.Contains(trait)) pawn.story.traits.RemoveTrait(trait);
         }
 
+        // ---------- Beauty surgeries (BaseAlterBeauty and subclasses) ----------
+
+        private static bool beautyBroken;
+        private static TraitDef beautyDef;
+        private static readonly Dictionary<System.Type, MethodInfo> allowedDegreesMethods = new Dictionary<System.Type, MethodInfo>();
+
+        // What TryPrepareBeauty changed, so it can be undone: the removed original trait (null = pawn had none)
+        // and the added one (null = target degree 0, no trait).
+        public class BeautyPrep
+        {
+                public Trait Removed;
+                public Trait Added;
+        }
+
+        private static bool IsBeautyWorker(System.Type type)
+        {
+                for (; type != null; type = type.BaseType)
+                        if (type.FullName == "PlasteelSurgery.BaseAlterBeauty") return true;
+                return false;
+        }
+
+        // Plasteel Surgery loaded and this is one of its beauty recipes (Increase/Decrease/Make*).
+        public static bool IsBeautyRecipe(RecipeDef recipe)
+        {
+                return recipe != null && !beautyBroken && SupportedMods.IsActive(SupportedMods.PlasteelSurgery) && IsBeautyWorker(recipe.workerClass);
+        }
+
+        private static void DisableBeauty(Exception e)
+        {
+                beautyBroken = true;
+                Log.Message("[Hospital] Plasteel Surgery compatibility for beauty surgeries is off (API differs: " + (e?.GetType().Name ?? "unknown") + ")");
+        }
+
+        // Same def lookup as Plasteel (BaseAlterBeauty.beauty).
+        private static TraitDef BeautyDef()
+        {
+                return beautyDef ??= DefDatabase<TraitDef>.GetNamedSilentFail("Beauty");
+        }
+
+        // The recipe worker's protected AllowedDegrees(); null on API problems (compat then off).
+        private static List<int> ReadAllowedDegrees(RecipeDef recipe)
+        {
+                try
+                {
+                        var workerType = recipe.Worker.GetType();
+                        if (!allowedDegreesMethods.TryGetValue(workerType, out var method))
+                        {
+                                method = workerType.GetMethod("AllowedDegrees", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                if (method == null) throw new MissingMethodException(workerType.FullName, "AllowedDegrees");
+                                allowedDegreesMethods[workerType] = method;
+                        }
+                        return method.Invoke(recipe.Worker, null) as List<int> ?? throw new InvalidCastException("AllowedDegrees");
+                }
+                catch (Exception e)
+                {
+                        DisableBeauty(e);
+                        return null;
+                }
+        }
+
+        // Degrees (0 = no trait) the worker accepts that the pawn could get, ignoring the Beauty trait it has now.
+        private static List<int> GrantableBeautyDegrees(Pawn pawn, RecipeDef recipe, TraitDef beauty, Trait current)
+        {
+                var result = new List<int>();
+                var allowed = ReadAllowedDegrees(recipe);
+                if (allowed == null) return result;
+                var story = pawn.story;
+                var kind = pawn.kindDef;
+                foreach (int degree in allowed)
+                {
+                        if (degree == 0) { result.Add(0); continue; }
+                        if (beauty.degreeDatas.NullOrEmpty() || !beauty.degreeDatas.Any(d => d.degree == degree)) continue;
+                        if (story.traits.allTraits.Any(t => t != current && beauty.ConflictsWith(t))) continue;
+                        if (story.Childhood != null && story.Childhood.DisallowsTrait(beauty, degree)) continue;
+                        if (story.Adulthood != null && story.Adulthood.DisallowsTrait(beauty, degree)) continue;
+                        if (kind != null && (kind.disallowedTraits.NotNullAndContains(beauty)
+                                             || (kind.disallowedTraitsWithDegree != null && kind.disallowedTraitsWithDegree.Any(r => r.def == beauty && (!r.degree.HasValue || r.degree.Value == degree))))) continue;
+                        result.Add(degree);
+                }
+                return result;
+        }
+
+        // The pawn's own Beauty trait, or null. Out: false when it cannot be swapped (gene-sourced, suppressed).
+        private static bool TryGetCurrentBeauty(Pawn pawn, TraitDef beauty, out Trait current)
+        {
+                current = pawn.story.traits.allTraits.FirstOrDefault(t => t.def == beauty);
+                return current == null || (current.sourceGene == null && !current.Suppressed);
+        }
+
+        // Beauty recipes are "prepared" surgeries: the worker only offers a pawn whose Beauty degree is in its
+        // AllowedDegrees(), so Hospital sets such a trait first (TryPrepareBeauty). True: beauty recipe, the
+        // worker rejects the pawn as it is, and an allowed degree could be given to it.
+        public static bool CanPrepareBeauty(Pawn pawn, RecipeDef recipe)
+        {
+                if (!IsBeautyRecipe(recipe) || pawn?.story?.traits == null || !pawn.RaceProps.Humanlike) return false;
+                var beauty = BeautyDef();
+                if (beauty == null || !TryGetCurrentBeauty(pawn, beauty, out var current)) return false;
+                var allowed = ReadAllowedDegrees(recipe);
+                if (allowed == null) return false;
+                int currentDegree = current?.Degree ?? 0;
+                if (allowed.Contains(currentDegree)) return false; // the worker accepts the pawn as it is
+                return GrantableBeautyDegrees(pawn, recipe, beauty, current).Count > 0;
+        }
+
+        // Swaps the pawn's Beauty trait to a random allowed degree when CanPrepareBeauty. Returns what changed
+        // (undo with RestoreBeauty) or null when nothing was changed. On a failed swap the original is restored.
+        public static BeautyPrep TryPrepareBeauty(Pawn pawn, RecipeDef recipe)
+        {
+                if (!CanPrepareBeauty(pawn, recipe)) return null;
+                var beauty = BeautyDef();
+                TryGetCurrentBeauty(pawn, beauty, out var current);
+                var degrees = GrantableBeautyDegrees(pawn, recipe, beauty, current);
+                if (degrees.Count == 0) return null;
+                var prep = new BeautyPrep { Removed = current };
+                int degree = degrees.RandomElement();
+                try
+                {
+                        if (current != null) pawn.story.traits.RemoveTrait(current);
+                        if (degree != 0)
+                        {
+                                var added = new Trait(beauty, degree);
+                                pawn.story.traits.GainTrait(added);
+                                if (!pawn.story.traits.allTraits.Contains(added))
+                                {
+                                        RestoreBeauty(pawn, prep);
+                                        return null;
+                                }
+                                prep.Added = added;
+                        }
+                        return prep;
+                }
+                catch (Exception e)
+                {
+                        RestoreBeauty(pawn, prep);
+                        DisableBeauty(e);
+                        return null;
+                }
+        }
+
+        // Undoes TryPrepareBeauty: removes the added trait and gives the original back.
+        public static void RestoreBeauty(Pawn pawn, BeautyPrep prep)
+        {
+                if (prep == null) return;
+                var traits = pawn.story.traits;
+                if (prep.Added != null && traits.allTraits.Contains(prep.Added)) traits.RemoveTrait(prep.Added);
+                if (prep.Removed != null && !traits.allTraits.Contains(prep.Removed)) traits.GainTrait(prep.Removed);
+        }
+
         // Laryngoplasty: patient generated with a voice/breathing trait. Body-type surgeries (BaseAlterBody) only work on adults of the right gender whose body type differs from
         // the target. Mod absent or recipe not a body surgery: nothing happens.
         public static void TryApplyHints(RecipeDef recipe, ref PawnGenerationRequest request)

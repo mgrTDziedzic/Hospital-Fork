@@ -86,39 +86,126 @@ namespace HospitalTests
 
         // ---------- worker-rejected recipes ----------
 
-        // Given: a Beautiful (+2) pawn. Then: no Increase Beauty recipe is assignable.
-        // When the pawn has Beauty 0: only Mid is.
-        [HospitalTest("PS3: Increase Beauty is not assigned when the worker rejects the pawn's beauty", RequiresMod = PlasteelId)]
-        public static void BeautyRules(TestContext ctx)
+        private static int BeautyDegree(Pawn pawn)
         {
-                        var pawn = Adult(ctx);
-
-            SetBeauty(pawn, 2);
-            Assert.False(Can(pawn, "PS_IncreaseBeautyBasic"), "Basic on Beautiful");
-            Assert.False(Can(pawn, "PS_IncreaseBeautyMid"), "Mid on Beautiful");
-            Assert.False(Can(pawn, "PS_IncreaseBeautyAdv"), "Adv on Beautiful");
-
-            SetBeauty(pawn, null);
-            Assert.False(Can(pawn, "PS_IncreaseBeautyBasic"), "Basic at beauty 0");
-            Assert.True(Can(pawn, "PS_IncreaseBeautyMid"), "Mid at beauty 0");
-            Assert.False(Can(pawn, "PS_IncreaseBeautyAdv"), "Adv at beauty 0");
+            return pawn.story.traits.DegreeOfTrait(DefDatabase<TraitDef>.GetNamed("Beauty"));
         }
 
-        // Given: a Staggeringly ugly (-2) pawn. Then: neither Decrease Beauty recipe is assignable (nothing left to worsen).
-        // When the pawn is Ugly (-1): Mid is assignable, Basic is not.
-        [HospitalTest("PS10: Decrease Beauty is not assigned when the worker rejects the pawn's beauty (Basic at 0/+1, Mid at -1/+2)", RequiresMod = PlasteelId)]
+        // Beauty recipes are prepared surgeries (Hospital sets an allowed Beauty degree). Given: a Beautiful (+2) pawn.
+        // Then: every Increase Beauty recipe is assignable (prepared), and checking eligibility leaves the trait alone.
+        // Same at Beauty 0.
+        [HospitalTest("PS3: Increase Beauty is assignable to any pawn that can be given an allowed beauty degree", RequiresMod = PlasteelId)]
+        public static void BeautyRules(TestContext ctx)
+        {
+            var pawn = Adult(ctx);
+
+            SetBeauty(pawn, 2);
+            Assert.True(Can(pawn, "PS_IncreaseBeautyBasic"), "Basic on Beautiful");
+            Assert.True(Can(pawn, "PS_IncreaseBeautyMid"), "Mid on Beautiful");
+            Assert.True(Can(pawn, "PS_IncreaseBeautyAdv"), "Adv on Beautiful");
+            Assert.Equal(2, BeautyDegree(pawn), "checking eligibility must not change the trait");
+
+            SetBeauty(pawn, null);
+            Assert.True(Can(pawn, "PS_IncreaseBeautyBasic"), "Basic at beauty 0");
+            Assert.True(Can(pawn, "PS_IncreaseBeautyMid"), "Mid at beauty 0");
+            Assert.True(Can(pawn, "PS_IncreaseBeautyAdv"), "Adv at beauty 0");
+            Assert.Equal(0, BeautyDegree(pawn), "checking eligibility must not change the trait");
+        }
+
+        // Given: Beauty is disallowed for the pawn's kind (restored in cleanup), pawn Staggeringly ugly (-2).
+        // Then: recipes that need a Beauty trait to be set are not assignable (Basic needs -1; Decrease Mid needs -1/+2);
+        // recipes whose allowed degree is 0 (Increase Mid, Decrease Basic accepts 0/+1) still are.
+        [HospitalTest("PS10: beauty recipes that need a trait the pawn cannot get are not assignable", RequiresMod = PlasteelId)]
         public static void DecreaseBeautyRules(TestContext ctx)
         {
             if (Recipe("PS_DecreaseBeautyBasic") == null || Recipe("PS_DecreaseBeautyMid") == null) return;
             var pawn = Adult(ctx);
-
+            var beauty = DefDatabase<TraitDef>.GetNamed("Beauty");
+            var kind = pawn.kindDef;
+            var saved = kind.disallowedTraits;
+            ctx.OnCleanup(() => kind.disallowedTraits = saved);
+            kind.disallowedTraits = new List<TraitDef>(saved ?? new List<TraitDef>()) { beauty };
             SetBeauty(pawn, -2);
-            Assert.False(Can(pawn, "PS_DecreaseBeautyBasic"), "Basic on Staggeringly ugly");
-            Assert.False(Can(pawn, "PS_DecreaseBeautyMid"), "Mid on Staggeringly ugly");
 
-            SetBeauty(pawn, -1);
-            Assert.False(Can(pawn, "PS_DecreaseBeautyBasic"), "Basic on Ugly");
-            Assert.True(Can(pawn, "PS_DecreaseBeautyMid"), "Mid on Ugly");
+            Assert.False(Can(pawn, "PS_IncreaseBeautyBasic"), "Basic needs -1, which is disallowed");
+            Assert.False(Can(pawn, "PS_DecreaseBeautyMid"), "Decrease Mid needs -1 or +2, which are disallowed");
+            Assert.True(Can(pawn, "PS_IncreaseBeautyMid"), "Increase Mid needs no trait (degree 0)");
+            Assert.True(Can(pawn, "PS_DecreaseBeautyBasic"), "Decrease Basic accepts degree 0");
+        }
+
+        // Given: a pawn at each start degree. When: AddSurgeryBill runs for Increase Beauty (Basic: only -1 allowed).
+        // Then: it succeeds, the pawn is now Ugly (-1) and the bill is pending.
+        [HospitalTest("PS13: AddSurgeryBill sets the allowed beauty degree for Increase Beauty (Basic)", RequiresMod = PlasteelId)]
+        public static void BeautyPrepared(TestContext ctx)
+        {
+            var recipe = Recipe("PS_IncreaseBeautyBasic");
+            if (recipe == null) return;
+            var hospital = VanillaCompatTests.HospitalOf(ctx);
+            foreach (int? start in new int?[] { 2, null })
+            {
+                var pawn = Adult(ctx);
+                SetBeauty(pawn, start);
+                var data = new PatientData(Find.TickManager.TicksGame, 0f, 0.5f, PatientType.Surgery);
+
+                bool failed = SurgeryUtility.AddSurgeryBill(pawn, data, hospital, recipe);
+
+                Assert.False(failed, "AddSurgeryBill failed from " + start);
+                Assert.Equal(-1, BeautyDegree(pawn), "beauty degree from " + start);
+                Assert.Equal(1, pawn.story.traits.allTraits.Count(t => t.def.defName == "Beauty"), "exactly one Beauty trait");
+                Assert.True(data.HasPendingSurgeryBill, "pending flag from " + start);
+            }
+        }
+
+        // Given: a pawn at Beauty 0 (Mid) and one Staggeringly ugly (Basic); Decrease recipes are blacklisted by default but can be re-enabled.
+        // When: AddSurgeryBill runs for Decrease Beauty Mid (allowed -1 or +2) and Basic (allowed 0 or +1).
+        // Then: both succeed, the pawn's Beauty degree is one the recipe's worker accepts, and the bill is pending.
+        [HospitalTest("PS15: AddSurgeryBill sets an allowed beauty degree for Decrease Beauty (Basic and Mid)", RequiresMod = PlasteelId)]
+        public static void DecreaseBeautyPrepared(TestContext ctx)
+        {
+            var mid = Recipe("PS_DecreaseBeautyMid");
+            var basic = Recipe("PS_DecreaseBeautyBasic");
+            if (mid == null || basic == null) return;
+            var hospital = VanillaCompatTests.HospitalOf(ctx);
+            var cases = new[] { (mid, (int?)null, new[] { -1, 2 }), (basic, (int?)-2, new[] { 0, 1 }) };
+            foreach (var (recipe, start, allowed) in cases)
+            {
+                var pawn = Adult(ctx);
+                SetBeauty(pawn, start);
+                var data = new PatientData(Find.TickManager.TicksGame, 0f, 0.5f, PatientType.Surgery);
+
+                bool failed = SurgeryUtility.AddSurgeryBill(pawn, data, hospital, recipe);
+
+                Assert.False(failed, recipe.defName + " AddSurgeryBill failed");
+                Assert.True(allowed.Contains(BeautyDegree(pawn)), recipe.defName + " degree " + BeautyDegree(pawn) + " not allowed");
+                Assert.True(data.HasPendingSurgeryBill, recipe.defName + " pending flag");
+            }
+        }
+
+        // Given: Beautiful (+2) pawn, recipe Increase Beauty Mid (allowed degree 0 = no trait). When: AddSurgeryBill runs.
+        // Then: the Beauty trait is gone. When TryPrepareBeauty is undone with RestoreBeauty on another +2 pawn, +2 is back.
+        [HospitalTest("PS14: beauty preparation can target 'no trait' and can be undone", RequiresMod = PlasteelId)]
+        public static void BeautyPrepareAndRestore(TestContext ctx)
+        {
+            var recipe = Recipe("PS_IncreaseBeautyMid");
+            if (recipe == null) return;
+            var hospital = VanillaCompatTests.HospitalOf(ctx);
+            var pawn = Adult(ctx);
+            SetBeauty(pawn, 2);
+            var data = new PatientData(Find.TickManager.TicksGame, 0f, 0.5f, PatientType.Surgery);
+
+            bool failed = SurgeryUtility.AddSurgeryBill(pawn, data, hospital, recipe);
+
+            Assert.False(failed, "AddSurgeryBill failed");
+            Assert.Equal(0, BeautyDegree(pawn), "Beauty trait removed");
+            Assert.False(pawn.story.traits.allTraits.Any(t => t.def.defName == "Beauty"), "no Beauty trait left");
+
+            var other = Adult(ctx);
+            SetBeauty(other, 2);
+            var prep = global::Hospital.Compat.PlasteelCompat.TryPrepareBeauty(other, recipe);
+            Assert.NotNull(prep, "prepared");
+            Assert.Equal(0, BeautyDegree(other), "prepared to no trait");
+            global::Hospital.Compat.PlasteelCompat.RestoreBeauty(other, prep);
+            Assert.Equal(2, BeautyDegree(other), "restored");
         }
 
         private static bool HasVoiceTrait(Pawn pawn)

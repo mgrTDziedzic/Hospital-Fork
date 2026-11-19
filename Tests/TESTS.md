@@ -6,7 +6,7 @@ Generated file, do not edit by hand. Regenerate with:
 
 Source: `[HospitalTest]` attributes and the `// Given: / When: / Then:` comments above each test method in `Tests/HospitalTests/Source/Tests/`.
 
-Total tests: 110
+Total tests: 113
 
 ## AggressivePatientTests.cs
 
@@ -135,8 +135,11 @@ Total tests: 110
 |---|---|---|---|---|---|---|
 | PS1 | `DefaultListContents` | default refused recipes hold Decrease Beauty and body-type mods, not Masculinize/Feminize/Sex Change | Plasteel Surgery loaded. | the default list is resolved. | face worsening and body-type recipes are in it; Masculinize, Feminize and Sex Change are not. | mod PlasteelSurgery |
 | PS2 | `NewComponentHasDefaults` | a new HospitalMapComponent refuses the defaults; Feminize stays allowed | a freshly constructed component (not registered on the map, new-map case). | its blacklist is read. | defaults are in refusedOperations; Decrease Beauty refused, Feminize allowed. | mod PlasteelSurgery |
-| PS3 | `BeautyRules` | Increase Beauty is not assigned when the worker rejects the pawn's beauty | a Beautiful (+2) pawn. |  | no Increase Beauty recipe is assignable. When the pawn has Beauty 0: only Mid is. | mod PlasteelSurgery |
-| PS10 | `DecreaseBeautyRules` | Decrease Beauty is not assigned when the worker rejects the pawn's beauty (Basic at 0/+1, Mid at -1/+2) | a Staggeringly ugly (-2) pawn. |  | neither Decrease Beauty recipe is assignable (nothing left to worsen). When the pawn is Ugly (-1): Mid is assignable, Basic is not. | mod PlasteelSurgery |
+| PS3 | `BeautyRules` | Increase Beauty is assignable to any pawn that can be given an allowed beauty degree | a Beautiful (+2) pawn. |  | every Increase Beauty recipe is assignable (prepared), and checking eligibility leaves the trait alone. Same at Beauty 0. | mod PlasteelSurgery |
+| PS10 | `DecreaseBeautyRules` | beauty recipes that need a trait the pawn cannot get are not assignable | Beauty is disallowed for the pawn's kind (restored in cleanup), pawn Staggeringly ugly (-2). |  | recipes that need a Beauty trait to be set are not assignable (Basic needs -1; Decrease Mid needs -1/+2); recipes whose allowed degree is 0 (Increase Mid, Decrease Basic accepts 0/+1) still are. | mod PlasteelSurgery |
+| PS13 | `BeautyPrepared` | AddSurgeryBill sets the allowed beauty degree for Increase Beauty (Basic) | a pawn at each start degree. | AddSurgeryBill runs for Increase Beauty (Basic: only -1 allowed). | it succeeds, the pawn is now Ugly (-1) and the bill is pending. | mod PlasteelSurgery |
+| PS15 | `DecreaseBeautyPrepared` | AddSurgeryBill sets an allowed beauty degree for Decrease Beauty (Basic and Mid) | a pawn at Beauty 0 (Mid) and one Staggeringly ugly (Basic); Decrease recipes are blacklisted by default but can be re-enabled. | AddSurgeryBill runs for Decrease Beauty Mid (allowed -1 or +2) and Basic (allowed 0 or +1). | both succeed, the pawn's Beauty degree is one the recipe's worker accepts, and the bill is pending. | mod PlasteelSurgery |
+| PS14 | `BeautyPrepareAndRestore` | beauty preparation can target 'no trait' and can be undone | Beautiful (+2) pawn, recipe Increase Beauty Mid (allowed degree 0 = no trait). | AddSurgeryBill runs. | the Beauty trait is gone. When TryPrepareBeauty is undone with RestoreBeauty on another +2 pawn, +2 is back. | mod PlasteelSurgery |
 | PS4 | `LaryngoplastyRules` | Laryngoplasty is assignable to an adult without the traits and to one that has a trait | an adult without either trait. |  | assignable; with a trait already: assignable too (as before). | mod PlasteelSurgery |
 | PS11 | `LaryngoplastyNotGrantable` | Laryngoplasty is not assignable when neither trait can be added | an adult whose traits conflict with both voice traits (simulated by a conflicting-trait def list on the trait defs, restored in cleanup). |  | Laryngoplasty is not assignable. Skipped when no conflicting trait can be built. | mod PlasteelSurgery |
 | PS12 | `LaryngoplastyPrepared` | AddSurgeryBill gives a Laryngoplasty patient exactly one voice trait | an adult without the traits and a free voice part. | AddSurgeryBill runs for Laryngoplasty. | it returns false, the pawn has exactly one of the two traits and a bill exists (no double trait on a second run). | mod PlasteelSurgery |

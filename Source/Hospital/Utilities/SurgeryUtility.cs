@@ -133,6 +133,8 @@ public class SurgeryUtility
                 // Plasteel Laryngoplasty: a pawn that can be given Annoying voice / Creepy breathing is eligible
                 // (AddSurgeryBill adds the trait). Mod absent: always false.
                 if (Compat.PlasteelCompat.CanPrepareLaryngoplasty(pawn, recipe)) return true;
+                // Plasteel beauty recipes: a pawn that can be given an allowed Beauty degree is eligible (AddSurgeryBill sets it).
+                if (Compat.PlasteelCompat.CanPrepareBeauty(pawn, recipe)) return true;
                 var worker = recipe.Worker;
                 if (recipe.targetsBodyPart && !worker.GetPartsToApplyOn(pawn, recipe).Any()) return false;
                 if (worker is Recipe_Surgery surgery && !surgery.CompletableEver(pawn)) return false;
@@ -274,6 +276,16 @@ public class SurgeryUtility
 	        {
 		        Compat.PlasteelCompat.RemoveLaryngoplastyTrait(pawn, addedTrait);
 		        Log.Message("tried to prepare Laryngoplasty but the recipe has no valid part");
+		        return true;
+	        }
+
+	        // Plasteel beauty recipes: set an allowed Beauty degree first (the worker only offers the core part then).
+	        // If the worker still offers no part, restore the original trait and fail (caller falls back to wounds).
+	        var beautyPrep = Compat.PlasteelCompat.TryPrepareBeauty(pawn, selectedRecipe);
+	        if (beautyPrep != null && !selectedRecipe.Worker.GetPartsToApplyOn(pawn, selectedRecipe).Any())
+	        {
+		        Compat.PlasteelCompat.RestoreBeauty(pawn, beautyPrep);
+		        Log.Message("tried to prepare a beauty surgery but the recipe has no valid part");
 		        return true;
 	        }
 
