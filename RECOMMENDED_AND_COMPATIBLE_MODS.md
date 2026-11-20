@@ -151,7 +151,7 @@ some of them) and they shouldn't get in your hospital's way.
 | **Vanilla Skills Expanded**† | |
 
 \*\* Compatibility inherited from the original Hospital; not yet re-checked in this fork.<br>
-† Played alongside it in this fork, no issues noticed.
+† Played alongside it in this fork, no major issues noticed.
 
 ---
 
