@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384" width="384" height="384">
+  <!-- Royal pad: marble disc, gold rim, purple ring, laurel wreath and star. 3x3 tiles. -->
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6d77a"/><stop offset="0.5" stop-color="#d4a530"/><stop offset="1" stop-color="#9a7116"/>
+    </linearGradient>
+    <radialGradient id="marble" cx="0.4" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#f4f1ea"/><stop offset="1" stop-color="#d9d3c6"/>
+    </radialGradient>
+    <g id="leaf"><path d="M0 0 C6 -8 18 -8 22 0 C18 8 6 8 0 0 Z"/></g>
+  </defs>
+
+  <!-- gold outer rim -->
+  <circle cx="192" cy="192" r="182" fill="#3a2a08"/>
+  <circle cx="192" cy="192" r="177" fill="url(#gold)"/>
+  <!-- purple band with gold studs -->
+  <circle cx="192" cy="192" r="162" fill="#4b2466" stroke="#2a1038" stroke-width="3"/>
+  <g fill="url(#gold)" stroke="#3a2a08" stroke-width="1.5">
+    <circle cx="192" cy="40" r="5"/><circle cx="192" cy="344" r="5"/><circle cx="40" cy="192" r="5"/><circle cx="344" cy="192" r="5"/>
+    <circle cx="299" cy="85" r="5"/><circle cx="85" cy="85" r="5"/><circle cx="299" cy="299" r="5"/><circle cx="85" cy="299" r="5"/>
+  </g>
+  <!-- marble disc -->
+  <circle cx="192" cy="192" r="138" fill="url(#marble)" stroke="#3a2a08" stroke-width="4"/>
+  <g fill="none" stroke="#bdb5a4" stroke-width="1.5" stroke-opacity="0.8">
+    <path d="M80 140 C120 150 140 120 180 130 C210 138 220 110 260 115"/>
+    <path d="M100 270 C140 250 170 280 210 262 C240 250 270 262 296 240"/>
+    <path d="M150 90 C160 110 150 130 162 150"/>
+  </g>
+  <circle cx="192" cy="192" r="122" fill="none" stroke="url(#gold)" stroke-width="3"/>
+
+  <!-- laurel wreath: two branches, open at the top -->
+  <g fill="#3f7a3a" stroke="#1d3a1a" stroke-width="1.5">
+    <g id="branch">
+      <use href="#leaf" transform="translate(192 296) rotate(200)"/>
+      <use href="#leaf" transform="translate(160 290) rotate(220)"/>
+      <use href="#leaf" transform="translate(132 276) rotate(240)"/>
+      <use href="#leaf" transform="translate(110 254) rotate(258)"/>
+      <use href="#leaf" transform="translate(96 226) rotate(275)"/>
+      <use href="#leaf" transform="translate(92 196) rotate(290)"/>
+      <use href="#leaf" transform="translate(98 166) rotate(305)"/>
+      <use href="#leaf" transform="translate(112 138) rotate(322)"/>
+      <use href="#leaf" transform="translate(146 286) rotate(150)"/>
+      <use href="#leaf" transform="translate(118 266) rotate(170)"/>
+      <use href="#leaf" transform="translate(100 240) rotate(190)"/>
+      <use href="#leaf" transform="translate(92 210) rotate(205)"/>
+      <use href="#leaf" transform="translate(94 180) rotate(220)"/>
+      <use href="#leaf" transform="translate(104 152) rotate(238)"/>
+    </g>
+    <use href="#branch" transform="translate(384 0) scale(-1 1)"/>
+  </g>
+  <path d="M184 300 Q192 310 200 300" fill="none" stroke="url(#gold)" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- eight-point star in the centre (active cell) -->
+  <g stroke="#3a2a08" stroke-width="3" stroke-linejoin="round">
+    <polygon fill="#4b2466" points="192,140 204,180 244,192 204,204 192,244 180,204 140,192 180,180"/>
+    <polygon fill="url(#gold)" points="192,156 200,184 228,192 200,200 192,228 184,200 156,192 184,184" transform="rotate(45 192 192)"/>
+  </g>
+  <circle cx="192" cy="192" r="9" fill="#f6d77a" stroke="#3a2a08" stroke-width="2.5"/>
+</svg>

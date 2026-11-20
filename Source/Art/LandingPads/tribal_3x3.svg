@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384" width="384" height="384">
+  <!-- Tribal landing spot: scratched and painted into bare earth, asymmetric. 3x3 tiles. -->
+  <!-- trampled dirt patch -->
+  <path d="M58 204 C46 128 112 52 202 60 C286 66 340 122 330 210 C322 288 258 338 182 330 C106 322 70 274 58 204 Z"
+        fill="#6e5236" fill-opacity="0.45"/>
+  <path d="M84 196 C80 140 128 92 196 96 C262 100 300 148 296 204 C292 262 244 302 188 298 C130 294 90 252 84 196 Z"
+        fill="#7d5e3e" fill-opacity="0.35"/>
+
+  <!-- ochre ring, painted by hand, left open at lower-left -->
+  <path d="M100 186 C96 134 142 98 196 102 C254 106 290 146 288 198 C286 252 246 290 190 292 C150 293 122 274 108 246"
+        fill="none" stroke="#3a2614" stroke-width="14" stroke-linecap="round"/>
+  <path d="M100 186 C96 134 142 98 196 102 C254 106 290 146 288 198 C286 252 246 290 190 292 C150 293 122 274 108 246"
+        fill="none" stroke="#c8742c" stroke-width="9" stroke-linecap="round"/>
+  <!-- second, thinner charcoal ring, wobbly and incomplete -->
+  <path d="M138 160 C150 132 186 124 214 130 C244 138 258 166 254 196 C250 226 230 246 200 250"
+        fill="none" stroke="#2b2420" stroke-width="5" stroke-linecap="round" stroke-dasharray="22 9 14 11"/>
+
+  <!-- white ash spiral in the centre (active cell) -->
+  <path d="M192 192 c8 -3 13 5 9 12 c-6 9 -21 7 -23 -4 c-3 -14 12 -25 27 -21 c19 5 25 27 14 41 c-12 15 -38 14 -50 -2"
+        fill="none" stroke="#3a2a1c" stroke-width="10" stroke-linecap="round"/>
+  <path d="M192 192 c8 -3 13 5 9 12 c-6 9 -21 7 -23 -4 c-3 -14 12 -25 27 -21 c19 5 25 27 14 41 c-12 15 -38 14 -50 -2"
+        fill="none" stroke="#ece3cc" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- three uneven arrows scratched toward the centre -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="#3a2614" stroke-width="11">
+      <path d="M184 30 L190 80 M174 64 L190 82 L203 62"/>
+      <path d="M352 236 L304 222 M322 208 L302 222 L318 240"/>
+      <path d="M44 108 L88 138 M70 140 L90 140 L86 120"/>
+    </g>
+    <g stroke="#c8742c" stroke-width="6">
+      <path d="M184 30 L190 80 M174 64 L190 82 L203 62"/>
+      <path d="M352 236 L304 222 M322 208 L302 222 L318 240"/>
+      <path d="M44 108 L88 138 M70 140 L90 140 L86 120"/>
+    </g>
+  </g>
+
+  <!-- handprints of red clay -->
+  <g fill="#9c3324" stroke="#3a1a12" stroke-width="2.5">
+    <g transform="translate(262 300) rotate(-25)">
+      <ellipse cx="0" cy="0" rx="11" ry="13"/>
+      <ellipse cx="-12" cy="-16" rx="3.5" ry="8"/><ellipse cx="-4" cy="-21" rx="3.5" ry="9"/>
+      <ellipse cx="5" cy="-21" rx="3.5" ry="9"/><ellipse cx="13" cy="-15" rx="3.5" ry="7"/>
+      <ellipse cx="15" cy="4" rx="3.5" ry="7" transform="rotate(-40 15 4)"/>
+    </g>
+    <g transform="translate(118 74) rotate(160)">
+      <ellipse cx="0" cy="0" rx="10" ry="12"/>
+      <ellipse cx="-11" cy="-15" rx="3.2" ry="7"/><ellipse cx="-3" cy="-20" rx="3.2" ry="8"/>
+      <ellipse cx="5" cy="-20" rx="3.2" ry="8"/><ellipse cx="12" cy="-14" rx="3.2" ry="6"/>
+    </g>
+  </g>
+
+  <!-- ring of field stones, uneven sizes and gaps -->
+  <g fill="#8c867a" stroke="#34302a" stroke-width="4">
+    <path d="M58 150 c4 -12 22 -14 28 -3 c5 10 -4 22 -15 21 c-9 -1 -16 -9 -13 -18 z"/>
+    <path d="M70 262 c2 -10 18 -13 24 -4 c6 8 1 19 -10 20 c-9 1 -16 -7 -14 -16 z"/>
+    <path d="M150 332 c4 -11 24 -10 28 1 c3 9 -7 17 -16 15 c-8 -1 -14 -8 -12 -16 z"/>
+    <path d="M250 50 c5 -10 26 -8 29 4 c3 12 -10 19 -20 16 c-8 -3 -13 -11 -9 -20 z"/>
+    <path d="M318 120 c3 -8 16 -9 20 -1 c4 8 -3 15 -11 14 c-7 -1 -11 -7 -9 -13 z"/>
+    <path d="M318 296 c6 -12 30 -8 30 6 c0 12 -16 18 -26 12 c-6 -4 -7 -11 -4 -18 z"/>
+    <path d="M120 40 c2 -6 12 -7 15 -1 c3 6 -2 11 -8 11 c-5 0 -9 -5 -7 -10 z"/>
+  </g>
+  <g fill="#a39d90" fill-opacity="0.7">
+    <ellipse cx="66" cy="150" rx="6" ry="3"/><ellipse cx="258" cy="56" rx="7" ry="3"/><ellipse cx="326" cy="300" rx="7" ry="3"/>
+  </g>
+
+  <!-- dropped sticks -->
+  <g stroke-linecap="round">
+    <path d="M210 340 L268 352" stroke="#2e1d0e" stroke-width="9"/>
+    <path d="M210 340 L268 352" stroke="#7a5430" stroke-width="5"/>
+    <path d="M30 220 L46 176" stroke="#2e1d0e" stroke-width="8"/>
+    <path d="M30 220 L46 176" stroke="#7a5430" stroke-width="4"/>
+  </g>
+</svg>

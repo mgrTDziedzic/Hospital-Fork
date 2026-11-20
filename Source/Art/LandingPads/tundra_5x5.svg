@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640">
+  <!-- Tundra pad, 5x5. -->
+  <defs>
+    <g id="torch">
+      <circle r="18" fill="#9fb2c2" fill-opacity="0.6"/>
+      <circle r="7" fill="#4a3018" stroke="#1e140a" stroke-width="2.5"/>
+      <path d="M0 -20 C10 -8 10 4 0 8 C-10 4 -10 -8 0 -20 Z" fill="#ff8c1a" stroke="#6a2a00" stroke-width="2"/>
+      <path d="M0 -10 C5 -4 5 2 0 4 C-5 2 -5 -4 0 -10 Z" fill="#ffe27a"/>
+    </g>
+    <g id="flag">
+      <circle r="6" fill="#5a3d22" stroke="#1e140a" stroke-width="2.5"/>
+      <path d="M2 -2 L34 -10 L30 6 L36 18 L2 10 Z" fill="#e8642a" stroke="#4a1e08" stroke-width="2.5"/>
+    </g>
+    <ellipse id="boot" rx="5" ry="9" fill="#b9c9d6"/>
+  </defs>
+
+  <!-- snow patches (scale 2, strokes compensated) -->
+  <g transform="translate(320 320) scale(2) translate(-192 -192)">
+    <path d="M50 196 C44 118 112 52 196 56 C282 60 338 120 332 200 C326 280 262 334 186 330 C108 326 56 272 50 196 Z"
+          fill="#e8eff5" fill-opacity="0.85" stroke="#9fb2c2" stroke-width="1.5"/>
+    <path d="M96 192 C94 140 136 100 192 100 C250 100 290 142 288 194 C286 248 246 288 190 286 C136 284 98 244 96 192 Z"
+          fill="#d4e0ea" fill-opacity="0.9"/>
+  </g>
+  <!-- small snow drifts -->
+  <g fill="#ffffff" fill-opacity="0.7">
+    <ellipse cx="200" cy="140" rx="30" ry="10" transform="rotate(-20 200 140)"/>
+    <ellipse cx="470" cy="500" rx="34" ry="11" transform="rotate(-20 470 500)"/>
+  </g>
+
+  <!-- boot trails -->
+  <use href="#boot" transform="translate(180 540) rotate(-25)"/><use href="#boot" transform="translate(198 520) rotate(-30)"/>
+  <use href="#boot" transform="translate(206 496) rotate(-20)"/><use href="#boot" transform="translate(224 478) rotate(-30)"/>
+  <use href="#boot" transform="translate(232 454) rotate(-20)"/><use href="#boot" transform="translate(250 436) rotate(-30)"/>
+  <use href="#boot" transform="translate(470 190) rotate(40)"/><use href="#boot" transform="translate(452 204) rotate(45)"/>
+  <use href="#boot" transform="translate(440 224) rotate(40)"/><use href="#boot" transform="translate(422 238) rotate(45)"/>
+
+  <!-- centre: crossed pine branches, native size -->
+  <g transform="translate(128 128)">
+    <g stroke-linecap="round">
+      <path d="M160 160 L224 224 M224 160 L160 224" stroke="#2b1c0e" stroke-width="12"/>
+      <path d="M160 160 L224 224 M224 160 L160 224" stroke="#6e4a26" stroke-width="7"/>
+    </g>
+    <g fill="#2f5a3a" stroke="#152a1a" stroke-width="2">
+      <path d="M160 160 l-6 14 l14 -6 z"/><path d="M224 224 l6 -14 l-14 6 z"/><path d="M224 160 l-14 -6 l6 14 z"/><path d="M160 224 l14 6 l-6 -14 z"/>
+      <path d="M176 176 l-12 4 l8 8 z"/><path d="M208 208 l12 -4 l-8 -8 z"/><path d="M208 176 l-4 -12 l-8 8 z"/><path d="M176 208 l4 12 l8 -8 z"/>
+    </g>
+  </g>
+  <!-- inner ring of small stones around the centre -->
+  <g fill="#8c95a0" stroke="#3a4048" stroke-width="2.5">
+    <ellipse cx="320" cy="226" rx="9" ry="7"/><ellipse cx="386" cy="254" rx="8" ry="6"/><ellipse cx="414" cy="320" rx="9" ry="7"/>
+    <ellipse cx="386" cy="386" rx="8" ry="6"/><ellipse cx="320" cy="414" rx="9" ry="7"/><ellipse cx="254" cy="386" rx="8" ry="6"/>
+    <ellipse cx="226" cy="320" rx="9" ry="7"/><ellipse cx="254" cy="254" rx="8" ry="6"/>
+  </g>
+
+  <!-- eight flags -->
+  <use href="#flag" transform="translate(320 50)"/>
+  <use href="#flag" transform="translate(586 320) rotate(20)"/>
+  <use href="#flag" transform="translate(320 590) rotate(-10)"/>
+  <use href="#flag" transform="translate(54 320) rotate(10)"/>
+  <use href="#flag" transform="translate(130 130) rotate(-15)"/>
+  <use href="#flag" transform="translate(506 130) rotate(15)"/>
+  <use href="#flag" transform="translate(506 506) rotate(5)"/>
+  <use href="#flag" transform="translate(130 506) rotate(-5)"/>
+
+  <!-- torches -->
+  <use href="#torch" transform="translate(196 196)"/>
+  <use href="#torch" transform="translate(444 196)"/>
+  <use href="#torch" transform="translate(444 444)"/>
+  <use href="#torch" transform="translate(196 444)"/>
+</svg>

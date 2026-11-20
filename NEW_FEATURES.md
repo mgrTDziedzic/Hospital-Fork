@@ -57,6 +57,14 @@ Deaths caused by raiders, wild or manhunting animals, mechs or the environment c
 On: every patient death costs goodwill. A patient who bleeds out after an animal attack has no killer attached
 and still counts.
 
+### Patient landing pad variants
+Besides the default 1x1 patient landing spot, Architect > Misc has a **patient landing pads** group with larger,
+purely cosmetic variants: 3x3 and 5x5 in nine designs (tribal, industrial, spacer, field tarp, mechanoid, royal,
+tundra, painted marking, medevac). They work like the default spot; patients land on the centre cell. A pad
+blocks its whole area for walls and furniture, and cannot be rotated. The mod setting "Enable Patient Landing Spot
+variants" (default on) hides them from the build menu. The default 1x1 spot is always available, and pads
+already placed keep working when the setting is off.
+
 ### Failed surgery
 After a failed operation the patient stays to recover instead of leaving, so the surgery can be
 added again.

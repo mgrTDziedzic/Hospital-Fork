@@ -9,6 +9,8 @@ public class Settings : ModSettings
     public bool ShowMessageAtArrival;
     public bool PreventIncapacitatedArrivals = true;
     public float SilverMultiplier = 1f;
+    // Shows the cosmetic 3x3 / 5x5 Patient Landing Spot variants in the build menu.
+    public bool EnableLandingSpotVariants = true;
 
     // Difficulty tuning - all defaults reproduce the original hardcoded behaviour.
     public float GoodwillGainMultiplier = 1f;
@@ -24,6 +26,7 @@ public class Settings : ModSettings
     public override void ExposeData()
     {
         Scribe_Values.Look(ref SilverMultiplier, "silverMultiplier", 1f);
+        Scribe_Values.Look(ref EnableLandingSpotVariants, "enableLandingSpotVariants", true);
         Scribe_Values.Look(ref ShowMessageAtArrival, "showMessageAtArrival", false);
         Scribe_Values.Look(ref PreventIncapacitatedArrivals, "preventIncapacitatedArrivals", true);
         Scribe_Values.Look(ref GoodwillGainMultiplier, "goodwillGainMultiplier", 1f);
@@ -43,6 +46,7 @@ public class Settings : ModSettings
 
         listingStandard.CheckboxLabeled("ShowMessageAtArrival".Translate(), ref ShowMessageAtArrival, "ShowMessageAtArrivalTooltip".Translate());
         listingStandard.CheckboxLabeled("PreventIncapacitatedArrivals".Translate(), ref PreventIncapacitatedArrivals, "PreventIncapacitatedArrivalsTooltip".Translate());
+        listingStandard.CheckboxLabeled("EnableLandingSpotVariants".Translate(), ref EnableLandingSpotVariants, "EnableLandingSpotVariantsTooltip".Translate());
 
         listingStandard.GapLine();
         Text.Font = GameFont.Medium;
@@ -85,6 +89,7 @@ public class Settings : ModSettings
     private void ResetToDefaults()
     {
         PreventIncapacitatedArrivals = true;
+        EnableLandingSpotVariants = true;
         SilverMultiplier = 1f;
         GoodwillGainMultiplier = 1f;
         DeathGoodwillPenalty = 10;

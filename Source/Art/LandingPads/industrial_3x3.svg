@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384" width="384" height="384">
+  <!-- Industrial helipad: concrete slab, hazard border, concentric rings, H. Symmetric. 3x3 tiles. -->
+  <defs>
+    <pattern id="haz" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="28" height="28" fill="#dcae22"/>
+      <rect width="14" height="28" fill="#26262a"/>
+    </pattern>
+  </defs>
+
+  <!-- hazard frame -->
+  <rect x="6" y="6" width="372" height="372" rx="6" fill="url(#haz)" stroke="#1c1d20" stroke-width="6"/>
+  <!-- concrete slab -->
+  <rect x="26" y="26" width="332" height="332" fill="#9b9d9f" stroke="#1c1d20" stroke-width="4"/>
+  <!-- expansion joints on tile borders -->
+  <g stroke="#7f8284" stroke-width="3">
+    <line x1="128" y1="26" x2="128" y2="358"/><line x1="256" y1="26" x2="256" y2="358"/>
+    <line x1="26" y1="128" x2="358" y2="128"/><line x1="26" y1="256" x2="358" y2="256"/>
+  </g>
+  <!-- wear stains -->
+  <g fill="#8c8e90" fill-opacity="0.6">
+    <ellipse cx="96" cy="300" rx="30" ry="14"/><ellipse cx="300" cy="84" rx="24" ry="11"/>
+  </g>
+
+  <!-- concentric rings -->
+  <circle cx="192" cy="192" r="152" fill="none" stroke="#1c1d20" stroke-width="16"/>
+  <circle cx="192" cy="192" r="152" fill="none" stroke="#f1f1ee" stroke-width="10"/>
+  <circle cx="192" cy="192" r="122" fill="none" stroke="#1c1d20" stroke-width="10"/>
+  <circle cx="192" cy="192" r="122" fill="none" stroke="#dcae22" stroke-width="6"/>
+  <circle cx="192" cy="192" r="96" fill="none" stroke="#f1f1ee" stroke-width="4" stroke-dasharray="18 12"/>
+
+  <!-- H -->
+  <path d="M146 130 h26 v48 h40 v-48 h26 v124 h-26 v-50 h-40 v50 h-26 z"
+        fill="#f1f1ee" stroke="#1c1d20" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- corner landing lights -->
+  <g stroke="#1c1d20" stroke-width="3">
+    <circle cx="44" cy="44" r="9" fill="#ff9a2e"/><circle cx="340" cy="44" r="9" fill="#ff9a2e"/>
+    <circle cx="44" cy="340" r="9" fill="#ff9a2e"/><circle cx="340" cy="340" r="9" fill="#ff9a2e"/>
+  </g>
+  <g fill="#ffe1a8">
+    <circle cx="41" cy="41" r="3"/><circle cx="337" cy="41" r="3"/><circle cx="41" cy="337" r="3"/><circle cx="337" cy="337" r="3"/>
+  </g>
+</svg>

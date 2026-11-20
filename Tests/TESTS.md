@@ -6,7 +6,7 @@ Generated file, do not edit by hand. Regenerate with:
 
 Source: `[HospitalTest]` attributes and the `// Given: / When: / Then:` comments above each test method in `Tests/HospitalTests/Source/Tests/`.
 
-Total tests: 118
+Total tests: 119
 
 ## AggressivePatientTests.cs
 
@@ -115,7 +115,8 @@ Total tests: 118
 | A3 | `BedNormalModeRemovesPatientOwner` | switching a bed back to normal mode removes patient owners (patients may own it in hospital mode) | a bed in hospital mode owned by a registered patient. | the bed is switched back to normal mode. | the patient loses the bed. |  |
 | A14 | `DamagePartsResetsForceDowned` | DamageParts leaves forceDowned false | a healthy pawn with forceDowned false. | WoundsUtility.DamageParts (private, by reflection) deals 20 damage. | forceDowned is still false afterwards. |  |
 | A14 | `DamagePartsResetsForceDownedOnException` | forceDowned is reset even when DamageParts throws | a pawn and a bogus damage def that makes DamageParts fail. | DamageParts is called and throws. | forceDowned is still false afterwards. |  |
-| A2 | `LandingCellIsValid` | TryFindPatientLandingCell returns a valid in-bounds cell and prefers the Patient Landing Spot | a map with a Patient Landing Spot (one is placed if the save has none). | a patient landing cell is requested. | the cell is valid, in bounds and is the landing spot. |  |
+| A2 | `LandingCellIsValid` | TryFindPatientLandingCell returns a valid in-bounds cell and prefers a Patient Landing Spot (any def) | a map with a Patient Landing Spot of any def (default or variant; the default 1x1 is placed if the save has none). | a patient landing cell is requested. | the cell is valid, in bounds and is the centre of a landing spot. |  |
+| A2b | `LandingSpotVariantsVisibility` | Landing spot variants - all defs valid, default always buildable, variants follow the setting | every Patient Landing Spot def (default 1x1 + variants) and the variants setting. | validity and build-menu visibility are checked with the setting on and off. | all shipped variants are valid (odd square, not rotatable); the default is always buildable; variants are buildable only when the setting is on. |  |
 | B1 | `EnsureValidSettingsRepairsOldSaveState` | EnsureValidSettings restores null settings and fixes opening hours to 24 entries (pad short, truncate long) | hospital settings as an old save leaves them: null lists, too-short and too-long opening hours. | EnsureValidSettings runs. | null lists are restored to defaults, short hours padded with closed, long hours truncated to 24. |  |
 
 ## ModCompatTests.cs

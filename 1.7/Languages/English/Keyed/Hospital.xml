@@ -80,6 +80,8 @@
     <ShowMessageAtArrivalTooltip>Shows as a message instead of a letter when a new patient arrives.</ShowMessageAtArrivalTooltip>
     <PreventIncapacitatedArrivals>Prevent incapacitated arrivals</PreventIncapacitatedArrivals>
     <PreventIncapacitatedArrivalsTooltip>Patients stop being wounded just before they would collapse, so they arrive hurt but still able to walk. Disable for tougher mass casualty events with downed patients you must rescue.</PreventIncapacitatedArrivalsTooltip>
+    <EnableLandingSpotVariants>Enable Patient Landing Spot variants</EnableLandingSpotVariants>
+    <EnableLandingSpotVariantsTooltip>Shows the larger cosmetic Patient Landing Pad variants (3x3 and 5x5) in the build menu (Architect > Misc). The default 1x1 patient landing spot is always available. Variants already placed keep working as landing spots when this is off. Patients always land on the centre cell.</EnableLandingSpotVariantsTooltip>
     <MassCasualties>Enable mass casualty events</MassCasualties>
     <MassCasualtiesTooltip>A MCE will sporadically overwhelm your hospital with patients.</MassCasualtiesTooltip>
     <!-- button -->

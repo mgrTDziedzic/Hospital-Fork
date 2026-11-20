@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384" width="384" height="384">
+  <!-- Tundra pad: trampled snow, marker flags and torches, no paint. 3x3 tiles. -->
+  <!-- trampled snow patch -->
+  <path d="M50 196 C44 118 112 52 196 56 C282 60 338 120 332 200 C326 280 262 334 186 330 C108 326 56 272 50 196 Z"
+        fill="#e8eff5" fill-opacity="0.85" stroke="#9fb2c2" stroke-width="3"/>
+  <path d="M96 192 C94 140 136 100 192 100 C250 100 290 142 288 194 C286 248 246 288 190 286 C136 284 98 244 96 192 Z"
+        fill="#d4e0ea" fill-opacity="0.9"/>
+  <!-- boot prints -->
+  <g fill="#b9c9d6">
+    <ellipse cx="130" cy="300" rx="5" ry="9" transform="rotate(-20 130 300)"/><ellipse cx="146" cy="282" rx="5" ry="9" transform="rotate(-25 146 282)"/>
+    <ellipse cx="152" cy="262" rx="5" ry="9" transform="rotate(-15 152 262)"/><ellipse cx="168" cy="246" rx="5" ry="9" transform="rotate(-25 168 246)"/>
+    <ellipse cx="282" cy="120" rx="5" ry="9" transform="rotate(40 282 120)"/><ellipse cx="266" cy="134" rx="5" ry="9" transform="rotate(45 266 134)"/>
+  </g>
+
+  <!-- centre: crossed pine branches (active cell) -->
+  <g stroke-linecap="round">
+    <path d="M160 160 L224 224 M224 160 L160 224" stroke="#2b1c0e" stroke-width="12"/>
+    <path d="M160 160 L224 224 M224 160 L160 224" stroke="#6e4a26" stroke-width="7"/>
+  </g>
+  <g fill="#2f5a3a" stroke="#152a1a" stroke-width="2">
+    <path d="M160 160 l-6 14 l14 -6 z"/><path d="M224 224 l6 -14 l-14 6 z"/><path d="M224 160 l-14 -6 l6 14 z"/><path d="M160 224 l14 6 l-6 -14 z"/>
+    <path d="M176 176 l-12 4 l8 8 z"/><path d="M208 208 l12 -4 l-8 -8 z"/><path d="M208 176 l-4 -12 l-8 8 z"/><path d="M176 208 l4 12 l8 -8 z"/>
+  </g>
+
+  <!-- marker flags on poles (top-down: pole base + flag cloth) -->
+  <g>
+    <g transform="translate(192 52)"><circle r="6" fill="#5a3d22" stroke="#1e140a" stroke-width="2.5"/><path d="M2 -2 L34 -10 L30 6 L36 18 L2 10 Z" fill="#e8642a" stroke="#4a1e08" stroke-width="2.5"/></g>
+    <g transform="translate(332 192)"><circle r="6" fill="#5a3d22" stroke="#1e140a" stroke-width="2.5"/><path d="M2 -2 L34 -10 L30 6 L36 18 L2 10 Z" fill="#e8642a" stroke="#4a1e08" stroke-width="2.5" transform="rotate(20)"/></g>
+    <g transform="translate(192 332)"><circle r="6" fill="#5a3d22" stroke="#1e140a" stroke-width="2.5"/><path d="M2 -2 L34 -10 L30 6 L36 18 L2 10 Z" fill="#e8642a" stroke="#4a1e08" stroke-width="2.5" transform="rotate(-10)"/></g>
+    <g transform="translate(52 192)"><circle r="6" fill="#5a3d22" stroke="#1e140a" stroke-width="2.5"/><path d="M2 -2 L34 -10 L30 6 L36 18 L2 10 Z" fill="#e8642a" stroke="#4a1e08" stroke-width="2.5" transform="rotate(10)"/></g>
+  </g>
+
+  <!-- torches at diagonals: melted ring, stake, flame -->
+  <defs>
+    <g id="torch">
+      <circle r="18" fill="#9fb2c2" fill-opacity="0.6"/>
+      <circle r="7" fill="#4a3018" stroke="#1e140a" stroke-width="2.5"/>
+      <path d="M0 -20 C10 -8 10 4 0 8 C-10 4 -10 -8 0 -20 Z" fill="#ff8c1a" stroke="#6a2a00" stroke-width="2"/>
+      <path d="M0 -10 C5 -4 5 2 0 4 C-5 2 -5 -4 0 -10 Z" fill="#ffe27a"/>
+    </g>
+  </defs>
+  <use href="#torch" transform="translate(96 96)"/>
+  <use href="#torch" transform="translate(288 96)"/>
+  <use href="#torch" transform="translate(288 288)"/>
+  <use href="#torch" transform="translate(96 288)"/>
+</svg>

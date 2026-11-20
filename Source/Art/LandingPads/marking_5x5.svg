@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640">
+  <!-- Floor marking, 5x5: subtle worn white paint. -->
+  <defs>
+    <path id="arr" d="M320 150 l14 -16 h-8 v-28 h-12 v28 h-8 z"/>
+    <path id="tick" d="M320 44 v22"/>
+  </defs>
+  <g fill="none" stroke="#f2f0e8" stroke-opacity="0.75" stroke-linecap="round">
+    <circle cx="320" cy="320" r="262" stroke-width="8" stroke-dasharray="110 12 50 14 140 10"/>
+    <circle cx="320" cy="320" r="170" stroke-width="4" stroke-dasharray="20 16"/>
+    <circle cx="320" cy="320" r="40" stroke-width="5"/>
+  </g>
+  <!-- corner ticks on the outer ring at 45 degrees -->
+  <g stroke="#f2f0e8" stroke-opacity="0.75" stroke-width="6" stroke-linecap="round">
+    <use href="#tick" transform="rotate(45 320 320)"/><use href="#tick" transform="rotate(135 320 320)"/>
+    <use href="#tick" transform="rotate(225 320 320)"/><use href="#tick" transform="rotate(315 320 320)"/>
+  </g>
+  <g fill="#f2f0e8" fill-opacity="0.75">
+    <use href="#arr"/>
+    <use href="#arr" transform="rotate(90 320 320)"/>
+    <use href="#arr" transform="rotate(180 320 320)"/>
+    <use href="#arr" transform="rotate(270 320 320)"/>
+  </g>
+  <circle cx="320" cy="320" r="8" fill="#f2f0e8" fill-opacity="0.8"/>
+  <g fill="#000" fill-opacity="0.18">
+    <circle cx="110" cy="200" r="5"/><circle cx="530" cy="446" r="4"/><circle cx="384" cy="62" r="3"/><circle cx="254" cy="574" r="4"/>
+    <circle cx="470" cy="190" r="3"/><circle cx="180" cy="450" r="4"/>
+  </g>
+</svg>

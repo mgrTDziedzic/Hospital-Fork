@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640">
+  <!-- Industrial helipad, 5x5. -->
+  <defs>
+    <pattern id="haz" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="28" height="28" fill="#dcae22"/>
+      <rect width="14" height="28" fill="#26262a"/>
+    </pattern>
+  </defs>
+
+  <rect x="6" y="6" width="628" height="628" rx="6" fill="url(#haz)" stroke="#1c1d20" stroke-width="6"/>
+  <rect x="26" y="26" width="588" height="588" fill="#9b9d9f" stroke="#1c1d20" stroke-width="4"/>
+  <g stroke="#7f8284" stroke-width="3">
+    <line x1="128" y1="26" x2="128" y2="614"/><line x1="256" y1="26" x2="256" y2="614"/>
+    <line x1="384" y1="26" x2="384" y2="614"/><line x1="512" y1="26" x2="512" y2="614"/>
+    <line x1="26" y1="128" x2="614" y2="128"/><line x1="26" y1="256" x2="614" y2="256"/>
+    <line x1="26" y1="384" x2="614" y2="384"/><line x1="26" y1="512" x2="614" y2="512"/>
+  </g>
+  <g fill="#8c8e90" fill-opacity="0.6">
+    <ellipse cx="120" cy="520" rx="40" ry="16"/><ellipse cx="520" cy="110" rx="32" ry="13"/><ellipse cx="500" cy="500" rx="22" ry="10"/>
+  </g>
+
+  <!-- rings -->
+  <circle cx="320" cy="320" r="272" fill="none" stroke="#1c1d20" stroke-width="16"/>
+  <circle cx="320" cy="320" r="272" fill="none" stroke="#f1f1ee" stroke-width="10"/>
+  <circle cx="320" cy="320" r="236" fill="none" stroke="#1c1d20" stroke-width="10"/>
+  <circle cx="320" cy="320" r="236" fill="none" stroke="#dcae22" stroke-width="6"/>
+  <circle cx="320" cy="320" r="206" fill="none" stroke="#f1f1ee" stroke-width="4" stroke-dasharray="18 12"/>
+  <circle cx="320" cy="320" r="150" fill="none" stroke="#f1f1ee" stroke-width="4" stroke-opacity="0.7"/>
+
+  <!-- H, 1.5x -->
+  <g transform="translate(320 320) scale(1.5) translate(-192 -192)">
+    <path d="M146 130 h26 v48 h40 v-48 h26 v124 h-26 v-50 h-40 v50 h-26 z"
+          fill="#f1f1ee" stroke="#1c1d20" stroke-width="3.4" stroke-linejoin="round"/>
+  </g>
+
+  <!-- lights: corners + edge midpoints -->
+  <g stroke="#1c1d20" stroke-width="3" fill="#ff9a2e">
+    <circle cx="44" cy="44" r="9"/><circle cx="596" cy="44" r="9"/><circle cx="44" cy="596" r="9"/><circle cx="596" cy="596" r="9"/>
+    <circle cx="320" cy="44" r="9"/><circle cx="320" cy="596" r="9"/><circle cx="44" cy="320" r="9"/><circle cx="596" cy="320" r="9"/>
+  </g>
+  <g fill="#ffe1a8">
+    <circle cx="41" cy="41" r="3"/><circle cx="593" cy="41" r="3"/><circle cx="41" cy="593" r="3"/><circle cx="593" cy="593" r="3"/>
+    <circle cx="317" cy="41" r="3"/><circle cx="317" cy="593" r="3"/><circle cx="41" cy="317" r="3"/><circle cx="593" cy="317" r="3"/>
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384" width="384" height="384">
+  <!-- Medevac pad, 3x3. -->
+  <rect x="8" y="8" width="368" height="368" rx="8" fill="#4a4d52" stroke="#1a1b1e" stroke-width="6"/>
+  <g stroke="#3f4247" stroke-width="3">
+    <line x1="128" y1="8" x2="128" y2="376"/><line x1="256" y1="8" x2="256" y2="376"/>
+    <line x1="8" y1="128" x2="376" y2="128"/><line x1="8" y1="256" x2="376" y2="256"/>
+  </g>
+  <rect x="24" y="24" width="336" height="336" fill="none" stroke="#efefea" stroke-width="6" stroke-dasharray="30 16"/>
+
+  <circle cx="192" cy="192" r="162" fill="#1a1b1e"/>
+  <circle cx="192" cy="192" r="157" fill="#c7302a"/>
+  <circle cx="192" cy="192" r="142" fill="#efefea"/>
+  <circle cx="192" cy="192" r="120" fill="none" stroke="#c7302a" stroke-width="5" stroke-dasharray="20 12"/>
+
+  <g transform="translate(192 192) scale(0.6) translate(-320 -320)">
+    <path d="M276 150 h88 v126 h126 v88 h-126 v126 h-88 v-126 h-126 v-88 h126 z"
+          fill="#c7302a" stroke="#5e1410" stroke-width="7" stroke-linejoin="round"/>
+  </g>
+  <circle cx="192" cy="192" r="22" fill="#efefea" stroke="#5e1410" stroke-width="4"/>
+  <circle cx="192" cy="192" r="8" fill="#c7302a"/>
+
+  <g fill="#4cd964" stroke="#1a1b1e" stroke-width="3">
+    <circle cx="192" cy="38" r="8"/><circle cx="192" cy="346" r="8"/><circle cx="38" cy="192" r="8"/><circle cx="346" cy="192" r="8"/>
+    <circle cx="38" cy="38" r="8"/><circle cx="346" cy="38" r="8"/><circle cx="38" cy="346" r="8"/><circle cx="346" cy="346" r="8"/>
+  </g>
+</svg>

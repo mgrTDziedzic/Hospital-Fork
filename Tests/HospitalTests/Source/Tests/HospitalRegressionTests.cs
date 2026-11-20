@@ -118,15 +118,15 @@ namespace HospitalTests
             Assert.False(pawn.health.forceDowned, "forceDowned left set after DamageParts threw");
         }
 
-        // Given: a map with a Patient Landing Spot (one is placed if the save has none).
+        // Given: a map with a Patient Landing Spot of any def (default or variant; the default 1x1 is placed if the save has none).
         // When:  a patient landing cell is requested.
-        // Then:  the cell is valid, in bounds and is the landing spot.
-        [HospitalTest("A2: TryFindPatientLandingCell returns a valid in-bounds cell and prefers the Patient Landing Spot")]
+        // Then:  the cell is valid, in bounds and is the centre of a landing spot.
+        [HospitalTest("A2: TryFindPatientLandingCell returns a valid in-bounds cell and prefers a Patient Landing Spot (any def)")]
         public static void LandingCellIsValid(TestContext ctx)
         {
             var map = ctx.Map;
-            var spotDef = ThingDef.Named("PatientLandingSpot");
-            var spots = map.listerBuildings.AllBuildingsColonistOfDef(spotDef).Where(b => b.Spawned).Select(b => b.Position).ToList();
+            var spots = map.listerBuildings.allBuildingsColonist.Where(b => b.Spawned && LandingSpotUtility.IsLandingSpotDef(b.def)
+                && (!LandingSpotUtility.IsVariantDef(b.def) || LandingSpotUtility.IsValidLandingDef(b.def))).Select(b => b.Position).ToList();
 
             Assert.True(IncidentHelper.TryFindPatientLandingCell(map, out var cell), "no landing cell found");
             Assert.True(cell.IsValid && cell.InBounds(map), "landing cell invalid or out of bounds: " + cell);
@@ -135,14 +135,54 @@ namespace HospitalTests
             else
             {
                 // no spot in the test save: place one and expect exactly that cell
+                var spotDef = ThingDef.Named("PatientLandingSpot");
                 var spot = ctx.Track(ThingMaker.MakeThing(spotDef));
                 spot.SetFaction(Faction.OfPlayer);
-                if (!CellFinder.TryFindRandomCellNear(map.Center, map, 20, c => c.Standable(map) && c.GetEdifice(map) == null, out var spotCell))
+                if (!CellFinder.TryFindRandomCellNear(map.Center, map, 20, c => FootprintFree(map, c, spotDef), out var spotCell))
                     Assert.Fail("no free cell for a test landing spot");
                 GenSpawn.Spawn(spot, spotCell, map);
                 Assert.True(IncidentHelper.TryFindPatientLandingCell(map, out var cell2), "no cell with a spot present");
                 Assert.Equal(spotCell, cell2, "spot not preferred");
             }
+        }
+
+        // The whole footprint must be in bounds, standable and free of edifices (a 3x3 or 5x5 variant needs all cells).
+        private static bool FootprintFree(Map map, IntVec3 centre, ThingDef def)
+        {
+            foreach (var c in GenAdj.OccupiedRect(centre, Rot4.North, def.size))
+                if (!c.InBounds(map) || !c.Standable(map) || c.GetEdifice(map) != null) return false;
+            return true;
+        }
+
+        // Given: every Patient Landing Spot def (default 1x1 + variants) and the variants setting.
+        // When:  validity and build-menu visibility are checked with the setting on and off.
+        // Then:  all shipped variants are valid (odd square, not rotatable); the default is always buildable; variants are buildable only when the setting is on.
+        [HospitalTest("A2b: Landing spot variants - all defs valid, default always buildable, variants follow the setting")]
+        public static void LandingSpotVariantsVisibility(TestContext ctx)
+        {
+            var defs = DefDatabase<ThingDef>.AllDefsListForReading.Where(LandingSpotUtility.IsLandingSpotDef).ToList();
+            var variants = defs.Where(LandingSpotUtility.IsVariantDef).ToList();
+            Assert.True(defs.Contains(ThingDef.Named("PatientLandingSpot")), "default PatientLandingSpot not marked");
+            Assert.False(LandingSpotUtility.IsVariantDef(ThingDef.Named("PatientLandingSpot")), "default spot marked as variant");
+            Assert.Equal(18, variants.Count, "variant def count");
+            foreach (var v in variants)
+                Assert.True(LandingSpotUtility.IsValidLandingDef(v), "invalid variant def " + v.defName);
+
+            var settings = HospitalMod.Settings;
+            bool old = settings.EnableLandingSpotVariants;
+            ctx.OnCleanup(() => settings.EnableLandingSpotVariants = old);
+
+            settings.EnableLandingSpotVariants = false;
+            Assert.True(LandingSpotUtility.IsBuildable(ThingDef.Named("PatientLandingSpot")), "default hidden with setting off");
+            Assert.False(variants.Any(LandingSpotUtility.IsBuildable), "a variant is buildable with setting off");
+            var spotDes = new Designator_Build(ThingDef.Named("PatientLandingSpot"));
+            var varDes = new Designator_Build(variants[0]);
+            Assert.True(spotDes.Visible, "default designator hidden with setting off");
+            Assert.False(varDes.Visible, "variant designator visible with setting off");
+
+            settings.EnableLandingSpotVariants = true;
+            Assert.True(variants.All(LandingSpotUtility.IsBuildable), "a variant is not buildable with setting on");
+            Assert.True(varDes.Visible, "variant designator hidden with setting on");
         }
 
         // Given: hospital settings as an old save leaves them: null lists, too-short and too-long opening hours.

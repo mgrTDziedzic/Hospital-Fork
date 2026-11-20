@@ -57,7 +57,9 @@ left. If it runs out, they wake up berserk.
   - others: the best tend quality.
 
 ### Patient landing spot
-Build a **Patient landing spot** to choose where the drop pods land.
+Build a **Patient landing spot** to choose where the drop pods land. Optional larger cosmetic
+**patient landing pads** (3x3 and 5x5, nine designs) are in the same Architect > Misc menu; patients land on the
+centre cell. They can be hidden with the mod setting "Enable Patient Landing Spot variants".
 
 ### Patients tab
 A **Patients** tab lists everyone in your care with their diagnosis, the treatment they need,

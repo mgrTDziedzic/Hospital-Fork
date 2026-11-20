@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640">
+  <!-- Royal pad, 5x5. -->
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6d77a"/><stop offset="0.5" stop-color="#d4a530"/><stop offset="1" stop-color="#9a7116"/>
+    </linearGradient>
+    <radialGradient id="marble" cx="0.4" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#f4f1ea"/><stop offset="1" stop-color="#d9d3c6"/>
+    </radialGradient>
+    <path id="leaf" d="M0 0 C6 -8 18 -8 22 0 C18 8 6 8 0 0 Z"/>
+    <polygon id="star4" points="0,-14 4,-4 14,0 4,4 0,14 -4,4 -14,0 -4,-4"/>
+  </defs>
+
+  <circle cx="320" cy="320" r="312" fill="#3a2a08"/>
+  <circle cx="320" cy="320" r="307" fill="url(#gold)"/>
+  <circle cx="320" cy="320" r="290" fill="#4b2466" stroke="#2a1038" stroke-width="3"/>
+  <circle cx="320" cy="320" r="276" fill="none" stroke="url(#gold)" stroke-width="2" stroke-dasharray="4 8"/>
+  <!-- gold studs + small stars on the band -->
+  <g fill="url(#gold)" stroke="#3a2a08" stroke-width="1.5">
+    <circle cx="320" cy="56" r="5"/><circle cx="320" cy="584" r="5"/><circle cx="56" cy="320" r="5"/><circle cx="584" cy="320" r="5"/>
+    <circle cx="507" cy="133" r="5"/><circle cx="133" cy="133" r="5"/><circle cx="507" cy="507" r="5"/><circle cx="133" cy="507" r="5"/>
+    <use href="#star4" transform="translate(421 76)"/><use href="#star4" transform="translate(219 76)"/>
+    <use href="#star4" transform="translate(421 564)"/><use href="#star4" transform="translate(219 564)"/>
+    <use href="#star4" transform="translate(76 421)"/><use href="#star4" transform="translate(76 219)"/>
+    <use href="#star4" transform="translate(564 421)"/><use href="#star4" transform="translate(564 219)"/>
+  </g>
+
+  <circle cx="320" cy="320" r="250" fill="url(#marble)" stroke="#3a2a08" stroke-width="4"/>
+  <g fill="none" stroke="#bdb5a4" stroke-width="1.5" stroke-opacity="0.8">
+    <path d="M110 230 C170 250 210 200 270 214 C320 226 340 184 400 190 C440 194 470 170 520 176"/>
+    <path d="M130 440 C190 410 240 456 300 430 C350 410 400 430 440 400 C470 380 500 390 520 370"/>
+    <path d="M230 110 C246 140 230 170 250 200"/><path d="M420 520 C410 490 430 470 414 440"/>
+  </g>
+  <circle cx="320" cy="320" r="232" fill="none" stroke="url(#gold)" stroke-width="3"/>
+
+  <!-- laurel wreath: dense, native-size leaves, radius ~190 -->
+  <g fill="#3f7a3a" stroke="#1d3a1a" stroke-width="1.5">
+    <g id="branch">
+      <use href="#leaf" transform="translate(320 510) rotate(195)"/>
+      <use href="#leaf" transform="translate(292 508) rotate(205)"/>
+      <use href="#leaf" transform="translate(264 502) rotate(215)"/>
+      <use href="#leaf" transform="translate(238 492) rotate(225)"/>
+      <use href="#leaf" transform="translate(214 478) rotate(235)"/>
+      <use href="#leaf" transform="translate(192 460) rotate(245)"/>
+      <use href="#leaf" transform="translate(174 440) rotate(255)"/>
+      <use href="#leaf" transform="translate(160 416) rotate(263)"/>
+      <use href="#leaf" transform="translate(150 390) rotate(272)"/>
+      <use href="#leaf" transform="translate(144 362) rotate(280)"/>
+      <use href="#leaf" transform="translate(142 334) rotate(288)"/>
+      <use href="#leaf" transform="translate(144 306) rotate(296)"/>
+      <use href="#leaf" transform="translate(150 278) rotate(304)"/>
+      <use href="#leaf" transform="translate(160 252) rotate(313)"/>
+      <use href="#leaf" transform="translate(174 228) rotate(322)"/>
+      <use href="#leaf" transform="translate(192 206) rotate(332)"/>
+      <use href="#leaf" transform="translate(278 506) rotate(150)"/>
+      <use href="#leaf" transform="translate(226 488) rotate(165)"/>
+      <use href="#leaf" transform="translate(182 452) rotate(180)"/>
+      <use href="#leaf" transform="translate(154 404) rotate(195)"/>
+      <use href="#leaf" transform="translate(142 350) rotate(210)"/>
+      <use href="#leaf" transform="translate(146 294) rotate(225)"/>
+      <use href="#leaf" transform="translate(166 240) rotate(242)"/>
+    </g>
+    <use href="#branch" transform="translate(640 0) scale(-1 1)"/>
+  </g>
+  <path d="M310 514 Q320 526 330 514" fill="none" stroke="url(#gold)" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- central star, 1.5x -->
+  <g transform="translate(320 320) scale(1.5) translate(-192 -192)" stroke="#3a2a08" stroke-width="2" stroke-linejoin="round">
+    <polygon fill="#4b2466" points="192,140 204,180 244,192 204,204 192,244 180,204 140,192 180,180"/>
+    <polygon fill="url(#gold)" points="192,156 200,184 228,192 200,200 192,228 184,200 156,192 184,184" transform="rotate(45 192 192)"/>
+  </g>
+  <circle cx="320" cy="320" r="10" fill="#f6d77a" stroke="#3a2a08" stroke-width="2.5"/>
+</svg>

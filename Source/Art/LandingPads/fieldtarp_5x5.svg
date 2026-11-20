@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640">
+  <!-- Field-hospital tarp, 5x5. Sheet scaled, ropes/stakes/stones native size. -->
+  <!-- guy ropes -->
+  <g stroke-linecap="round">
+    <g stroke="#3b2c1a" stroke-width="5">
+      <line x1="90" y1="97" x2="34" y2="40"/><line x1="550" y1="93" x2="606" y2="36"/>
+      <line x1="550" y1="550" x2="604" y2="604"/><line x1="87" y1="547" x2="30" y2="600"/>
+      <line x1="327" y1="83" x2="322" y2="22"/><line x1="560" y1="327" x2="620" y2="322"/>
+      <line x1="317" y1="560" x2="320" y2="620"/><line x1="80" y1="317" x2="20" y2="320"/>
+    </g>
+    <g stroke="#b59a6a" stroke-width="2.5">
+      <line x1="90" y1="97" x2="34" y2="40"/><line x1="550" y1="93" x2="606" y2="36"/>
+      <line x1="550" y1="550" x2="604" y2="604"/><line x1="87" y1="547" x2="30" y2="600"/>
+      <line x1="327" y1="83" x2="322" y2="22"/><line x1="560" y1="327" x2="620" y2="322"/>
+      <line x1="317" y1="560" x2="320" y2="620"/><line x1="80" y1="317" x2="20" y2="320"/>
+    </g>
+  </g>
+  <g fill="#7a5430" stroke="#2e1d0e" stroke-width="3">
+    <circle cx="34" cy="40" r="8"/><circle cx="606" cy="36" r="8"/><circle cx="604" cy="604" r="8"/><circle cx="30" cy="600" r="8"/>
+    <circle cx="322" cy="22" r="8"/><circle cx="620" cy="322" r="8"/><circle cx="320" cy="620" r="8"/><circle cx="20" cy="320" r="8"/>
+  </g>
+
+  <!-- sheet, folds, cross (scaled, strokes compensated) -->
+  <g transform="translate(320 320) scale(1.6667) translate(-192 -192)">
+    <path d="M54 58 L196 50 L330 56 L336 196 L330 330 L190 336 L52 328 L48 190 Z"
+          fill="#d6c9a3" stroke="#3b3020" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M66 70 L196 63 L318 68 L323 196 L318 318 L190 323 L64 316 L61 190 Z"
+          fill="none" stroke="#a8996f" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <g fill="none" stroke="#b8aa80" stroke-width="2.4" stroke-linecap="round">
+      <path d="M196 50 C192 120 200 260 190 336"/>
+      <path d="M48 190 C130 186 260 198 336 196"/>
+      <path d="M122 54 C120 130 126 260 120 332" stroke-opacity="0.6"/>
+      <path d="M264 53 C268 130 260 260 262 333" stroke-opacity="0.6"/>
+    </g>
+    <g fill="#c4b68c" fill-opacity="0.6">
+      <path d="M70 230 C110 220 130 260 100 300 C80 290 66 260 70 230 Z"/>
+      <path d="M290 80 C310 100 316 130 300 150 C282 130 280 100 290 80 Z"/>
+    </g>
+    <path d="M164 108 L222 106 L224 164 L282 166 L280 222 L222 224 L220 282 L162 280 L164 224 L106 222 L108 166 L164 164 Z"
+          fill="#a8261f" stroke="#4a110c" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+  <g fill="#c03a30" fill-opacity="0.6"><circle cx="402" cy="470" r="4"/><circle cx="488" cy="392" r="3"/><circle cx="414" cy="482" r="2.5"/><circle cx="200" cy="170" r="3"/></g>
+
+  <!-- stones on the edges -->
+  <g fill="#8c867a" stroke="#34302a" stroke-width="3.5">
+    <path d="M200 76 c3 -9 20 -9 23 0 c3 9 -6 15 -13 14 c-7 -1 -12 -7 -10 -14 z"/>
+    <path d="M430 74 c3 -9 20 -9 23 0 c3 9 -6 15 -13 14 c-7 -1 -12 -7 -10 -14 z"/>
+    <path d="M552 200 c8 -4 18 4 15 13 c-3 8 -14 9 -18 3 c-3 -5 -2 -12 3 -16 z"/>
+    <path d="M552 440 c8 -4 18 4 15 13 c-3 8 -14 9 -18 3 c-3 -5 -2 -12 3 -16 z"/>
+    <path d="M196 552 c4 -8 19 -7 21 2 c2 8 -7 13 -13 12 c-6 -1 -10 -7 -8 -14 z"/>
+    <path d="M436 556 c4 -8 19 -7 21 2 c2 8 -7 13 -13 12 c-6 -1 -10 -7 -8 -14 z"/>
+    <path d="M66 200 c6 -6 18 -2 18 7 c0 8 -10 12 -16 8 c-5 -3 -6 -10 -2 -15 z"/>
+    <path d="M64 440 c6 -6 18 -2 18 7 c0 8 -10 12 -16 8 c-5 -3 -6 -10 -2 -15 z"/>
+  </g>
+</svg>

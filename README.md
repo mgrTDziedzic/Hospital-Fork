@@ -45,6 +45,11 @@ To reduce risk, the fork adds:
 
 and is playtested manually. If you run into a bug, please report it on GitHub Issues.
 
+The art for the Patient Landing Spot variants (the 3x3 and 5x5 landing pads) was also made
+with AI. These pads are optional eye candy: the default landing spot is always available, and
+you can hide the variants from the build menu with the "Enable Patient Landing Spot variants"
+option in the mod settings.
+
 ## Credits
 
 - Original mod: Adamas (tomvd).

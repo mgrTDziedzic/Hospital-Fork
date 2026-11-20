@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-    <ThingDef ParentName="BuildingBase">
-        <defName>PatientLandingSpot</defName>
-        <label>patients land here</label>
-        <description>Designates a spot where patients will be dropped.</description>
+    <!-- Shared fields of all Patient Landing Spot defs. -->
+    <ThingDef ParentName="BuildingBase" Name="PatientLandingSpotBase" Abstract="True">
         <graphicData>
-            <texPath>Things/Building/Misc/PartySpot</texPath>
             <graphicClass>Graphic_Single</graphicClass>
         </graphicData>
         <altitudeLayer>FloorEmplacement</altitudeLayer>
@@ -17,7 +14,6 @@
         <designationCategory>Misc</designationCategory>
         <passability>Standable</passability>
         <canOverlapZones>true</canOverlapZones>
-        <uiOrder>2000</uiOrder>
         <building>
             <isInert>true</isInert>
             <sowTag>SupportPlantsOnly</sowTag>
@@ -27,5 +23,371 @@
             <ai_chillDestination>false</ai_chillDestination>
             <ai_neverTrashThis>true</ai_neverTrashThis>
         </building>
+    </ThingDef>
+
+    <!-- Default 1x1 spot: always available. -->
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingSpot</defName>
+        <label>patients land here</label>
+        <description>Designates a spot where patients will be dropped.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PartySpot</texPath>
+        </graphicData>
+        <uiOrder>2000</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>false</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <!-- Cosmetic variants (hidden by the mod setting "Enable Patient Landing Spot variants"). Odd square sizes only: the centre cell is where patients land. -->
+    <DesignatorDropdownGroupDef>
+        <defName>PatientLandingPads</defName>
+        <label>patient landing pads</label>
+        <useGridMenu>true</useGridMenu>
+        <iconSource>Placed</iconSource>
+    </DesignatorDropdownGroupDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_3x3_Tribal</defName>
+        <label>patient landing pad (tribal, 3x3)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/tribal_3x3</texPath>
+            <drawSize>(3,3)</drawSize>
+        </graphicData>
+        <size>(3,3)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2001</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_5x5_Tribal</defName>
+        <label>patient landing pad (tribal, 5x5)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/tribal_5x5</texPath>
+            <drawSize>(5,5)</drawSize>
+        </graphicData>
+        <size>(5,5)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2002</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_3x3_Industrial</defName>
+        <label>patient landing pad (industrial, 3x3)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/industrial_3x3</texPath>
+            <drawSize>(3,3)</drawSize>
+        </graphicData>
+        <size>(3,3)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2003</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_5x5_Industrial</defName>
+        <label>patient landing pad (industrial, 5x5)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/industrial_5x5</texPath>
+            <drawSize>(5,5)</drawSize>
+        </graphicData>
+        <size>(5,5)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2004</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_3x3_Spacer</defName>
+        <label>patient landing pad (spacer, 3x3)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/spacer_3x3</texPath>
+            <drawSize>(3,3)</drawSize>
+        </graphicData>
+        <size>(3,3)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2005</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_5x5_Spacer</defName>
+        <label>patient landing pad (spacer, 5x5)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/spacer_5x5</texPath>
+            <drawSize>(5,5)</drawSize>
+        </graphicData>
+        <size>(5,5)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2006</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_3x3_FieldTarp</defName>
+        <label>patient landing pad (field tarp, 3x3)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/fieldtarp_3x3</texPath>
+            <drawSize>(3,3)</drawSize>
+        </graphicData>
+        <size>(3,3)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2007</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_5x5_FieldTarp</defName>
+        <label>patient landing pad (field tarp, 5x5)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/fieldtarp_5x5</texPath>
+            <drawSize>(5,5)</drawSize>
+        </graphicData>
+        <size>(5,5)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2008</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_3x3_Mechanoid</defName>
+        <label>patient landing pad (mechanoid, 3x3)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/mechanoid_3x3</texPath>
+            <drawSize>(3,3)</drawSize>
+        </graphicData>
+        <size>(3,3)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2009</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_5x5_Mechanoid</defName>
+        <label>patient landing pad (mechanoid, 5x5)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/mechanoid_5x5</texPath>
+            <drawSize>(5,5)</drawSize>
+        </graphicData>
+        <size>(5,5)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2010</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_3x3_Royal</defName>
+        <label>patient landing pad (royal, 3x3)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/royal_3x3</texPath>
+            <drawSize>(3,3)</drawSize>
+        </graphicData>
+        <size>(3,3)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2011</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_5x5_Royal</defName>
+        <label>patient landing pad (royal, 5x5)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/royal_5x5</texPath>
+            <drawSize>(5,5)</drawSize>
+        </graphicData>
+        <size>(5,5)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2012</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_3x3_Tundra</defName>
+        <label>patient landing pad (tundra, 3x3)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/tundra_3x3</texPath>
+            <drawSize>(3,3)</drawSize>
+        </graphicData>
+        <size>(3,3)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2013</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_5x5_Tundra</defName>
+        <label>patient landing pad (tundra, 5x5)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/tundra_5x5</texPath>
+            <drawSize>(5,5)</drawSize>
+        </graphicData>
+        <size>(5,5)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2014</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_3x3_Marking</defName>
+        <label>patient landing pad (painted marking, 3x3)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/marking_3x3</texPath>
+            <drawSize>(3,3)</drawSize>
+        </graphicData>
+        <size>(3,3)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2015</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_5x5_Marking</defName>
+        <label>patient landing pad (painted marking, 5x5)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/marking_5x5</texPath>
+            <drawSize>(5,5)</drawSize>
+        </graphicData>
+        <size>(5,5)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2016</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_3x3_Medevac</defName>
+        <label>patient landing pad (medevac, 3x3)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/medevac_3x3</texPath>
+            <drawSize>(3,3)</drawSize>
+        </graphicData>
+        <size>(3,3)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2017</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
+    </ThingDef>
+
+    <ThingDef ParentName="PatientLandingSpotBase">
+        <defName>PatientLandingPad_5x5_Medevac</defName>
+        <label>patient landing pad (medevac, 5x5)</label>
+        <description>A larger, purely cosmetic patient landing spot. Patients are dropped on the centre cell, exactly like on the default patient landing spot.</description>
+        <graphicData>
+            <texPath>Things/Building/Misc/PatientLandingPad/medevac_5x5</texPath>
+            <drawSize>(5,5)</drawSize>
+        </graphicData>
+        <size>(5,5)</size>
+        <rotatable>false</rotatable>
+        <designatorDropdown>PatientLandingPads</designatorDropdown>
+        <uiOrder>2018</uiOrder>
+        <modExtensions>
+            <li Class="Hospital.Utilities.PatientLandingSpotExtension">
+                <variant>true</variant>
+            </li>
+        </modExtensions>
     </ThingDef>
 </Defs>

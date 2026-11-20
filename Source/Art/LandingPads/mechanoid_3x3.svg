@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384" width="384" height="384">
+  <!-- Mechanoid / archotech pad: angular gunmetal plate, red energy lines, central optic. 3x3 tiles. -->
+  <defs>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a4c50"/><stop offset="0.5" stop-color="#2e3034"/><stop offset="1" stop-color="#1b1c1f"/>
+    </linearGradient>
+  </defs>
+
+  <!-- outer angular plate (chamfered octagon) -->
+  <polygon points="96,8 288,8 376,96 376,288 288,376 96,376 8,288 8,96" fill="#111214" stroke="#050506" stroke-width="5"/>
+  <polygon points="102,22 282,22 362,102 362,282 282,362 102,362 22,282 22,102" fill="url(#metal)" stroke="#5c5f66" stroke-width="2"/>
+
+  <!-- armour seams, angular -->
+  <g fill="none" stroke="#151618" stroke-width="4">
+    <path d="M22 150 L80 150 L110 120 L110 22"/><path d="M362 150 L304 150 L274 120 L274 22"/>
+    <path d="M22 234 L80 234 L110 264 L110 362"/><path d="M362 234 L304 234 L274 264 L274 362"/>
+  </g>
+  <!-- vent grilles -->
+  <g fill="#0c0d0f">
+    <rect x="160" y="36" width="64" height="6"/><rect x="160" y="48" width="64" height="6"/><rect x="160" y="60" width="64" height="6"/>
+    <rect x="160" y="318" width="64" height="6"/><rect x="160" y="330" width="64" height="6"/><rect x="160" y="342" width="64" height="6"/>
+    <rect x="36" y="160" width="6" height="64"/><rect x="48" y="160" width="6" height="64"/><rect x="60" y="160" width="6" height="64"/>
+    <rect x="318" y="160" width="6" height="64"/><rect x="330" y="160" width="6" height="64"/><rect x="342" y="160" width="6" height="64"/>
+  </g>
+  <!-- rivets -->
+  <g fill="#6a6d74" stroke="#0c0d0f" stroke-width="1.5">
+    <circle cx="110" cy="36" r="4"/><circle cx="274" cy="36" r="4"/><circle cx="110" cy="348" r="4"/><circle cx="274" cy="348" r="4"/>
+    <circle cx="36" cy="110" r="4"/><circle cx="348" cy="110" r="4"/><circle cx="36" cy="274" r="4"/><circle cx="348" cy="274" r="4"/>
+  </g>
+
+  <!-- red energy conduits -->
+  <g fill="none" stroke="#ff2a1f" stroke-width="3" filter="url(#glow)">
+    <path d="M110 120 L150 160"/><path d="M274 120 L234 160"/><path d="M110 264 L150 224"/><path d="M274 264 L234 224"/>
+    <polygon points="192,92 292,192 192,292 92,192"/>
+  </g>
+  <!-- segmented inner ring -->
+  <g fill="none" stroke="#ff4a3a" stroke-width="5" filter="url(#glow)">
+    <circle cx="192" cy="192" r="70" stroke-dasharray="40 15"/>
+  </g>
+
+  <!-- central optic (active cell) -->
+  <circle cx="192" cy="192" r="40" fill="#0a0a0c" stroke="#5c5f66" stroke-width="4"/>
+  <circle cx="192" cy="192" r="24" fill="#3a0806" stroke="#ff2a1f" stroke-width="3" filter="url(#glow)"/>
+  <circle cx="192" cy="192" r="10" fill="#ff6a50" filter="url(#glow)"/>
+  <circle cx="187" cy="187" r="3" fill="#ffd8cc"/>
+</svg>

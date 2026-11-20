@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640">
+  <!-- Tribal landing spot, 5x5: same style as 3x3; big shapes scaled, line widths and small details kept native. -->
+  <!-- scaled shapes (stroke widths divided by 1.667 to stay native) -->
+  <g transform="translate(320 320) scale(1.6667) translate(-192 -192)">
+    <path d="M58 204 C46 128 112 52 202 60 C286 66 340 122 330 210 C322 288 258 338 182 330 C106 322 70 274 58 204 Z" fill="#6e5236" fill-opacity="0.45"/>
+    <path d="M84 196 C80 140 128 92 196 96 C262 100 300 148 296 204 C292 262 244 302 188 298 C130 294 90 252 84 196 Z" fill="#7d5e3e" fill-opacity="0.35"/>
+    <path d="M100 186 C96 134 142 98 196 102 C254 106 290 146 288 198 C286 252 246 290 190 292 C150 293 122 274 108 246"
+          fill="none" stroke="#3a2614" stroke-width="8.4" stroke-linecap="round"/>
+    <path d="M100 186 C96 134 142 98 196 102 C254 106 290 146 288 198 C286 252 246 290 190 292 C150 293 122 274 108 246"
+          fill="none" stroke="#c8742c" stroke-width="5.4" stroke-linecap="round"/>
+    <path d="M138 160 C150 132 186 124 214 130 C244 138 258 166 254 196 C250 226 230 246 200 250"
+          fill="none" stroke="#2b2420" stroke-width="3" stroke-linecap="round" stroke-dasharray="22 9 14 11"/>
+  </g>
+
+  <!-- extra outer ring of ochre dots, uneven -->
+  <g fill="#c8742c" stroke="#3a2614" stroke-width="3">
+    <circle cx="320" cy="52" r="7"/><circle cx="410" cy="64" r="6"/><circle cx="492" cy="104" r="8"/><circle cx="556" cy="176" r="6"/>
+    <circle cx="590" cy="262" r="7"/><circle cx="592" cy="360" r="6"/><circle cx="560" cy="452" r="8"/><circle cx="496" cy="530" r="6"/>
+    <circle cx="404" cy="580" r="7"/><circle cx="232" cy="584" r="6"/><circle cx="140" cy="540" r="7"/><circle cx="62" cy="380" r="8"/>
+    <circle cx="54" cy="282" r="6"/><circle cx="80" cy="188" r="7"/><circle cx="136" cy="110" r="6"/><circle cx="226" cy="62" r="8"/>
+  </g>
+
+  <!-- white ash spiral in the centre (native size, active cell) -->
+  <g transform="translate(128 128)">
+    <path d="M192 192 c8 -3 13 5 9 12 c-6 9 -21 7 -23 -4 c-3 -14 12 -25 27 -21 c19 5 25 27 14 41 c-12 15 -38 14 -50 -2"
+          fill="none" stroke="#3a2a1c" stroke-width="10" stroke-linecap="round"/>
+    <path d="M192 192 c8 -3 13 5 9 12 c-6 9 -21 7 -23 -4 c-3 -14 12 -25 27 -21 c19 5 25 27 14 41 c-12 15 -38 14 -50 -2"
+          fill="none" stroke="#ece3cc" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- four uneven arrows -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="#3a2614" stroke-width="11">
+      <path d="M312 90 L318 140 M302 124 L318 142 L331 122"/>
+      <path d="M560 380 L506 364 M524 350 L504 364 L520 382"/>
+      <path d="M96 190 L144 222 M124 224 L146 224 L142 204"/>
+      <path d="M268 556 L284 506 M266 518 L284 504 L298 522"/>
+    </g>
+    <g stroke="#c8742c" stroke-width="6">
+      <path d="M312 90 L318 140 M302 124 L318 142 L331 122"/>
+      <path d="M560 380 L506 364 M524 350 L504 364 L520 382"/>
+      <path d="M96 190 L144 222 M124 224 L146 224 L142 204"/>
+      <path d="M268 556 L284 506 M266 518 L284 504 L298 522"/>
+    </g>
+  </g>
+
+  <!-- handprints -->
+  <g fill="#9c3324" stroke="#3a1a12" stroke-width="2.5">
+    <g transform="translate(450 470) rotate(-25)">
+      <ellipse cx="0" cy="0" rx="11" ry="13"/>
+      <ellipse cx="-12" cy="-16" rx="3.5" ry="8"/><ellipse cx="-4" cy="-21" rx="3.5" ry="9"/>
+      <ellipse cx="5" cy="-21" rx="3.5" ry="9"/><ellipse cx="13" cy="-15" rx="3.5" ry="7"/>
+      <ellipse cx="15" cy="4" rx="3.5" ry="7" transform="rotate(-40 15 4)"/>
+    </g>
+    <g transform="translate(200 140) rotate(160)">
+      <ellipse cx="0" cy="0" rx="10" ry="12"/>
+      <ellipse cx="-11" cy="-15" rx="3.2" ry="7"/><ellipse cx="-3" cy="-20" rx="3.2" ry="8"/>
+      <ellipse cx="5" cy="-20" rx="3.2" ry="8"/><ellipse cx="12" cy="-14" rx="3.2" ry="6"/>
+    </g>
+    <g transform="translate(482 218) rotate(70)">
+      <ellipse cx="0" cy="0" rx="10" ry="12"/>
+      <ellipse cx="-11" cy="-15" rx="3.2" ry="7"/><ellipse cx="-3" cy="-20" rx="3.2" ry="8"/>
+      <ellipse cx="5" cy="-20" rx="3.2" ry="8"/><ellipse cx="12" cy="-14" rx="3.2" ry="6"/>
+    </g>
+  </g>
+
+  <!-- field stones -->
+  <g fill="#8c867a" stroke="#34302a" stroke-width="4">
+    <path d="M86 250 c4 -12 22 -14 28 -3 c5 10 -4 22 -15 21 c-9 -1 -16 -9 -13 -18 z"/>
+    <path d="M110 440 c2 -10 18 -13 24 -4 c6 8 1 19 -10 20 c-9 1 -16 -7 -14 -16 z"/>
+    <path d="M250 560 c4 -11 24 -10 28 1 c3 9 -7 17 -16 15 c-8 -1 -14 -8 -12 -16 z"/>
+    <path d="M420 80 c5 -10 26 -8 29 4 c3 12 -10 19 -20 16 c-8 -3 -13 -11 -9 -20 z"/>
+    <path d="M534 200 c3 -8 16 -9 20 -1 c4 8 -3 15 -11 14 c-7 -1 -11 -7 -9 -13 z"/>
+    <path d="M530 494 c6 -12 30 -8 30 6 c0 12 -16 18 -26 12 c-6 -4 -7 -11 -4 -18 z"/>
+    <path d="M196 70 c2 -6 12 -7 15 -1 c3 6 -2 11 -8 11 c-5 0 -9 -5 -7 -10 z"/>
+    <path d="M574 312 c4 -10 22 -10 25 0 c3 10 -8 16 -16 14 c-7 -2 -12 -8 -9 -14 z"/>
+    <path d="M364 588 c3 -8 18 -8 20 1 c2 8 -6 13 -12 12 c-6 -1 -10 -7 -8 -13 z"/>
+    <path d="M40 330 c3 -9 19 -10 22 -1 c3 9 -6 15 -13 14 c-7 -1 -12 -7 -9 -13 z"/>
+    <path d="M300 30 c3 -7 15 -8 18 -1 c3 7 -4 12 -10 11 c-5 -1 -10 -5 -8 -10 z"/>
+  </g>
+  <g fill="#a39d90" fill-opacity="0.7">
+    <ellipse cx="94" cy="250" rx="6" ry="3"/><ellipse cx="428" cy="86" rx="7" ry="3"/><ellipse cx="538" cy="498" rx="7" ry="3"/><ellipse cx="582" cy="314" rx="6" ry="3"/>
+  </g>
+
+  <!-- sticks and a bone -->
+  <g stroke-linecap="round">
+    <path d="M380 600 L440 612" stroke="#2e1d0e" stroke-width="9"/><path d="M380 600 L440 612" stroke="#7a5430" stroke-width="5"/>
+    <path d="M30 470 L48 424" stroke="#2e1d0e" stroke-width="8"/><path d="M30 470 L48 424" stroke="#7a5430" stroke-width="4"/>
+    <path d="M590 120 L610 160" stroke="#2e1d0e" stroke-width="8"/><path d="M590 120 L610 160" stroke="#7a5430" stroke-width="4"/>
+  </g>
+  <g transform="translate(150 600) rotate(-15)" fill="#e6dfcc" stroke="#4a4234" stroke-width="2.5">
+    <rect x="-18" y="-3" width="36" height="6" rx="3"/>
+    <circle cx="-19" cy="-4" r="4"/><circle cx="-19" cy="4" r="4"/><circle cx="19" cy="-4" r="4"/><circle cx="19" cy="4" r="4"/>
+  </g>
+</svg>
