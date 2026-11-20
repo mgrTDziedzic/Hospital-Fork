@@ -23,8 +23,8 @@ the original author's permission, but he is not involved in its development. Ple
 report any problems with this fork here, not to the original author.
 
 - [OVERVIEW.md](OVERVIEW.md) - everything the mod currently offers
-- [RECOMMENDED_AND_COMPATIBLE_MODS.md](RECOMMENDED_AND_COMPATIBLE_MODS.md) - mods that pair well with Hospital, including the ones the fork explicitly supports
 - [NEW_FEATURES.md](NEW_FEATURES.md) - an overview of what the fork adds and changes
+- [RECOMMENDED_AND_COMPATIBLE_MODS.md](RECOMMENDED_AND_COMPATIBLE_MODS.md) - mods that pair well with Hospital, including the ones the fork explicitly supports
 - [PLANNED_FEATURES.md](PLANNED_FEATURES.md) - features and ideas planned for the future
 
 ## Ideas and suggestions

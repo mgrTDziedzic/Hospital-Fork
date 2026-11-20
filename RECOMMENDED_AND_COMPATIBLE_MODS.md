@@ -59,14 +59,6 @@ What's supported:
 
 Link: [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3356249192)
 
-### Also supported (not yet tested in this fork)
-
-#### Enemy Self Preservation (Continued)
-
-Wounded patients stay calm when they arrive instead of panicking and running off.\*
-
-Link: TODO
-
 \* Supported by the original Hospital too.
 
 ---
@@ -123,6 +115,7 @@ some of them) and they shouldn't get in your hospital's way.
 |---|---|
 | **Hospitality**\*\* | Visitors don't carry your patients away. |
 | **Multiplayer**\*\* | Mostly compatible. |
+| **Enemy Self Preservation (Continued)**\*\* | Wounded patients stay calm when they arrive instead of panicking and running off. |
 | **EPOE (Expanded Prosthetics and Organ Engineering)**\*\* | Mostly compatible. |
 | **Rah's Bionics and Surgery Expansion**\*\* | Mostly compatible. |
 | **Vanilla Races Expanded - Android**\*\* | Androids are never patients; the mod's factions and android surgeries are left out. |
