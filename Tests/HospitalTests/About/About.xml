@@ -2,19 +2,19 @@
 <ModMetaData>
 	<name>Hospital Tests (dev)</name>
 	<author>Adamas</author>
-	<packageId>Adamas.Hospital.Tests</packageId>
+	<packageId>Niejeden.HospitalFork.Tests</packageId>
 	<supportedVersions>
 		<li>1.6</li>
 	</supportedVersions>
 	<description>Developer-only in-game test harness for the Hospital mod. Not for publishing.</description>
 	<modDependencies>
 		<li>
-			<packageId>Adamas.Hospital</packageId>
+			<packageId>Niejeden.HospitalFork</packageId>
 			<displayName>Hospital</displayName>
 			<downloadUrl>https://github.com/mgrTDziedzic/Hospital-Fork</downloadUrl>
 		</li>
 	</modDependencies>
 	<loadAfter>
-		<li>Adamas.Hospital</li>
+		<li>Niejeden.HospitalFork</li>
 	</loadAfter>
 </ModMetaData>

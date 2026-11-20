@@ -4,6 +4,13 @@ Changes made in this fork ([mgrTDziedzic/Hospital-Fork](https://github.com/mgrTD
 relative to the original [Hospital](https://github.com/tomvd/Hospital) by Adamas (tomvd).
 Original code is © its author, licensed under GPLv3; modifications are © mgrTDziedzic, also GPLv3.
 
+## 3.0.0 (2026-11-20)
+- First release as its own Steam Workshop item, published with the permission of Adamas (tomvd). Version 3.0.0 continues the 2.9.6 history.
+- New packageId `Niejeden.HospitalFork` (was `Adamas.Hospital`); Harmony ID changed to match. `About.xml` author is now "Adamas, Niejeden", `modVersion` 3.0.0, and the description notes the permission and that the mod replaces the original.
+- `About.xml` declares `Adamas.Hospital` in `incompatibleWith` (same defs and patches; do not run both).
+- Because of the new packageId, mod settings start from defaults when switching from the original. Defs keep the same defNames, so existing saves should load; back up the save first.
+- Test mod: packageId `Niejeden.HospitalFork.Tests`, depends on the new packageId.
+
 ## 2026-11-20
 - Patient landing pad variants: 18 cosmetic defs (`PatientLandingPad_3x3_<Design>` / `PatientLandingPad_5x5_<Design>`; designs tribal, industrial, spacer, fieldtarp, mechanoid, royal, tundra, marking, medevac) next to the default 1x1 `PatientLandingSpot`, which keeps its defName, size and fields. Shared fields moved to the abstract def `PatientLandingSpotBase`; all landing spot defs carry the marker `Hospital.Utilities.PatientLandingSpotExtension` (`variant` flag). Variants are grouped in the `PatientLandingPads` dropdown (Architect > Misc), are not rotatable, and are drawn at their size; textures in `Textures/Things/Building/Misc/PatientLandingPad/` (sources: `Source/Art/LandingPads/`). `IncidentHelper.TryFindPatientLandingCell` now accepts spots of any marked def and still returns the centre cell; variants that are not odd-sized squares or are rotatable (`LandingSpotUtility.IsValidLandingDef`) are ignored there, hidden from the build menu, and logged once at startup (`Log.Error`).
 - New mod setting "Enable Patient Landing Spot variants" (default on; `Settings.EnableLandingSpotVariants`, key `enableLandingSpotVariants`; Keyed strings `EnableLandingSpotVariants`, `EnableLandingSpotVariantsTooltip`, 1.6 and 1.7). When off, a Harmony postfix on `Designator_Build.Visible` (`LandingSpotVariantsPatch`) hides the variants from the build menu and from the copy gizmo of placed variants; placed variants keep working as landing spots.

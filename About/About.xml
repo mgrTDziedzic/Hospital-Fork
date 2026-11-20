@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
 	<name>Hospital (Fork)</name>
-	<author>Adamas, mgrTDziedzic</author>
-	<packageId>Adamas.Hospital</packageId>
+	<author>Adamas, Niejeden</author>
+	<packageId>Niejeden.HospitalFork</packageId>
+	<modVersion>3.0.0</modVersion>
+	<incompatibleWith>
+		<li>Adamas.Hospital</li>
+	</incompatibleWith>
 	<url>https://github.com/mgrTDziedzic/Hospital-Fork</url>
 	<supportedVersions>
 		<li>1.6</li>
@@ -11,6 +15,8 @@
 	<description>
 		Fork of Hospital by Adamas (original: https://steamcommunity.com/sharedfiles/filedetails/?id=2992224079), maintained by mgrTDziedzic. Licensed under GPLv3, source: https://github.com/mgrTDziedzic/Hospital-Fork
 			Copyright (C) 2023-2026 Adamas (tomvd) and contributors; fork changes (C) 2026 mgrTDziedzic (Niejeden).
+			Published with permission of Adamas.
+			Replaces the original Hospital - do not run both.
 
 		Run a hospital: if you have this mod enabled (and settings allow you to receive patients) and you have plenty of medical beds
 		patients will knock on your door asking for help with their disease, wounds or a surgery.
