@@ -4,11 +4,10 @@
     <exclude>.claude</exclude>
     <exclude>.git</exclude>
     <exclude>.idea</exclude>
-    <exclude>About\preview.afdesign</exclude>
     <exclude>CONTRIBUTING.md</exclude>
     <exclude>Hospital.slnx</exclude>
     <exclude>Source</exclude>
+    <exclude>Art</exclude>
     <exclude>Tests</exclude>
-    <exclude>Textures\UI\Commands\PSDs</exclude>
   </Excluded>
 </Configuration>
