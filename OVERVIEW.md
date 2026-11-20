@@ -26,7 +26,7 @@ Each patient comes for one of three reasons:
   patient, and surgeries (time and materials).
 - Patients pay when they leave. The silver is dropped where they stand.
 - Goodwill depends on the patient's mood when they leave: happy patients bring more.
-- A patient who dies costs goodwill with their faction, and so does a failed surgery.
+- A patient who dies costs goodwill with their faction, and so does a failed surgery. By default a death only costs goodwill when you caused it or it had no killer (illness, blood loss, failed surgery); a setting makes every death count.
 - After a failed surgery the patient stays to recover, so you can try again.
 
 ### Mass casualty events
@@ -91,7 +91,7 @@ their satisfaction, time spent in the hospital and current bill. From here you c
 - Prevent incapacitated arrivals: patients arrive hurt but still able to walk. Turn it off for
   tougher mass casualty events with downed patients you have to rescue.
 - Difficulty: silver multiplier, goodwill gain multiplier, goodwill loss on patient death and on
-  surgery failure, disease and wound severity multipliers, sedation time of aggressive patients.
+  surgery failure, whether deaths not caused by you also cost goodwill, disease and wound severity multipliers, sedation time of aggressive patients.
 
 ### Languages
 English. French, German and Spanish translations are partial.

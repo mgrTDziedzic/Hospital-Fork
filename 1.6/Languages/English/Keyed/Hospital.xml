@@ -16,6 +16,7 @@
     <HospitalPatientLeavesNoFaction>{0} leaves: +{1}</HospitalPatientLeavesNoFaction>
     <HospitalConditionCuredExternally>{0} no longer needs the operation - the condition has been cured.</HospitalConditionCuredExternally>
     <HospitalPatientDied>{0} died: -{1} {2}</HospitalPatientDied>
+    <HospitalPatientDiedNoPenalty>{0} died. Not your fault, so {1}'s goodwill is unchanged.</HospitalPatientDiedNoPenalty>
     <HospitalSurgeryFailed>{0} failed: -{1} {2}</HospitalSurgeryFailed>
     <HospitalPatientDismissed>{0} dismissed.</HospitalPatientDismissed>
     <HospitalBlacklisted>{0} blacklisted.</HospitalBlacklisted>
@@ -60,7 +61,9 @@
     <GoodwillGainMultiplier>Goodwill gain multiplier</GoodwillGainMultiplier>
     <GoodwillGainMultiplierTooltip>Scales the goodwill earned from happy patients leaving. (default: 100%)</GoodwillGainMultiplierTooltip>
     <DeathGoodwillPenalty>Goodwill loss on patient death</DeathGoodwillPenalty>
-    <DeathGoodwillPenaltyTooltip>Goodwill lost with a faction when one of their patients dies. (default: 10)</DeathGoodwillPenaltyTooltip>
+    <DeathGoodwillPenaltyTooltip>Goodwill lost with a faction when one of their patients dies. Applies to deaths you are responsible for (killed by your colonists, turrets or animals, or died of illness, blood loss or failed surgery) unless "Penalize deaths not caused by me" is ticked. (default: 10)</DeathGoodwillPenaltyTooltip>
+    <PenalizeNonPlayerDeaths>Penalize deaths not caused by me</PenalizeNonPlayerDeaths>
+    <PenalizeNonPlayerDeathsTooltip>Unticked (default): the death penalty applies only when your faction killed the patient or the patient died with no killer (illness, blood loss, failed surgery). Deaths caused by raiders, wild or manhunting animals, enemy mechs or the environment cost no goodwill. Ticked: every patient death costs goodwill. Known gap: a patient who bleeds out after an animal attack has no killer attached, so that death still counts.</PenalizeNonPlayerDeathsTooltip>
     <SurgeryFailGoodwillPenalty>Goodwill loss on surgery failure</SurgeryFailGoodwillPenalty>
     <SurgeryFailGoodwillPenaltyTooltip>Goodwill lost with a faction when a surgery on their patient fails. (default: 1)</SurgeryFailGoodwillPenaltyTooltip>
     <DiseaseSeverityMultiplier>Disease severity multiplier</DiseaseSeverityMultiplier>

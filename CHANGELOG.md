@@ -4,6 +4,9 @@ Changes made in this fork ([mgrTDziedzic/Hospital-Fork](https://github.com/mgrTD
 relative to the original [Hospital](https://github.com/tomvd/Hospital) by Adamas (tomvd).
 Original code is © its author, licensed under GPLv3; modifications are © mgrTDziedzic, also GPLv3.
 
+## 2026-11-20
+- New mod setting "Penalize deaths not caused by me" (default off), under the death-penalty slider. When off, the goodwill penalty for a patient death applies only to deaths without a killer (illness, blood loss, failed surgery) and deaths caused by the player's faction; deaths caused by other factions, wild or manhunting animals, mechs or the environment cost no goodwill and show the message "X died. Not your fault...". When on, every patient death costs goodwill as before. Patients who bleed out after an animal attack have no killer attached and still count. `Pawn.Kill` prefix now passes the `DamageInfo` to `PatientDied`; new `HospitalMapComponent.PlayerResponsibleForDeath`. Keyed strings `PenalizeNonPlayerDeaths`, `PenalizeNonPlayerDeathsTooltip`, `HospitalPatientDiedNoPenalty` added and `DeathGoodwillPenaltyTooltip` updated (1.6 and 1.7).
+
 ## 2026-11-19
 - Internal: `_PublisherPlus.xml` no longer excludes `LICENSE` (the GPL text now ships with Workshop uploads) and excludes `Tests`.
 - Added copyright notices (original author and fork) to README, `About/About.xml` description and the assembly copyright attribute.

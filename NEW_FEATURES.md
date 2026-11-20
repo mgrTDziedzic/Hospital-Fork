@@ -50,6 +50,13 @@ and lies where the pod landed. They need to be brought to a bed and cured before
 the arrival letter shows the remaining time. If it runs out, they wake up berserk. A death costs goodwill
 as for any patient. The sedation time (default 8 hours) is set in the mod settings.
 
+### Death penalty only for deaths you cause
+New mod setting "Penalize deaths not caused by me", under the death goodwill slider (default off). Off: a patient
+death costs goodwill only if it has no killer (illness, blood loss, failed surgery) or was caused by your faction.
+Deaths caused by raiders, wild or manhunting animals, mechs or the environment cost nothing and show a message.
+On: every patient death costs goodwill. A patient who bleeds out after an animal attack has no killer attached
+and still counts.
+
 ### Failed surgery
 After a failed operation the patient stays to recover instead of leaving, so the surgery can be
 added again.

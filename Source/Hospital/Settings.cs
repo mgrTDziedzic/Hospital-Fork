@@ -13,6 +13,8 @@ public class Settings : ModSettings
     // Difficulty tuning - all defaults reproduce the original hardcoded behaviour.
     public float GoodwillGainMultiplier = 1f;
     public int DeathGoodwillPenalty = 10;
+    // false: the death penalty applies only to deaths the player is responsible for (see HospitalMapComponent.PlayerResponsibleForDeath).
+    public bool PenalizeNonPlayerDeaths;
     public int SurgeryFailGoodwillPenalty = 1;
     // Hours an aggressive patient stays sedated after arrival (aggressive patients challenge).
     public float SedationHours = 8f;
@@ -26,6 +28,7 @@ public class Settings : ModSettings
         Scribe_Values.Look(ref PreventIncapacitatedArrivals, "preventIncapacitatedArrivals", true);
         Scribe_Values.Look(ref GoodwillGainMultiplier, "goodwillGainMultiplier", 1f);
         Scribe_Values.Look(ref DeathGoodwillPenalty, "deathGoodwillPenalty", 10);
+        Scribe_Values.Look(ref PenalizeNonPlayerDeaths, "penalizeNonPlayerDeaths", false);
         Scribe_Values.Look(ref SurgeryFailGoodwillPenalty, "surgeryFailGoodwillPenalty", 1);
         Scribe_Values.Look(ref SedationHours, "sedationHours", 8f);
         Scribe_Values.Look(ref DiseaseSeverityMultiplier, "diseaseSeverityMultiplier", 1f);
@@ -55,6 +58,7 @@ public class Settings : ModSettings
         listingStandard.SliderLabeled("DeathGoodwillPenalty".Translate(), ref deathPenalty, deathPenalty.ToString("0"), 0f, 50f,
             "DeathGoodwillPenaltyTooltip".Translate());
         DeathGoodwillPenalty = Mathf.RoundToInt(deathPenalty);
+        listingStandard.CheckboxLabeled("PenalizeNonPlayerDeaths".Translate(), ref PenalizeNonPlayerDeaths, "PenalizeNonPlayerDeathsTooltip".Translate());
 
         float surgeryFailPenalty = SurgeryFailGoodwillPenalty;
         listingStandard.SliderLabeled("SurgeryFailGoodwillPenalty".Translate(), ref surgeryFailPenalty, surgeryFailPenalty.ToString("0"), 0f, 50f,
@@ -84,6 +88,7 @@ public class Settings : ModSettings
         SilverMultiplier = 1f;
         GoodwillGainMultiplier = 1f;
         DeathGoodwillPenalty = 10;
+        PenalizeNonPlayerDeaths = false;
         SurgeryFailGoodwillPenalty = 1;
         SedationHours = 8f;
         DiseaseSeverityMultiplier = 1f;

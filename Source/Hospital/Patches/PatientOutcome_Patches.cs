@@ -14,10 +14,10 @@ public class PatientOutcome_Patches
     public static class Kill
     {
         [HarmonyPrefix]
-        public static void Prefix(Pawn __instance)
+        public static void Prefix(Pawn __instance, DamageInfo? dinfo)
         {
             // not IsPatient: a patient dying while being carried has no Map and would be missed
-            HospitalMapComponent.FindHospitalOf(__instance)?.PatientDied(__instance);
+            HospitalMapComponent.FindHospitalOf(__instance)?.PatientDied(__instance, dinfo);
         }
     }
     

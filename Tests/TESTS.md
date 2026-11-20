@@ -6,7 +6,7 @@ Generated file, do not edit by hand. Regenerate with:
 
 Source: `[HospitalTest]` attributes and the `// Given: / When: / Then:` comments above each test method in `Tests/HospitalTests/Source/Tests/`.
 
-Total tests: 113
+Total tests: 118
 
 ## AggressivePatientTests.cs
 
@@ -63,6 +63,16 @@ Total tests: 113
 | A10 | `SentAwayUsesActiveOnly` | SentAway keeps an active downed patient and sends away a dismissed one | a downed registered patient, then the same patient marked Dismissed. | Trigger_SentAway.SentAway runs (call site using activeOnly: true). | active downed patient: not sent away; dismissed one: sent away (no longer an active patient). Skipped when there are dangers on the map (SentAway is always false then). |  |
 | MultiDoctor | `PatientBillOpensNoWindow` | a patient cure bill is a plain Bill_Medical created without opening any window | a spawned registered patient (Multi-Doctor Surgery customizes bills only for pawns with a Map). | the mod adds the cure bill (install denture on the jaw) via SurgeryUtility.CreatePatientBill. | the bill is a plain Bill_Medical on the right part and no window was opened. Before the fix the bill went through HealthCardUtility.CreateSurgeryBill; Multi-Doctor opened "assign doctors" and deleted the bill when that window was closed, so the patient was sent home right after arrival. |  |
 | AsIs1 | `CanAssignAsIsExistingImplant` | CanAssignAsIs: an implant the pawn already has is not assigned; removesHediff recipes always are | a pawn without a Joywire. |  | InstallJoywire is assignable; once the pawn has the implant it is not (vanilla would remove the bill). A removesHediff recipe stays assignable without the hediff (preparation adds it). |  |
+
+## DeathPenaltyTests.cs
+
+| ID | Method | Description | Given | When | Then | Requires |
+|---|---|---|---|---|---|---|
+| Death1 | `HostileKillNoPenalty` | option off, a patient killed by a hostile pawn costs no goodwill | option off, a registered patient of a non-hostile faction. | a hostile raider (not the player's faction) kills them. | goodwill is unchanged and the patient is removed from the roster. |  |
+| Death2 | `ColonistKillPenalty` | option off, a patient killed by a player colonist costs the death penalty | option off, a registered patient and a player colonist. | the colonist kills the patient. | the death penalty is applied. |  |
+| Death3 | `MedicalDeathPenalty` | option off, a medical death (no killer) costs the death penalty | option off, a registered patient. | they die with no DamageInfo (illness, blood loss, failed surgery: Kill(null)). | the death penalty is applied. |  |
+| Death4 | `OptionOnHostileKillPenalty` | option on, a patient killed by a hostile pawn costs the death penalty | option on, a registered patient. | a hostile raider kills them. | the death penalty is applied (original behaviour). |  |
+| Death5 | `ResponsibleCheck` | PlayerResponsibleForDeath is true for null dinfo and player instigators only | DamageInfo with a player colonist, a hostile pawn, no instigator, and no DamageInfo at all. |  | PlayerResponsibleForDeath is true for null and the colonist, false for the hostile pawn and for no instigator. |  |
 
 ## DrugPolicyTests.cs
 

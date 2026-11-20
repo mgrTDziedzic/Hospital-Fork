@@ -445,16 +445,33 @@ namespace Hospital
             }
         }
 
-        public void PatientDied(Pawn pawn)
+        /// <summary>
+        /// True for medical deaths (no damage info: illness, blood loss, failed surgery) and deaths caused by the player's faction.
+        /// </summary>
+        public static bool PlayerResponsibleForDeath(DamageInfo? dinfo)
+        {
+            if (dinfo == null) return true;
+            return dinfo.Value.Instigator?.Faction == Faction.OfPlayer;
+        }
+
+        public void PatientDied(Pawn pawn, DamageInfo? dinfo = null)
         {
             if (Patients.TryGetValue(pawn, out var patientData))
             {
                 if (pawn.Faction != null)
                 {
-                    int penalty = HospitalMod.Settings.DeathGoodwillPenalty;
-                    Messages.Message("HospitalPatientDied".Translate(pawn.NameFullColored, penalty, pawn.Faction.name),
-                        MessageTypeDefOf.PawnDeath);
-                    pawn.Faction.TryAffectGoodwillWith(Faction.OfPlayer, -penalty, false);
+                    if (HospitalMod.Settings.PenalizeNonPlayerDeaths || PlayerResponsibleForDeath(dinfo))
+                    {
+                        int penalty = HospitalMod.Settings.DeathGoodwillPenalty;
+                        Messages.Message("HospitalPatientDied".Translate(pawn.NameFullColored, penalty, pawn.Faction.name),
+                            MessageTypeDefOf.PawnDeath);
+                        pawn.Faction.TryAffectGoodwillWith(Faction.OfPlayer, -penalty, false);
+                    }
+                    else
+                    {
+                        Messages.Message("HospitalPatientDiedNoPenalty".Translate(pawn.NameFullColored, pawn.Faction.name),
+                            MessageTypeDefOf.PawnDeath);
+                    }
                 }
                 RemoveFromPatientList(pawn);
                 PatientLeftTheMap(pawn);
