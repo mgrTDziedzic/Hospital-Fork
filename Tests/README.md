@@ -26,6 +26,7 @@ Dev mode -> debug actions menu -> "Hospital Debug":
 
 Both ignore opening hours and danger settings (and the per-map mass casualty switch) for that one incident and restore them afterwards.
 They still need a free hospital bed and a friendly humanlike faction; otherwise a message says why nothing happened.
+The full list (specific patients, specific mass casualty events, patient distribution sample) is in [DEBUG_ACTIONS.md](DEBUG_ACTIONS.md).
 
 ## Run automatically
 `powershell -File Tests\run-tests.ps1 [-SaveName HospitalTest] [-TimeoutMinutes 10] [-SaveDataFolder <path>] [-GameDir <path>] [-Dotnet <path>]`
