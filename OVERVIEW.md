@@ -100,30 +100,4 @@ English. French, German and Spanish translations are partial.
 
 ## Compatibility with other mods
 
-All of these are optional: nothing changes if a mod is not installed.
-
-### Supported and tested in this fork
-
-| Mod | What works |
-|---|---|
-| **MedPod** | Patients use MedPods. A condition cured by a MedPod counts as treated and is paid for, including a missing body part regrown by the MedPod. |
-| **Multi-Doctor Surgery** | With its "(Beta) Fast Operation" option on and a default surgery team set, patient surgeries get that team. Otherwise a single doctor operates. |
-| **Plasteel Surgery (Continued)** | Patients only request surgeries they can actually receive. Decrease Beauty and most body-type changes are blacklisted by default on new maps (can be re-enabled). Feminize is requested only by women, Masculinize only by men. Laryngoplasty patients can arrive (given Annoying voice or Creepy breathing), and so can patients for the beauty surgeries (their Beauty trait is set to a level the surgery accepts). |
-
-### Supported, not yet tested in this fork
-
-| Mod | What it does |
-|---|---|
-| **Enemy Self Preservation (Continued)** | Wounded patients don't panic and flee when they arrive. |
-| **Vanilla Races Expanded - Android** | Androids are never patients; the mod's factions and android surgeries are left out. |
-| **Genetic Rim** | Its diseases and implant surgeries are not given to patients. |
-
-### Listed by the original mod (not yet re-checked in this fork)
-
-| Mod | Status |
-|---|---|
-| **Hospitality** | Compatible – visitors don't carry your patients away. |
-| **Multiplayer** | Mostly compatible. |
-| **EPOE (Expanded Prosthetics and Organ Engineering)** | Mostly compatible. |
-| **Diseases Overhauled** | Mostly compatible. |
-| **Rah's Bionics and Surgery Expansion** | Mostly compatible. |
+Supported, recommended and compatible mods are listed in [RECOMMENDED_AND_COMPATIBLE_MODS.md](RECOMMENDED_AND_COMPATIBLE_MODS.md).

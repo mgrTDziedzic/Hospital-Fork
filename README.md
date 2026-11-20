@@ -22,7 +22,8 @@ compatibility with other mods, bug fixes and performance improvements. The work 
 the original author's permission, but he is not involved in its development. Please
 report any problems with this fork here, not to the original author.
 
-- [OVERVIEW.md](OVERVIEW.md) - everything the mod currently offers, plus mod compatibility
+- [OVERVIEW.md](OVERVIEW.md) - everything the mod currently offers
+- [RECOMMENDED_AND_COMPATIBLE_MODS.md](RECOMMENDED_AND_COMPATIBLE_MODS.md) - mods that pair well with Hospital, including the ones the fork explicitly supports
 - [NEW_FEATURES.md](NEW_FEATURES.md) - an overview of what the fork adds and changes
 - [PLANNED_FEATURES.md](PLANNED_FEATURES.md) - features and ideas planned for the future
 
@@ -39,8 +40,8 @@ software developer (ERP systems), though new to C# and RimWorld modding. Most of
 is written by AI; I decide what to change and test every change in-game.
 
 To reduce risk, the fork adds:
-- automated in-game tests covering core hospital logic,
-- debug actions for spawning and inspecting patients and mass casualty events,
+- automated in-game tests covering core hospital logic ([list of tests](Tests/TESTS.md)),
+- debug actions for spawning and inspecting patients and mass casualty events ([description](Tests/DEBUG_ACTIONS.md)),
 
 and is playtested manually. If you run into a bug, please report it on GitHub Issues.
 
