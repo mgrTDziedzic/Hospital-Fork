@@ -146,8 +146,9 @@ public static class IncidentHelper
         manhunterOnMap = activePawns.Any(p => p.InAggroMentalState);
 
         // remove all factions that could get hostile with a pawn on the map - or if the player is currently has hostile pawns visiting
+        // guests of the colony (visitors, patients) never fight factions that are not hostile to the player (vanilla HostFaction rule), so they only count for the player check
         potentialPatientFactions.RemoveAll(faction =>
-            activePawns.Where(p => p.Faction != null).Select(p => p.Faction).Any(f => f.HostileTo(Faction.OfPlayer) || f.HostileTo(faction)));
+            activePawns.Where(p => p.Faction != null).Any(p => p.Faction.HostileTo(Faction.OfPlayer) || (p.HostFaction != Faction.OfPlayer && p.Faction.HostileTo(faction))));
         return potentialPatientFactions;
     }
 

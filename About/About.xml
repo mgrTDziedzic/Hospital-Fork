@@ -3,7 +3,7 @@
 	<name>Hospital (Fork)</name>
 	<author>Adamas, Niejeden</author>
 	<packageId>Niejeden.HospitalFork</packageId>
-	<modVersion>3.0.0</modVersion>
+	<modVersion>3.0.1</modVersion>
 	<incompatibleWith>
 		<li>Adamas.Hospital</li>
 	</incompatibleWith>
