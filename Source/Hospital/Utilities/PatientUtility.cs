@@ -68,11 +68,43 @@ namespace Hospital.Utilities
         // yet at that point, so patches on other mods' damage reactions check this instead.
         public static Pawn PawnBeingInjured { get; private set; }
 
+        // > 0 while arrival wounds/disease/surgery are applied to a pawn that is about to be put in a drop pod (or
+        // sampled). Vanilla damage side effects (blood filth, "Headshot" text, wound voice, damage effecters) are
+        // skipped then, see DamageEffectSuppressionPatches. A counter, so nested scopes are safe.
+        public static int SuppressDamageEffectsDepth;
+        public static bool SuppressDamageEffects => SuppressDamageEffectsDepth > 0;
+
+        private static void BeginArrivalDamage(Pawn pawn)
+        {
+            PawnBeingInjured = pawn;
+            SuppressDamageEffectsDepth++;
+        }
+
+        private static void EndArrivalDamage(Pawn pawn)
+        {
+            PawnBeingInjured = null;
+            if (SuppressDamageEffectsDepth > 0) SuppressDamageEffectsDepth--;
+            try
+            {
+                // Vanilla keeps a wounded effecter on the pawn; it was never triggered while suppressed.
+                var health = pawn?.health;
+                if (health?.woundedEffecter != null)
+                {
+                    health.woundedEffecter.Cleanup();
+                    health.woundedEffecter = null;
+                }
+            }
+            catch (System.Exception)
+            {
+                // cosmetic only
+            }
+        }
+
         // spec == null: random problem exactly as before. With a spec, forced choices are used; if a forced
         // choice cannot be applied to this pawn the usual fallback to wounds happens, with a warning.
         public static void DamagePawn(Pawn pawn, PatientData patientData, HospitalMapComponent hospital, PatientSpec spec = null)
         {
-            PawnBeingInjured = pawn;
+            BeginArrivalDamage(pawn);
             try
             {
                 bool failed = false;
@@ -103,7 +135,7 @@ namespace Hospital.Utilities
             }
             finally
             {
-                PawnBeingInjured = null;
+                EndArrivalDamage(pawn);
             }
         }
 
@@ -120,7 +152,7 @@ namespace Hospital.Utilities
 
         public static void DamagePawn(Pawn pawn, PatientData patientData, HospitalMapComponent hospital, IncidentWorker_MassCasualtyEvent.MCEType type)
         {
-            PawnBeingInjured = pawn;
+            BeginArrivalDamage(pawn);
             try
             {
                 switch (type)
@@ -141,7 +173,7 @@ namespace Hospital.Utilities
             }
             finally
             {
-                PawnBeingInjured = null;
+                EndArrivalDamage(pawn);
             }
         }
         

@@ -6,7 +6,7 @@ Generated file, do not edit by hand. Regenerate with:
 
 Source: `[HospitalTest]` attributes and the `// Given: / When: / Then:` comments above each test method in `Tests/HospitalTests/Source/Tests/`.
 
-Total tests: 119
+Total tests: 120
 
 ## AggressivePatientTests.cs
 
@@ -18,6 +18,12 @@ Total tests: 119
 | Aggr4 | `WakesUpBerserk` | when the sedation is gone the Scaria patient turns BerserkPermanent | the Aggr3 patient. | the sedation is removed and Scaria ticks. | BerserkPermanent starts. |  |
 | Aggr5 | `AggressionHediffCheck` | IsAggressionHediff is true for Scaria, false for Flu and Plague | vanilla and modded hediff defs. |  | Scaria is an aggression hediff, ordinary diseases are not. |  |
 | Aggr6 | `DeathPenaltyOnce` | a sedated aggressive patient dying costs exactly the normal death goodwill penalty | a registered sedated patient dies (Pawn.Kill). |  | PatientDied applies the normal death penalty once (goodwill drops by exactly DeathGoodwillPenalty) and vanilla adds nothing on top. |  |
+
+## ArrivalEffectTests.cs
+
+| ID | Method | Description | Given | When | Then | Requires |
+|---|---|---|---|---|---|---|
+| Arrival | `ArrivalWoundsLeaveNoBlood` | wounds applied to the landing pawn leave no blood filth or wounded effecter, and the suppress flag is reset | a spawned pawn on a cell with no filth around. | arrival wounds are applied through PatientUtility.DamagePawn (the shared path of arrivals, mass casualty events and the sampler). | the pawn is wounded, but no blood filth appeared near the cell, the pawn has no wounded effecter and the suppress flag is off again. Control: outside that scope the same pawn drops blood filth as in vanilla. |  |
 
 ## ArrivalTests.cs
 
