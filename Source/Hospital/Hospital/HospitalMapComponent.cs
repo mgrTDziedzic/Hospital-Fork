@@ -280,11 +280,14 @@ namespace Hospital
                 BodyPartRecord part = bill?.Part;
                 if (part == null) return;
                 if (pawn.health.hediffSet.PartOrAnyAncestorHasDirectlyAddedParts(part)) return;
-                bool stillMissing = false;
-                for (BodyPartRecord p = part; p != null && !stillMissing; p = p.parent)
-                {
-                    stillMissing = hediffs.Any(h => h is Hediff_MissingPart && h.Part == p);
-                }
+                // Vanilla adds one MissingPart hediff per part of the subtree (leg -> foot -> toes) and
+                // MedPod removes them one by one, parent first. So descendants must be checked too,
+                // or the bill looks cured while the foot/toes are still missing. Parts under a
+                // prosthetic are skipped (MedPod skips them as well). Raw list: MedPod edits it directly.
+                HediffSet hSet = pawn.health.hediffSet;
+                bool stillMissing = hediffs.Any(h => h is Hediff_MissingPart && h.Part != null
+                    && (IsSelfOrAncestor(h.Part, part) || IsSelfOrAncestor(part, h.Part))
+                    && !hSet.PartOrAnyAncestorHasDirectlyAddedParts(h.Part));
                 if (stillMissing) return;
                 cured = true;
             }
@@ -324,6 +327,13 @@ namespace Hospital
             data.PartMissingAtArrival = false;
         }
 
+        // True if anc is p itself or one of its ancestors.
+        private static bool IsSelfOrAncestor(BodyPartRecord anc, BodyPartRecord p)
+        {
+            for (; p != null; p = p.parent) if (p == anc) return true;
+            return false;
+        }
+
         // Without the bill we no longer know the exact part, so judge by the recipe's target
         // part defs. The surgery can't happen anymore either way, so the flag is always cleared;
         // the surgery price is charged only when the condition is verifiably cured.
@@ -339,7 +349,15 @@ namespace Hospital
             {
                 List<BodyPartDef> targets = recipe.appliedOnFixedBodyParts;
                 bool Targeted(BodyPartRecord p) => p != null && (targets.NullOrEmpty() || targets.Contains(p.def));
-                bool stillMissing = hediffs.Any(h => h is Hediff_MissingPart && Targeted(h.Part));
+                // Descendants (foot/toes) carry their own MissingPart hediffs, so check ancestors too.
+                bool TargetedOrUnder(BodyPartRecord p)
+                {
+                    for (; p != null; p = p.parent) if (Targeted(p)) return true;
+                    return false;
+                }
+                bool stillMissing = hediffs.Any(h => h is Hediff_MissingPart && h.Part != null
+                    && TargetedOrUnder(h.Part)
+                    && !pawn.health.hediffSet.PartOrAnyAncestorHasDirectlyAddedParts(h.Part));
                 bool prosthetic = hediffs.Any(h => h is Hediff_AddedPart && Targeted(h.Part));
                 cured = !stillMissing && !prosthetic;
             }
