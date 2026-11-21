@@ -59,7 +59,7 @@ left. If it runs out, they wake up berserk.
 ### Patient landing spot
 Build a **Patient landing spot** to choose where the drop pods land. Optional larger cosmetic
 **patient landing pads** (3x3 and 5x5, nine designs) are in the same Architect > Misc menu; patients land on the
-centre cell. They can be hidden with the mod setting "Enable Patient Landing Spot variants".
+centre cell. They can be hidden with the mod setting "Show patient landing pads".
 
 ### Patients tab
 A **Patients** tab lists everyone in your care with their diagnosis, the treatment they need,
@@ -67,32 +67,33 @@ their satisfaction, time spent in the hospital and current bill. From here you c
 
 - **Dismiss** a patient (they leave without paying),
 - **Refuse operation** – send the patient away and never accept that operation again,
-- open **Hospital Policies**.
+- open **Hospital policies**.
 
-### Hospital Policies (per map)
-- **Accept patients** – open or close the hospital.
+### Hospital policies (per map)
+- **Allow patients** – open or close the hospital.
 - **Opening hours** – the hours when patients may arrive.
-- **Enable mass casualty events**.
-- **Accept surgery** – whether surgery patients come at all.
+- **Allow surgery patients** – whether surgery patients come at all.
 - **Allow aggressive patients** – the challenge described above.
 - **Allow patients during danger** – whether patients come during dangers such as toxic
   fallout or manhunters.
-- **Mass casualties during danger** – whether mass casualty events may happen while the map
+- **Allow mass casualty events**, and **Allow mass casualties during danger** – whether mass casualty events may happen while the map
   is dangerous (e.g. manhunters).
 - **Medical care** and **food policy** for patients.
-- **Patient drugs** – a drug policy for each kind of patient: all patients, infection,
+- **Patient drug policies** – a drug policy for each kind of patient: all patients, infection,
   surgery, injuries and scars. A patient gets the drugs of every list that applies to them.
   Doctors give the drugs marked "Scheduled", following the policy's frequency and mood/joy
-  limits, and the drugs are added to the bill. Each list can include or skip teetotalers.
+  limits, and the drugs are added to the bill. Each list can include or skip teetotalers ("Include teetotalers").
   The base game has few suitable drugs, so most options come from other mods
   (e.g. Vanilla Brewing Expanded, Remedies).
-- **Blacklists** for surgeries, diseases and factions you don't want to see.
+- **Refused** surgeries, diseases and factions you don't want to see.
 
 ### Mod settings (global)
 - Show a message instead of a letter when a patient arrives.
 - Prevent incapacitated arrivals: patients arrive hurt but still able to walk. Turn it off for
   tougher mass casualty events with downed patients you have to rescue.
-- Difficulty: silver multiplier, goodwill gain multiplier, goodwill loss on patient death and on
+- Show patient landing pads: the larger cosmetic landing pads in the build menu.
+- Economy: silver multiplier.
+- Difficulty: goodwill gain multiplier, goodwill loss on patient death and on
   surgery failure, whether deaths not caused by you also cost goodwill, disease and wound severity multipliers, sedation time of aggressive patients.
 
 ### Languages

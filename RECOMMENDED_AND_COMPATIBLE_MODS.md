@@ -65,7 +65,7 @@ Link: [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=33
 
 ## Mods that fit well
 
-No special support needed: these mods just pair nicely with running a hospital.
+No special support: these mods just pair nicely with running a hospital.
 
 ### Diseases Overhauled
 
@@ -104,6 +104,21 @@ patients right where they lie.
 
 Link: [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3526251680)
 
+### Vanilla Apparel Expanded
+
+**Dress the part.** Put your doctors in scrubs and surgical masks and they'll finally look
+like real medical staff. It's not just for show either: the outfit improves their treatment
+results.
+
+Link: [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=1814987817)
+
+### Vanilla Furniture Expanded - Medical Module
+
+**Make it look like a real hospital.** A lot more choice of medical beds and the equipment
+that links to them, plus sterile walls with color-coded stripes.
+
+Link: [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=1718191613)
+
 ---
 
 ## Compatible mods
@@ -120,7 +135,6 @@ some of them) and they shouldn't get in your hospital's way.
 | **Rah's Bionics and Surgery Expansion**\*\* | Mostly compatible. |
 | **Vanilla Races Expanded - Android**\*\* | Androids are never patients; the mod's factions and android surgeries are left out. |
 | **Genetic Rim**\*\* | Its diseases and implant surgeries are not given to patients. Marked as obsolete on its Steam page, but still supported for anyone using it. |
-| **Vanilla Furniture Expanded - Medical**† | |
 | **Vanilla Bionics Expansion**† | |
 | **Archotech Bionics**† | |
 | **Prosthetic No Missing Body Parts (Continued)**† | |

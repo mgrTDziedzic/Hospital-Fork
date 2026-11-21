@@ -9,10 +9,10 @@ Supported game versions: RimWorld 1.6 and 1.7.
 
 ## Additions
 
-### Patient drugs
+### Patient drug policies
 Lets you choose which drugs patients receive while in your care.
 
-- **Hospital Policies → Patient drugs** has a drug policy for each kind of patient:
+- **Hospital policies → Patient drug policies** has a drug policy for each kind of patient:
   - **All patients**
   - **Infection** – sick patients who are not yet immune
   - **Surgery** – patients waiting for an operation
@@ -21,17 +21,17 @@ Lets you choose which drugs patients receive while in your care.
 - A patient gets the drugs of every list that applies to them.
 - Only drugs marked **Scheduled** in the policy are given. Doctors administer them as
   medical bills, following the policy's frequency and mood/joy limits.
-- **Teetotalers too** – per list, whether teetotaler patients also get those drugs.
+- **Include teetotalers** – per list, whether teetotaler patients also get those drugs.
 - Drugs are billed to the patient like other treatment.
-- **Manage drug policies...** creates policies for the hospital. Examples:
-  - **All patients** ("Teetotalers too" off): psychite tea for mood.
+- **Manage drug policies** creates policies for the hospital. Examples:
+  - **All patients** ("Include teetotalers" off): psychite tea for mood.
   - **Infection**: Masala Chai from Vanilla Brewing Expanded.
   - **Scars**: Neoderm from Remedies (Continued). A scar alone does not keep a patient in the
     hospital, so the drug only applies while they are being treated for something else.
 
   The base game has few suitable drugs, so most options come from other mods.
 
-### Bed choice
+### Optimal bed choice
 Patients pick a hospital bed based on what they need:
 
 - Surgery patients: the bed with the highest surgery success chance (bed quality, cleanliness,
@@ -40,12 +40,12 @@ Patients pick a hospital bed based on what they need:
 - Others: the bed with the best tend quality.
 
 ### Mass casualties during danger
-New hospital setting. When unticked, mass casualty events wait until there are no manhunters
+New hospital policy, "Allow mass casualties during danger". When unticked, mass casualty events wait until there are no manhunters
 or other aggressive animals on the map. Ticked (the default) keeps the original behaviour.
 
 ### Sedated aggressive patients (optional)
-Patients no longer arrive with scaria. **Allow aggressive patients** in Hospital Policies (requires
-"Accept surgery") re-enables this as an optional challenge: the patient arrives sedated by their faction
+Patients no longer arrive with scaria. **Allow aggressive patients** in Hospital policies (requires
+"Allow surgery patients") re-enables this as an optional challenge: the patient arrives sedated by their faction
 and lies where the pod landed. They need to be brought to a bed and cured before the sedation wears off;
 the arrival letter shows the remaining time. If it runs out, they wake up berserk. A death costs goodwill
 as for any patient. The sedation time (default 8 hours) is set in the mod settings.
@@ -81,12 +81,17 @@ comes from the original Hospital.
 
 ## Fixes and adjustments
 
-- Fixed freezes when generating certain disease, plague or wound patients.
-- Patients are no longer assigned surgeries that the game cancels, which could leave them waiting.
+- Disease, plague and wound patients are generated without freezing the game.
+- Patients are assigned only surgeries the game can perform on them.
 - Wound and infection patients arrive with the condition they came for.
-- Payment: empty silver stacks are no longer created; large payments are split into proper stacks.
-- Mass casualty events respect the faction blacklist, don't fire without free beds,
+- Payment: silver arrives in valid stacks; large payments are split by the stack limit.
+- Mass casualty events respect the refused factions list, don't fire without free beds,
   and the letter shows the actual number of patients.
 - Arrested patients are removed from the hospital list.
+- A patient's arrival leaves no blood, "Headshot" text or pain sounds on the landing spot.
+- Modded surgeries with "gr" in their name (e.g. upgrades, grafts) can be requested by patients.
+- Beds from other mods with "Pod" in their name work as regular hospital beds; MedPod handling applies only to MedPod beds.
+- Deafness surgeries target an ear.
+- Feeding a patient is billed only when the meal is completed.
 - Saves from earlier versions of the mod load correctly.
-- Performance improvements with many pawns on the map.
+- Performance improvements with many pawns on the map and when generating mass casualty events.
