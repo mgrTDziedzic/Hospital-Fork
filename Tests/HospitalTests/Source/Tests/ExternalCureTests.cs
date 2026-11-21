@@ -121,9 +121,11 @@ namespace HospitalTests
         // Given: a patient who arrived with a missing leg and a pending peg-leg bill.
         // When:  (control) the check runs while the leg is still missing.
         // Then:  nothing happens: bill stays, no charge.
-        // When:  the missing-part hediff is removed (leg regrown) and the check runs again.
+        // When:  only the leg's own missing-part hediff is removed (partial regrowth: foot/toes still missing) and the check runs.
+        // Then:  nothing happens: bill stays, no charge.
+        // When:  all remaining missing-part hediffs on the leg and its descendants are removed and the check runs.
         // Then:  the patient is billed, the bill deleted and the arrival flag reset.
-        [HospitalTest("MedPod: a regrown missing part counts as cured and is billed (nothing happens while still missing)")]
+        [HospitalTest("MedPod: a regrown missing part counts as cured and is billed only once the whole limb is back (nothing happens while still missing)")]
         public static void RegrownPartIsBilled(TestContext ctx)
         {
             var recipe = DefDatabase<RecipeDef>.GetNamedSilentFail("InstallPegLeg");
@@ -136,7 +138,20 @@ namespace HospitalTests
             Assert.True(pawn.health.surgeryBills.Bills.Contains(bill) && data.HasPendingSurgeryBill, "bill resolved while the part was still missing");
             Assert.Equal(0f, data.Bill, "charged while the part was still missing");
 
+            // partial regrowth: only the leg hediff gone, descendants (foot, toes) still missing -> not cured yet
+            var legPart = missing.Part;
             pawn.health.hediffSet.hediffs.Remove(missing);
+            CheckAll.Invoke(hospital, null);
+            Assert.True(pawn.health.surgeryBills.Bills.Contains(bill) && data.HasPendingSurgeryBill, "bill resolved while descendants of the part were still missing");
+            Assert.Equal(0f, data.Bill, "charged while descendants of the part were still missing");
+
+            // whole limb regrown: remove the remaining missing-part hediffs on the leg subtree
+            pawn.health.hediffSet.hediffs.RemoveAll(h =>
+            {
+                if (!(h is Hediff_MissingPart)) return false;
+                for (var p = h.Part; p != null; p = p.parent) if (p == legPart) return true;
+                return false;
+            });
             CheckAll.Invoke(hospital, null);
 
             Assert.True(data.Bill > 0f, "patient was not billed for the regrown part");
