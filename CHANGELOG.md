@@ -4,6 +4,9 @@ Changes made in this fork ([mgrTDziedzic/Hospital-Fork](https://github.com/mgrTD
 relative to the original [Hospital](https://github.com/tomvd/Hospital) by Adamas (tomvd).
 Original code is © its author, licensed under GPLv3; modifications are © mgrTDziedzic, also GPLv3.
 
+## 3.0.1
+- Patients arrive while visitors from factions hostile to each other are on the map; only pawns that are not guests of the colony are checked for hostility between factions (`IncidentHelper.GetPotentialPatientFactions`). Pawns hostile to the player still block arrivals.
+
 ## 3.0.0 (2026-11-20)
 - First release as its own Steam Workshop item, published with the permission of Adamas (tomvd). Version 3.0.0 continues the 2.9.6 history.
 - New packageId `Niejeden.HospitalFork` (was `Adamas.Hospital`); Harmony ID changed to match. `About.xml` author is now "Adamas, Niejeden", `modVersion` 3.0.0, and the description notes the permission and that the mod replaces the original.

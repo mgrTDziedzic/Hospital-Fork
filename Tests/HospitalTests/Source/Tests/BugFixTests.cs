@@ -657,5 +657,48 @@ namespace HospitalTests
             Assert.False(SurgeryUtility.CanAssignAsIs(pawn, joywire), "Joywire already installed");
             Assert.True(SurgeryUtility.CanAssignAsIs(pawn, excise), "removesHediff recipe without the hediff");
         }
+
+        // ---------- Patient factions vs. mutually hostile visitors ----------
+
+        private static (Faction a, Faction b) HostilePair(TestContext ctx)
+        {
+            VanillaCompatTests.ProtectGoodwill(ctx);
+            var hospital = VanillaCompatTests.HospitalOf(ctx);
+            var cands = Find.FactionManager.AllFactionsListForReading.Where(f => !f.IsPlayer && !f.defeated && !f.def.hidden
+                && f.def.humanlikeFaction && !f.HostileTo(Faction.OfPlayer) && hospital.IsFactionAllowed(f.def)).Take(2).ToList();
+            Assert.True(cands.Count == 2, "precondition: need two non-hostile humanlike factions allowed by the hospital");
+            var relA = cands[0].RelationWith(cands[1], true);
+            var relB = cands[1].RelationWith(cands[0], true);
+            var kindA = relA.kind; var kindB = relB.kind;
+            relA.kind = FactionRelationKind.Hostile; relB.kind = FactionRelationKind.Hostile;
+            ctx.OnCleanup(() => { relA.kind = kindA; relB.kind = kindB; });
+            return (cands[0], cands[1]);
+        }
+
+        // Given: factions A and B are allied/neutral to the player but hostile to each other; a guest of the player from each is on the map.
+        // Then:  guests never fight each other (vanilla HostFaction rule), so both factions are still potential patient factions.
+        [HospitalTest("PF1: guests of two mutually hostile factions on the map do not block patient arrivals")]
+        public static void HostileGuestFactionsDoNotBlock(TestContext ctx)
+        {
+            var (a, b) = HostilePair(ctx);
+            var pa = HospitalRegressionTests.MakePawn(ctx, a, true);
+            var pb = HospitalRegressionTests.MakePawn(ctx, b, true);
+            pa.guest.SetGuestStatus(Faction.OfPlayer, GuestStatus.Guest);
+            pb.guest.SetGuestStatus(Faction.OfPlayer, GuestStatus.Guest);
+            var result = IncidentHelper.GetPotentialPatientFactions(ctx.Map, VanillaCompatTests.HospitalOf(ctx), out _);
+            Assert.True(result.Contains(a), "faction A was removed although only guests are on the map");
+            Assert.True(result.Contains(b), "faction B was removed although only guests are on the map");
+        }
+
+        // Given: factions A and B are hostile to each other; a pawn of A (not a guest) is on the map.
+        // Then:  B is excluded (they could fight), A is not.
+        [HospitalTest("PF2: a non-guest pawn of a faction blocks factions hostile to it")]
+        public static void NonGuestBlocksHostileFaction(TestContext ctx)
+        {
+            var (a, b) = HostilePair(ctx);
+            HospitalRegressionTests.MakePawn(ctx, a, true);
+            var result = IncidentHelper.GetPotentialPatientFactions(ctx.Map, VanillaCompatTests.HospitalOf(ctx), out _);
+            Assert.False(result.Contains(b), "faction B stayed although a non-guest pawn of hostile faction A is on the map");
+        }
     }
 }
