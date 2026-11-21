@@ -49,6 +49,13 @@ $dataDir = if ($SaveDataFolder) { $SaveDataFolder } else { Join-Path $env:USERPR
 $results = Join-Path $dataDir "HospitalTestResults.txt"
 $playerLog = Join-Path $dataDir "Player.log"
 
+# Record what is being tested (the game loads the checked-out working tree).
+$branch = (& git -C $repo rev-parse --abbrev-ref HEAD 2>$null)
+$hash = (& git -C $repo rev-parse --short HEAD 2>$null)
+$branchLine = "Branch: $branch @ $hash"
+Write-Host $branchLine
+if (& git -C $repo status --porcelain 2>$null) { Write-Host "WARNING: working tree is dirty (uncommitted changes are tested too)" }
+
 & $dotnet build (Join-Path $repo "Source\Hospital\Hospital.csproj") -c Release -p:RwVersion=1.6 -v q
 if ($LASTEXITCODE -ne 0) { Write-Host "Hospital build failed"; exit 1 }
 & $dotnet build (Join-Path $repo "Tests\HospitalTests\Source\HospitalTests.csproj") -v q
@@ -76,8 +83,12 @@ if (-not (Test-Path $results)) {
     Write-Host "No results file at $results"
     exit $(if ($timedOut) { 2 } else { 1 })
 }
-Write-Host "---- $results ----"
 $text = Get-Content $results -Raw
+if ($text -notmatch '(?m)^Branch: ') {
+    $text = $branchLine + "`n" + $text
+    Set-Content -Path $results -Value $text -Encoding UTF8
+}
+Write-Host "---- $results ----"
 Write-Host $text
 if ($timedOut) { exit 2 }
 if ($text -match "RESULT: \d+ passed, 0 failed") { exit 0 } else { exit 1 }

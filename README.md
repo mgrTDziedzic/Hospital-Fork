@@ -12,8 +12,8 @@
 
 > [!WARNING]
 > **Early stage.** This fork is a work in progress and may contain bugs. I strongly
-> recommend backing up your save before trying it. The fork has not been released on the
-> Steam Workshop yet.
+> recommend backing up your save before trying it. The fork is available on the
+> [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3843639021).
 
 A RimWorld mod that triggers events to receive patients you have to care for.
 
@@ -47,7 +47,7 @@ and is playtested manually. If you run into a bug, please report it on GitHub Is
 
 The art for the Patient Landing Spot variants (the 3x3 and 5x5 landing pads) was also made
 with AI. These pads are optional eye candy: the default landing spot is always available, and
-you can hide the variants from the build menu with the "Enable Patient Landing Spot variants"
+you can hide the variants from the build menu with the "Show patient landing pads"
 option in the mod settings.
 
 ## Credits

@@ -159,7 +159,7 @@ namespace HospitalTests
             Assert.True(pawn.health.immunity.GetImmunity(HediffDefOf.Plague) >= 1f, "precondition: pawn is not immune");
             var data = NewData(PatientType.Disease);
 
-            var harmony = new Harmony("Adamas.Hospital.Tests.B4Guard");
+            var harmony = new Harmony("Niejeden.HospitalFork.Tests.B4Guard");
             var original = AccessTools.Method(typeof(HediffMaker), nameof(HediffMaker.MakeHediff));
             harmony.Patch(original, prefix: new HarmonyMethod(typeof(BugFixTests), nameof(MakeHediffGuard)));
             ctx.OnCleanup(() => { GuardActive = false; harmony.Unpatch(original, HarmonyPatchType.Prefix, harmony.Id); });

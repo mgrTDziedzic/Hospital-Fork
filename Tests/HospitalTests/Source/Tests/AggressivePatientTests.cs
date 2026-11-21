@@ -9,10 +9,35 @@ namespace HospitalTests
 {
     // Aggressive patients: CureScaria must not leak onto patients, and with the AcceptAggressive challenge the
     // patient arrives sedated (downed) so Hediff_Scaria stays quiet until the sedation wears off.
-    // Map settings and the blacklist are restored in cleanup. Needs a non-hostile humanlike faction in the test save
-    // and a colonist who meets CureScaria's skill requirement plus its ingredients on the map (see messages).
+    // Map settings and the blacklist are restored in cleanup. Needs a non-hostile humanlike faction in the test save.
+    // Tests that need CureScaria (skill requirement + ingredients) create what is missing: a test colonist with enough
+    // Medicine and a stack of medicine on the map, both removed on cleanup (see EnsureScariaPreconditions).
     public static class AggressivePatientTests
     {
+        // MapStageRejection needs a free colonist meeting the recipe's skill requirements and its ingredients on the map.
+        // Adds a skilled test colonist and/or medicine only when the map lacks them. Cleanup destroys both.
+        private static void EnsureScariaPreconditions(TestContext ctx, RecipeDef recipe)
+        {
+            var map = ctx.Map;
+            bool HasDoctor() => map.mapPawns.PawnsInFaction(Faction.OfPlayer)
+                .Any(p => (p.IsFreeColonist || p.IsColonyMechPlayerControlled) && recipe.PawnSatisfiesSkillRequirements(p));
+            if (!HasDoctor())
+            {
+                int level = recipe.skillRequirements?.Where(r => r.skill == SkillDefOf.Medicine).Select(r => r.minLevel).DefaultIfEmpty(0).Max() ?? 0;
+                MultiDoctorTests.Doctor(ctx, level);
+            }
+            Assert.True(HasDoctor(), "precondition: no free colonist meets " + recipe.defName + " skill requirements");
+
+            if (recipe.PotentiallyMissingIngredients(null, map).Any())
+            {
+                var medicine = ctx.Track(ThingMaker.MakeThing(ThingDefOf.MedicineIndustrial));
+                medicine.stackCount = 3;
+                IntVec3 cell = CellFinder.RandomClosewalkCellNear(map.Center, map, 20);
+                GenPlace.TryPlaceThing(medicine, cell, map, ThingPlaceMode.Near);
+            }
+            Assert.False(recipe.PotentiallyMissingIngredients(null, map).Any(), "precondition: " + recipe.defName + " ingredients still missing on the map");
+        }
+
         private static RecipeDef CureScaria()
         {
             var r = DefDatabase<RecipeDef>.GetNamedSilentFail("CureScaria");
@@ -86,6 +111,7 @@ namespace HospitalTests
         public static void SedatedWhenOn(TestContext ctx)
         {
             var hospital = Setup(ctx, true, CureScaria());
+            EnsureScariaPreconditions(ctx, CureScaria());
             var pawn = Patient(ctx);
             var data = new PatientData(Find.TickManager.TicksGame, 0f, 0.5f, PatientType.Surgery);
             bool fallback = SurgeryUtility.AddRandomSurgeryBill(pawn, data, hospital);
@@ -112,6 +138,7 @@ namespace HospitalTests
         public static void WakesUpBerserk(TestContext ctx)
         {
             var hospital = Setup(ctx, true, CureScaria());
+            EnsureScariaPreconditions(ctx, CureScaria());
             var pawn = Patient(ctx);
             var data = new PatientData(Find.TickManager.TicksGame, 0f, 0.5f, PatientType.Surgery);
             Assert.False(SurgeryUtility.AddRandomSurgeryBill(pawn, data, hospital), "fell back to wounds");
@@ -143,6 +170,7 @@ namespace HospitalTests
         {
             VanillaCompatTests.ProtectGoodwill(ctx);
             var hospital = Setup(ctx, true, CureScaria());
+            EnsureScariaPreconditions(ctx, CureScaria());
             var pawn = Patient(ctx);
             var data = VanillaCompatTests.Register(ctx, pawn);
             Assert.False(SurgeryUtility.AddRandomSurgeryBill(pawn, data, hospital), "fell back to wounds");

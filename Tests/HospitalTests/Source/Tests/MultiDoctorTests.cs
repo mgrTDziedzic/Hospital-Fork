@@ -66,7 +66,7 @@ namespace HospitalTests
         // A spawned colonist that can really work as a doctor (Doctor work type not disabled by backstory or traits,
         // Manipulation, Medicine skill usable), with Doctor priority 1 and the given Medicine level.
         // Generation is random, so it retries a few times; fails the precondition if no suitable pawn comes out.
-        private static Pawn Doctor(TestContext ctx, int medicine)
+        internal static Pawn Doctor(TestContext ctx, int medicine)
         {
             for (int attempt = 0; attempt < 10; attempt++)
             {

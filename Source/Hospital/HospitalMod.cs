@@ -15,7 +15,7 @@ namespace Hospital
 		{
 			Settings = GetSettings<Settings>();
 
-			harmonyInstance = new Harmony("Adamas.Hospital");
+			harmonyInstance = new Harmony("Niejeden.HospitalFork");
             harmonyInstance.PatchAll();
 
             // Optional mods: one info line each when detected, nothing otherwise.
@@ -42,7 +42,7 @@ namespace Hospital
         /// <returns>The (translated) mod name.</returns>
         public override string SettingsCategory()
         {
-	        return "Hospital";
+	        return "HospitalModName".Translate();
         }
 	}
 }

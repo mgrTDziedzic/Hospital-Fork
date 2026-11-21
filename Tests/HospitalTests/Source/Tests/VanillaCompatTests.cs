@@ -22,7 +22,7 @@ namespace HospitalTests
     // Expectations come from the 1.6 decompiled vanilla code; vanilla private constants are copied where needed.
     public static class VanillaCompatTests
     {
-        private const string HarmonyId = "Adamas.Hospital";
+        private const string HarmonyId = "Niejeden.HospitalFork";
 
         // ---------- helpers ----------
 

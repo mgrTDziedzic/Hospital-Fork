@@ -41,12 +41,10 @@ namespace Hospital.MainTab
             listingStandard.Label("HospitalSettings".Translate());
             listingStandard.Gap();
             listingStandard.CheckboxLabeled("AcceptPatients".Translate(), ref hospital.openForBusiness, "AcceptPatientsTooltip".Translate());
-            /*listingStandard.SliderLabeled("BedsReserved".Translate(), ref hospital.bedsReserved, hospital.bedsReserved.ToString("0"), 0f, 10f,
-                "BedsReservedTooltip".Translate());*/
-            listingStandard.CheckboxLabeled("MassCasualties".Translate(), ref hospital.MassCasualties, "MassCasualtiesTooltip".Translate());
             listingStandard.CheckboxLabeled("AcceptSurgery".Translate(), ref hospital.AcceptSurgery, "AcceptSurgeryTooltip".Translate());
             listingStandard.CheckboxLabeled("AcceptAggressive".Translate(), ref hospital.AcceptAggressive, "AcceptAggressiveTooltip".Translate(HospitalMod.Settings.SedationHours.ToString("0")));
             listingStandard.CheckboxLabeled("AcceptDanger".Translate(), ref hospital.AcceptDanger, "AcceptDangerTooltip".Translate());
+            listingStandard.CheckboxLabeled("MassCasualties".Translate(), ref hospital.MassCasualties, "MassCasualtiesTooltip".Translate());
             listingStandard.CheckboxLabeled("MceAcceptDanger".Translate(), ref hospital.MceAcceptDanger, "MceAcceptDangerTooltip".Translate());
             listingStandard.End();
             int y = 175;
@@ -90,9 +88,9 @@ namespace Hospital.MainTab
             TooltipHandler.TipRegion(new Rect(0f, rect.y, inRect.width, 24f), "HospitalDrugPoliciesTooltip".Translate());
             rect.y += 26f;
             DoDrugRow(inRect.width, ref rect, DrugList.All, "HospitalDrugListAll");
+            DoDrugRow(inRect.width, ref rect, DrugList.Injuries, "HospitalDrugListInjuries");
             DoDrugRow(inRect.width, ref rect, DrugList.Infection, "HospitalDrugListInfection");
             DoDrugRow(inRect.width, ref rect, DrugList.Surgery, "HospitalDrugListSurgery");
-            DoDrugRow(inRect.width, ref rect, DrugList.Injuries, "HospitalDrugListInjuries");
             DoDrugRow(inRect.width, ref rect, DrugList.Scars, "HospitalDrugListScars");
 
             // Blacklist pickers - keep the settings window compact by opening a dedicated dialog per category.
@@ -100,6 +98,7 @@ namespace Hospital.MainTab
             rect.y += 26f;
 
             float btnWidth = inRect.width;
+            TooltipHandler.TipRegion(new Rect(0f, rect.y, btnWidth, 30f), "BlacklistSurgeriesTooltip".Translate());
             if (Widgets.ButtonText(new Rect(0f, rect.y, btnWidth, 30f),
                     "BlacklistSurgeries".Translate(hospital.refusedOperations.Count)))
             {
@@ -109,6 +108,7 @@ namespace Hospital.MainTab
                     (d, refused) => hospital.SetRefusedOperation((RecipeDef)d, refused));
             }
             rect.y += 34f;
+            TooltipHandler.TipRegion(new Rect(0f, rect.y, btnWidth, 30f), "BlacklistDiseasesTooltip".Translate());
             if (Widgets.ButtonText(new Rect(0f, rect.y, btnWidth, 30f),
                     "BlacklistDiseases".Translate(hospital.refusedDiseases.Count)))
             {
@@ -118,6 +118,7 @@ namespace Hospital.MainTab
                     (d, refused) => hospital.SetRefusedDisease((HediffDef)d, refused));
             }
             rect.y += 34f;
+            TooltipHandler.TipRegion(new Rect(0f, rect.y, btnWidth, 30f), "BlacklistFactionsTooltip".Translate());
             if (Widgets.ButtonText(new Rect(0f, rect.y, btnWidth, 30f),
                     "BlacklistFactions".Translate(hospital.refusedFactions.Count)))
             {
@@ -160,7 +161,7 @@ namespace Hospital.MainTab
                     DrugPolicy policy = all[i];
                     options.Add(new FloatMenuOption(policy.label, delegate { hospital.SetDrugPolicy(list, policy); }));
                 }
-                options.Add(new FloatMenuOption("HospitalDrugManagePolicies".Translate(), delegate
+                options.Add(new FloatMenuOption("ManageDrugPolicies".Translate(), delegate
                 {
                     Find.WindowStack.Add(new Dialog_ManageDrugPolicies(null));
                 }));

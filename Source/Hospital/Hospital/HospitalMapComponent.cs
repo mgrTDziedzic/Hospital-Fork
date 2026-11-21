@@ -94,7 +94,7 @@ namespace Hospital
             Scribe_Values.Look(ref DrugsInjuriesTeetotal, "DrugsInjuriesTeetotal", true);
             Scribe_Values.Look(ref DrugsScarsTeetotal, "DrugsScarsTeetotal", false);
             Scribe_Values.Look(ref MassCasualties, "massCasualties", false);
-            Scribe_Values.Look(ref AcceptSurgery, "acceptSurgery", true);
+            Scribe_Values.Look(ref AcceptSurgery, "acceptSurgery", false);
             Scribe_Values.Look(ref AcceptDanger, "AcceptDanger", false);
             Scribe_Values.Look(ref AcceptAggressive, "AcceptAggressive", false);
             Scribe_Values.Look(ref MceAcceptDanger, "MceAcceptDanger", true);

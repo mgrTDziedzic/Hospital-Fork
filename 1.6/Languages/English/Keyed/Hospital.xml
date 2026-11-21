@@ -19,71 +19,74 @@
     <HospitalPatientDiedNoPenalty>{0} died. Not your fault, so {1}'s goodwill is unchanged.</HospitalPatientDiedNoPenalty>
     <HospitalSurgeryFailed>{0} failed: -{1} {2}</HospitalSurgeryFailed>
     <HospitalPatientDismissed>{0} dismissed.</HospitalPatientDismissed>
-    <HospitalBlacklisted>{0} blacklisted.</HospitalBlacklisted>
+    <HospitalBlacklisted>{0} added to refused surgeries.</HospitalBlacklisted>
     <!-- blacklists -->
-    <Blacklists>Blacklists</Blacklists>
-    <BlacklistHint>Checked entries are blacklisted and will not appear.</BlacklistHint>
-    <BlacklistSurgeries>Blacklisted surgeries ({0})...</BlacklistSurgeries>
-    <BlacklistDiseases>Blacklisted diseases ({0})...</BlacklistDiseases>
-    <BlacklistFactions>Blacklisted factions ({0})...</BlacklistFactions>
-    <BlacklistSurgeriesTitle>Blacklisted surgeries</BlacklistSurgeriesTitle>
-    <BlacklistDiseasesTitle>Blacklisted diseases</BlacklistDiseasesTitle>
-    <BlacklistFactionsTitle>Blacklisted factions</BlacklistFactionsTitle>
+    <Blacklists>Refused</Blacklists>
+    <BlacklistHint>Checked entries are refused. Patients matching them will not arrive.</BlacklistHint>
+    <BlacklistSurgeries>Refused surgeries ({0})</BlacklistSurgeries>
+    <BlacklistSurgeriesTooltip>Surgeries that patients will never arrive needing.</BlacklistSurgeriesTooltip>
+    <BlacklistDiseases>Refused diseases ({0})</BlacklistDiseases>
+    <BlacklistDiseasesTooltip>Diseases that patients will never arrive with.</BlacklistDiseasesTooltip>
+    <BlacklistFactions>Refused factions ({0})</BlacklistFactions>
+    <BlacklistFactionsTooltip>Factions whose members will never come as patients.</BlacklistFactionsTooltip>
+    <BlacklistSurgeriesTitle>Refused surgeries</BlacklistSurgeriesTitle>
+    <BlacklistDiseasesTitle>Refused diseases</BlacklistDiseasesTitle>
+    <BlacklistFactionsTitle>Refused factions</BlacklistFactionsTitle>
     <!-- patient drug policies -->
-    <HospitalDrugPolicies>Patient drugs</HospitalDrugPolicies>
-    <HospitalDrugPoliciesTooltip>Drug policy entries with "Scheduled" enabled are administered by doctors as medical bills placed before other bills. The entry's frequency, mood and joy limits apply. Policies are edited in the drug policy manager.</HospitalDrugPoliciesTooltip>
+    <HospitalDrugPolicies>Patient drug policies</HospitalDrugPolicies>
+    <HospitalDrugPoliciesTooltip>Doctors give patients the drugs marked "Scheduled" in the selected policy, as medical bills placed before other bills. Each entry's frequency and mood limits apply. Policies are edited in the drug policy manager.</HospitalDrugPoliciesTooltip>
     <HospitalDrugListAll>All patients</HospitalDrugListAll>
     <HospitalDrugListInfection>Infection</HospitalDrugListInfection>
     <HospitalDrugListSurgery>Surgery</HospitalDrugListSurgery>
-    <HospitalDrugListTooltip>Drug policy given to patients of this kind. Patients get the drugs of every list that applies to them.</HospitalDrugListTooltip>
+    <HospitalDrugListTooltip>The drug policy for this kind of patient. A patient gets the drugs from every list that applies to them.</HospitalDrugListTooltip>
     <HospitalDrugListInjuries>Injuries</HospitalDrugListInjuries>
     <HospitalDrugListScars>Scars</HospitalDrugListScars>
-    <HospitalDrugTeetotalers>Teetotalers too</HospitalDrugTeetotalers>
-    <HospitalDrugTeetotalersTooltip>Also give this list's drugs to teetotalers. When unchecked, teetotaler patients skip this list.</HospitalDrugTeetotalersTooltip>
-    <HospitalDrugManagePolicies>Manage drug policies...</HospitalDrugManagePolicies>
+    <HospitalDrugTeetotalers>Include teetotalers</HospitalDrugTeetotalers>
+    <HospitalDrugTeetotalersTooltip>When enabled, teetotalers also get this list's drugs. When disabled, teetotalers skip this list.</HospitalDrugTeetotalersTooltip>
     <!-- settings -->
-    <HospitalMapSettings>Hospital Policies...</HospitalMapSettings>
-    <HospitalSettings>Hospital Policies</HospitalSettings>
-    <AcceptPatients>Accept patients</AcceptPatients>
-    <AcceptPatientsTooltip>uncheck this if you want to stop patients from visiting</AcceptPatientsTooltip>
-    <AcceptSurgery>Accept surgery</AcceptSurgery>
-    <AcceptSurgeryTooltip>uncheck this if you do not want to get surgery events</AcceptSurgeryTooltip>
+    <HospitalMapSettings>Hospital policies</HospitalMapSettings>
+    <HospitalSettings>Hospital policies</HospitalSettings>
+    <AcceptPatients>Allow patients</AcceptPatients>
+    <AcceptPatientsTooltip>When enabled, patients from other factions can arrive on this map for treatment.\n\nDefault: Disabled</AcceptPatientsTooltip>
+    <AcceptSurgery>Allow surgery patients</AcceptSurgery>
+    <AcceptSurgeryTooltip>When enabled, some patients arrive needing surgery.\n\nDefault: Disabled</AcceptSurgeryTooltip>
     <AcceptAggressive>Allow aggressive patients</AcceptAggressive>
-    <AcceptAggressiveTooltip>Challenge. Needs "Accept surgery". Patients may arrive needing a cure for an aggression-causing condition (e.g. scaria). Their faction sedates them for transport; if the cure does not come in time, they wake up berserk and your colonists must deal with them. Sedation lasts {0} hours (set in the mod settings).</AcceptAggressiveTooltip>
+    <AcceptAggressiveTooltip>Challenge. Requires "Allow surgery patients". Some patients arrive needing a cure for a condition that causes aggression, such as scaria. Their faction sedates them for transport. If they are not cured within {0} hours, they wake up berserk. The sedation time is set in the mod settings.\n\nDefault: Disabled</AcceptAggressiveTooltip>
     <AcceptDanger>Allow patients during danger</AcceptDanger>
-    <AcceptDangerTooltip>check this if you want to override the check if the map if safe for patients to arrive</AcceptDangerTooltip>
-    <MceAcceptDanger>Mass casualties during danger</MceAcceptDanger>
-    <MceAcceptDangerTooltip>check this to let mass casualty events happen while the map is dangerous (e.g. manhunters). Uncheck to make them wait for a safe map. Weather dangers are still controlled by "Allow patients during danger".</MceAcceptDangerTooltip>
+    <AcceptDangerTooltip>When enabled, patients arrive even when the map is not safe, for example during a raid or toxic fallout.\n\nDefault: Disabled</AcceptDangerTooltip>
+    <MceAcceptDanger>Allow mass casualties during danger</MceAcceptDanger>
+    <MceAcceptDangerTooltip>When enabled, mass casualty events can happen while enemies such as manhunters are on the map. When disabled, they wait until the map is safe. Dangerous weather is governed by "Allow patients during danger".\n\nDefault: Enabled</MceAcceptDangerTooltip>
     <SilverMultiplier>Silver multiplier</SilverMultiplier>
-    <SilverMultiplierTooltip>Changes the patients bill by this percentage. (recommended: 100%)</SilverMultiplierTooltip>
-    <!-- difficulty -->
+    <SilverMultiplierTooltip>Multiplies the amount patients pay for treatment.\n\nDefault: 100%</SilverMultiplierTooltip>
+    <!-- economy / difficulty -->
+    <HospitalModName>Hospital</HospitalModName>
+    <EconomySettings>Economy</EconomySettings>
     <DifficultySettings>Difficulty</DifficultySettings>
     <GoodwillGainMultiplier>Goodwill gain multiplier</GoodwillGainMultiplier>
-    <GoodwillGainMultiplierTooltip>Scales the goodwill earned from happy patients leaving. (default: 100%)</GoodwillGainMultiplierTooltip>
+    <GoodwillGainMultiplierTooltip>Multiplies the goodwill gained when satisfied patients leave.\n\nDefault: 100%</GoodwillGainMultiplierTooltip>
     <DeathGoodwillPenalty>Goodwill loss on patient death</DeathGoodwillPenalty>
-    <DeathGoodwillPenaltyTooltip>Goodwill lost with a faction when one of their patients dies. Applies to deaths you are responsible for (killed by your colonists, turrets or animals, or died of illness, blood loss or failed surgery) unless "Penalize deaths not caused by me" is ticked. (default: 10)</DeathGoodwillPenaltyTooltip>
+    <DeathGoodwillPenaltyTooltip>Goodwill lost with a patient's faction when the patient dies. By default this applies only to deaths you are responsible for: killed by your colonists, turrets or animals, or dead from illness, blood loss or failed surgery. See "Penalize deaths not caused by me".\n\nDefault: 10</DeathGoodwillPenaltyTooltip>
     <PenalizeNonPlayerDeaths>Penalize deaths not caused by me</PenalizeNonPlayerDeaths>
-    <PenalizeNonPlayerDeathsTooltip>Unticked (default): the death penalty applies only when your faction killed the patient or the patient died with no killer (illness, blood loss, failed surgery). Deaths caused by raiders, wild or manhunting animals, enemy mechs or the environment cost no goodwill. Ticked: every patient death costs goodwill. Known gap: a patient who bleeds out after an animal attack has no killer attached, so that death still counts.</PenalizeNonPlayerDeathsTooltip>
+    <PenalizeNonPlayerDeathsTooltip>When enabled, every patient death costs goodwill. When disabled, deaths caused by raiders, wild or manhunting animals, enemy mechanoids or the environment cost none.\n\nNote: a patient who bleeds out after an animal attack has no recorded killer, so that death still costs goodwill.\n\nDefault: Disabled</PenalizeNonPlayerDeathsTooltip>
     <SurgeryFailGoodwillPenalty>Goodwill loss on surgery failure</SurgeryFailGoodwillPenalty>
-    <SurgeryFailGoodwillPenaltyTooltip>Goodwill lost with a faction when a surgery on their patient fails. (default: 1)</SurgeryFailGoodwillPenaltyTooltip>
+    <SurgeryFailGoodwillPenaltyTooltip>Goodwill lost with a patient's faction when surgery on them fails.\n\nDefault: 1</SurgeryFailGoodwillPenaltyTooltip>
     <DiseaseSeverityMultiplier>Disease severity multiplier</DiseaseSeverityMultiplier>
-    <DiseaseSeverityMultiplierTooltip>Scales how severe arriving patients' diseases are. Higher is harder. (default: 100%)</DiseaseSeverityMultiplierTooltip>
+    <DiseaseSeverityMultiplierTooltip>Multiplies the severity of arriving patients' diseases. Higher is harder.\n\nDefault: 100%</DiseaseSeverityMultiplierTooltip>
     <WoundSeverityMultiplier>Wound severity multiplier</WoundSeverityMultiplier>
-    <WoundSeverityMultiplierTooltip>Scales how badly wounded arriving patients are. Higher is harder. (default: 100%)</WoundSeverityMultiplierTooltip>
-    <SedationHours>Aggressive patient sedation (hours)</SedationHours>
-    <SedationHoursTooltip>How long an aggressive patient stays sedated after arriving, before turning berserk if not cured. Only used when "Allow aggressive patients" is on. (default: 8)</SedationHoursTooltip>
+    <WoundSeverityMultiplierTooltip>Multiplies how badly arriving patients are wounded. Higher is harder.\n\nDefault: 100%</WoundSeverityMultiplierTooltip>
+    <SedationHours>Aggressive patient sedation time</SedationHours>
+    <SedationHoursTooltip>How long an aggressive patient stays sedated after arrival. If they are not cured by then, they turn berserk. Used only when "Allow aggressive patients" is enabled in hospital policies.\n\nDefault: 8h</SedationHoursTooltip>
     <PatientSedatedWarning>Sedated by their faction. They wake up in about {0} hours and will turn berserk unless cured first.</PatientSedatedWarning>
     <ResetToDefaults>Reset to defaults</ResetToDefaults>
-    <BedsReserved>Beds reserved for colonists</BedsReserved>
-    <BedsReservedTooltip>To make sure your beds are not all filled up with patients</BedsReservedTooltip>
+    <ResetToDefaultsTooltip>Restores all settings on this page to their default values.</ResetToDefaultsTooltip>
     <ShowMessageAtArrival>Show message instead of letter</ShowMessageAtArrival>
-    <ShowMessageAtArrivalTooltip>Shows as a message instead of a letter when a new patient arrives.</ShowMessageAtArrivalTooltip>
+    <ShowMessageAtArrivalTooltip>When enabled, a new patient's arrival is shown as a message instead of a letter.\n\nDefault: Disabled</ShowMessageAtArrivalTooltip>
     <PreventIncapacitatedArrivals>Prevent incapacitated arrivals</PreventIncapacitatedArrivals>
-    <PreventIncapacitatedArrivalsTooltip>Patients stop being wounded just before they would collapse, so they arrive hurt but still able to walk. Disable for tougher mass casualty events with downed patients you must rescue.</PreventIncapacitatedArrivalsTooltip>
-    <EnableLandingSpotVariants>Enable Patient Landing Spot variants</EnableLandingSpotVariants>
-    <EnableLandingSpotVariantsTooltip>Shows the larger cosmetic Patient Landing Pad variants (3x3 and 5x5) in the build menu (Architect > Misc). The default 1x1 patient landing spot is always available. Variants already placed keep working as landing spots when this is off. Patients always land on the centre cell.</EnableLandingSpotVariantsTooltip>
-    <MassCasualties>Enable mass casualty events</MassCasualties>
-    <MassCasualtiesTooltip>A MCE will sporadically overwhelm your hospital with patients.</MassCasualtiesTooltip>
+    <PreventIncapacitatedArrivalsTooltip>When enabled, arriving patients are wounded only up to the point of collapse, so they can still walk. Disable it for harder mass casualty events with downed patients you must rescue.\n\nDefault: Enabled</PreventIncapacitatedArrivalsTooltip>
+    <EnableLandingSpotVariants>Show patient landing pads</EnableLandingSpotVariants>
+    <EnableLandingSpotVariantsTooltip>When enabled, the larger patient landing pads (3x3 and 5x5) appear in Architect > Misc. They are cosmetic, and patients always land on the center cell. The 1x1 "patients land here" spot is always available, and pads already built keep working.\n\nDefault: Enabled</EnableLandingSpotVariantsTooltip>
+    <MassCasualties>Allow mass casualty events</MassCasualties>
+    <MassCasualtiesTooltip>When enabled, a mass casualty event occasionally brings a large group of patients at once.\n\nDefault: Disabled</MassCasualtiesTooltip>
     <!-- button -->
     <CommandBedSetAsHospitalLabel>Hospital Bed</CommandBedSetAsHospitalLabel>
     <CommandBedSetAsHospitalDesc>Whether this bed is for patients.</CommandBedSetAsHospitalDesc>
