@@ -42,7 +42,7 @@ namespace Hospital
         /// <returns>The (translated) mod name.</returns>
         public override string SettingsCategory()
         {
-	        return "Hospital";
+	        return "HospitalModName".Translate();
         }
 	}
 }

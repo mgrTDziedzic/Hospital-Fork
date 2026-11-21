@@ -41,7 +41,7 @@
         </modExtensions>
     </ThingDef>
 
-    <!-- Cosmetic variants (hidden by the mod setting "Enable Patient Landing Spot variants"). Odd square sizes only: the centre cell is where patients land. -->
+    <!-- Cosmetic variants (hidden by the mod setting "Show patient landing pads"). Odd square sizes only: the centre cell is where patients land. -->
     <DesignatorDropdownGroupDef>
         <defName>PatientLandingPads</defName>
         <label>patient landing pads</label>

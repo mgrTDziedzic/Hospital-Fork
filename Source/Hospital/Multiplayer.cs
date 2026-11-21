@@ -28,7 +28,6 @@ namespace Hospital
                 //MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.refusedOperations)),
                 //MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.openingHours)),
                 MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.PatientFoodPolicy)),
-                //MP.RegisterSyncField(typeof(HospitalMapComponent), nameof(HospitalMapComponent.bedsReserved))
             };
             //Interface not supported, either tricky for registered one or tricky for inner register method
             {

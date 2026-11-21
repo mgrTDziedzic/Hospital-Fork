@@ -50,11 +50,17 @@ public class Settings : ModSettings
 
         listingStandard.GapLine();
         Text.Font = GameFont.Medium;
-        listingStandard.Label("DifficultySettings".Translate());
+        listingStandard.Label("EconomySettings".Translate());
         Text.Font = GameFont.Small;
 
         listingStandard.SliderLabeled("SilverMultiplier".Translate(), ref SilverMultiplier, SilverMultiplier.ToString("0%"), 0f, 2f,
             "SilverMultiplierTooltip".Translate());
+
+        listingStandard.GapLine();
+        Text.Font = GameFont.Medium;
+        listingStandard.Label("DifficultySettings".Translate());
+        Text.Font = GameFont.Small;
+
         listingStandard.SliderLabeled("GoodwillGainMultiplier".Translate(), ref GoodwillGainMultiplier, GoodwillGainMultiplier.ToString("0%"), 0f, 3f,
             "GoodwillGainMultiplierTooltip".Translate());
 
@@ -69,15 +75,17 @@ public class Settings : ModSettings
             "SurgeryFailGoodwillPenaltyTooltip".Translate());
         SurgeryFailGoodwillPenalty = Mathf.RoundToInt(surgeryFailPenalty);
 
-        listingStandard.SliderLabeled("SedationHours".Translate(), ref SedationHours, SedationHours.ToString("0.#") + "h", 2f, 24f,
-            "SedationHoursTooltip".Translate());
-        SedationHours = Mathf.Clamp(Mathf.Round(SedationHours * 2f) / 2f, 2f, 24f);
-
         listingStandard.SliderLabeled("DiseaseSeverityMultiplier".Translate(), ref DiseaseSeverityMultiplier, DiseaseSeverityMultiplier.ToString("0%"), 0.25f, 2f,
             "DiseaseSeverityMultiplierTooltip".Translate());
         listingStandard.SliderLabeled("WoundSeverityMultiplier".Translate(), ref WoundSeverityMultiplier, WoundSeverityMultiplier.ToString("0%"), 0.25f, 2f,
             "WoundSeverityMultiplierTooltip".Translate());
 
+        listingStandard.SliderLabeled("SedationHours".Translate(), ref SedationHours, SedationHours.ToString("0.#") + "h", 2f, 24f,
+            "SedationHoursTooltip".Translate());
+        SedationHours = Mathf.Clamp(Mathf.Round(SedationHours * 2f) / 2f, 2f, 24f);
+
+        Rect resetRect = new Rect(0f, listingStandard.CurHeight, listingStandard.ColumnWidth * 0.35f, 30f);
+        TooltipHandler.TipRegion(resetRect, "ResetToDefaultsTooltip".Translate());
         if (listingStandard.ButtonText("ResetToDefaults".Translate(), widthPct: 0.35f))
         {
             ResetToDefaults();
