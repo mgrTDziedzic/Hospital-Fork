@@ -19,6 +19,7 @@ Replaces the original Hospital - do not run both.
 
 Original: https://steamcommunity.com/sharedfiles/filedetails/?id=2992224079
 Source (GPLv3): https://github.com/mgrTDziedzic/Hospital-Fork
+Known issues: https://github.com/mgrTDziedzic/Hospital-Fork/blob/main/KNOWN_ISSUES.md
 
 Copyright (C) 2023-2026 Adamas (tomvd) and contributors; fork changes (C) 2026 mgrTDziedzic (Niejeden).</description>
 	<modIconPath IgnoreIfNoMatchingField="True">HospitalModIcon</modIconPath>

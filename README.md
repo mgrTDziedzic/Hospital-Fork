@@ -26,6 +26,7 @@ report any problems with this fork here, not to the original author.
 - [NEW_FEATURES.md](NEW_FEATURES.md) - an overview of what the fork adds and changes
 - [RECOMMENDED_AND_COMPATIBLE_MODS.md](RECOMMENDED_AND_COMPATIBLE_MODS.md) - mods that pair well with Hospital, including the ones the fork explicitly supports
 - [PLANNED_FEATURES.md](PLANNED_FEATURES.md) - features and ideas planned for the future
+- [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - known problems in the version on the Steam Workshop
 
 ## Ideas and suggestions
 
