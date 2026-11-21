@@ -9,5 +9,9 @@
     <exclude>Source</exclude>
     <exclude>Art</exclude>
     <exclude>Tests</exclude>
+    <exclude>.editorconfig</exclude>
+    <exclude>.gitattributes</exclude>
+    <exclude>.gitignore</exclude>
+    <exclude>_PublisherPlus.xml</exclude>
   </Excluded>
 </Configuration>

@@ -25,7 +25,7 @@ Original code is © its author, licensed under GPLv3; modifications are © mgrTD
 - Fixes and adjustments: the "cured externally" check for patients who arrived with a missing part (`HospitalMapComponent.CheckExternallyCured`, `ResolveVanishedBill`) now also considers missing descendant parts (foot, toes, fingers), not only the bill part and its ancestors. A limb regrown part by part (e.g. in a MedPod) is billed only when the whole limb is back. Missing parts under a prosthetic are ignored.
 
 ## 2026-11-19
-- Internal: `_PublisherPlus.xml` no longer excludes `LICENSE` (the GPL text now ships with Workshop uploads) and excludes `Tests`.
+- Internal: `_PublisherPlus.xml` no longer excludes `LICENSE` (the GPL text now ships with Workshop uploads) and excludes `Tests`, the git/editor dotfiles (`.editorconfig`, `.gitattributes`, `.gitignore`) and itself.
 - Added copyright notices (original author and fork) to README, `About/About.xml` description and the assembly copyright attribute.
 - Added `LICENSES/MultiplayerAPI-LICENSE.txt`: MIT notice for the shipped `0MultiplayerAPI.dll` (RimWorld Multiplayer API, © 2018 Zetrith), linked from README.
 - README: added a Credits section (original author, contributors to the original, settings helper code authors).
