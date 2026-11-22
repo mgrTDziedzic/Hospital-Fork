@@ -6,7 +6,7 @@ Generated file, do not edit by hand. Regenerate with:
 
 Source: `[HospitalTest]` attributes and the `// Given: / When: / Then:` comments above each test method in `Tests/HospitalTests/Source/Tests/`.
 
-Total tests: 120
+Total tests: 140
 
 ## AggressivePatientTests.cs
 
@@ -30,6 +30,20 @@ Total tests: 120
 | ID | Method | Description | Given | When | Then | Requires |
 |---|---|---|---|---|---|---|
 | Smoke | `PatientArrivalSmoke` | PatientArrives registers patients with sane PatientData, as guests under a new lord, arriving in drop pods | the hospital is open with a free hospital bed and danger accepted. | the PatientArrives incident is forced. | new patients are registered with sane PatientData, are guests under a new lord and arrive in a drop pod. |  |
+
+## BackstoryTests.cs
+
+| ID | Method | Description | Given | When | Then | Requires |
+|---|---|---|---|---|---|---|
+| Story1 | `ClassifyPure` | Classify picks the wound category with the largest severity sum, Generic when there is none | lists of (injury def, severity) pairs. | BackstoryUtility.Classify runs on them. | the category with the largest severity sum wins; gunshots, burns, crush/bruise/crack (Blunt) and cut/stab/scratch/bite (Sharp) map as planned; no injuries or unknown defs give Generic. |  |
+| Story2 | `TextsAreValid` | every category x 100 seeds gives a non-empty text with the pawn's name and no grammar error | a test pawn and each wound category, 100 seeds per category. | the backstory text is resolved. | it is non-empty, has no ERR / CANNOT_RESOLVE marker or unresolved symbol and contains the pawn's short name. |  |
+| Story3 | `DeterministicAndRandSafe` | the same seed gives the same text and Resolve leaves the Rand state untouched | a seed and category. | the text is resolved twice, and the next Rand value is compared with and without a Resolve call in between. | the texts are identical (the saved seed gives the same text after loading) and the game's Rand sequence is not disturbed. |  |
+| Story4 | `RoundTrip` | BackstorySeed and BackstoryWound survive save/load; old saves load with seed 0 and no text | a PatientData with a backstory seed and wound category. | it is saved to a temp file with the Scribe and loaded back; a PatientData without a backstory (old save) also goes through. | seed and category are intact and give the same text; the old-save data has seed 0 and GetBackstory returns "". |  |
+| Story5 | `ArrivalAssignsOnlyForWounds` | arrival smoke - Wounds patients get a backstory seed, Disease and Surgery patients do not | the hospital is open with a free bed; wounds, disease and surgery arrivals are forced one by one. | PatientArrives fires. | a Wounds patient has BackstorySeed != 0, a known category and a non-empty text; Disease and Surgery patients have seed 0. |  |
+| Story9 | `SettingOffHidesText` | with ShowPatientBackstories off the seed is still assigned but GetBackstory returns empty | the setting "Show patient backstories" is off. | a Wounds arrival is forced and GetBackstory is called; then the setting is turned on. | the seed is still assigned (RNG use must not depend on a per-client setting), GetBackstory is "" while off and non-empty when on. |  |
+| Story10 | `LeaveLineSharesActivity` | backstory and leave line of one seed use the same activity | a test pawn and each wound category, 100 seeds per category. | the activity, the backstory and the leave line are resolved for the same seed. | the activity text (resolved separately) is contained in both the backstory and the leave line, and the leave line has no error marker or unresolved symbol. |  |
+| Story11 | `LeaveLineDeterministic` | the leave line is deterministic and leaves the Rand state untouched | a patient with a seed, then the same seed again, and the Rand state compared with and without resolving. | the leave line is resolved twice. | both results are equal and the next Rand value is unchanged by the call. |  |
+| Story12 | `LeaveLineGates` | GetLeaveLine is empty without a seed or with ShowPatientBackstories off | a wounded PatientData with a seed. | GetLeaveLine is called with the setting on, with seed 0, and with the setting off. | it is non-empty and equal to ResolveLeave with the setting on; empty with seed 0 and when the setting is off. |  |
 
 ## BedSelectionTests.cs
 
@@ -69,6 +83,16 @@ Total tests: 120
 | A10 | `SentAwayUsesActiveOnly` | SentAway keeps an active downed patient and sends away a dismissed one | a downed registered patient, then the same patient marked Dismissed. | Trigger_SentAway.SentAway runs (call site using activeOnly: true). | active downed patient: not sent away; dismissed one: sent away (no longer an active patient). Skipped when there are dangers on the map (SentAway is always false then). |  |
 | MultiDoctor | `PatientBillOpensNoWindow` | a patient cure bill is a plain Bill_Medical created without opening any window | a spawned registered patient (Multi-Doctor Surgery customizes bills only for pawns with a Map). | the mod adds the cure bill (install denture on the jaw) via SurgeryUtility.CreatePatientBill. | the bill is a plain Bill_Medical on the right part and no window was opened. Before the fix the bill went through HealthCardUtility.CreateSurgeryBill; Multi-Doctor opened "assign doctors" and deleted the bill when that window was closed, so the patient was sent home right after arrival. |  |
 | AsIs1 | `CanAssignAsIsExistingImplant` | CanAssignAsIs: an implant the pawn already has is not assigned; removesHediff recipes always are | a pawn without a Joywire. |  | InstallJoywire is assignable; once the pawn has the implant it is not (vanilla would remove the bill). A removesHediff recipe stays assignable without the hediff (preparation adds it). |  |
+| PF1 | `HostileGuestFactionsDoNotBlock` | guests of two mutually hostile factions on the map do not block patient arrivals | factions A and B are allied/neutral to the player but hostile to each other; a guest of the player from each is on the map. |  | guests never fight each other (vanilla HostFaction rule), so both factions are still potential patient factions. |  |
+| PF2 | `NonGuestBlocksHostileFaction` | a non-guest pawn of a faction blocks factions hostile to it | factions A and B are hostile to each other; a pawn of A (not a guest) is on the map. |  | B is excluded (they could fight), A is not. |  |
+
+## CharacterCardTests.cs
+
+| ID | Method | Description | Given | When | Then | Requires |
+|---|---|---|---|---|---|---|
+| Story6 | `TranspilerApplied` | the Bio tab transpiler is applied to CharacterCardUtility.DoTopStack | the game is loaded with Hospital. | the Harmony patch info of CharacterCardUtility.DoTopStack is read. | it carries a transpiler owned by Hospital (the anchor call was found); if not, the chip is off (check the log for the info line). |  |
+| Story7 | `NoChipForNonPatient` | the Bio tab chip is not added for non-patients | a spawned non-patient (colonist) and an empty element list. | AddPatientChip is called. | nothing is added. |  |
+| Story8 | `ChipForActivePatient` | the Bio tab chip is added once for an active patient, not for a dismissed one | a spawned pawn registered as an active patient, and a list that already holds one element. | AddPatientChip is called; then the patient is marked Dismissed and it is called again. | exactly one element with a positive width is appended for the active patient, none for the dismissed one. |  |
 
 ## DeathPenaltyTests.cs
 
@@ -102,6 +126,7 @@ Total tests: 120
 | Drugs12 | `DrugBillDoesNotBlockDischarge` | an unfinished drug bill neither blocks Trigger_SentAway nor changes the bed need | a patient who is otherwise healed but still has an unfinished drug bill (danger check disabled). | Trigger_SentAway.SentAway runs; and the bed need / bed type is computed. | the patient is sent away anyway, and the drug bill neither makes them a surgery patient nor wants a surgery bed. A real surgery bill still counts (control). |  |
 | Drugs13 | `LeavingRemovesDrugBills` | leftover Administer bills are removed when the patient leaves | a patient with a waiting drug bill. | the patient is dismissed (same path as leaving: RemoveFromPatientList). | no administer bill is left on the pawn. |  |
 | Drugs14 | `LastDrugTickRoundTrip` | LastDrugTick survives save/load; an old save without it loads an empty dictionary | a PatientData with LastDrugTick entries. | it is saved to a temp file with the Scribe and loaded back. | LastDrugTick is intact. A PatientData without the node (old save) loads with an empty, non-null dictionary. |  |
+| Drugs15 | `PolicyAllowsNowRules` | PolicyAllowsNow follows policy, frequency and LastDrugTick; waiting Administer bill can be removed | a wounded patient. |  | PolicyAllowsNow (the IV Drug Infuser whitelist) is false without a policy, true with a due entry, false right after a dose (LastDrugTick) until the frequency passes; RemoveAdministerBillsFor drops the waiting bill. |  |
 
 ## ExternalCureTests.cs
 
@@ -125,6 +150,13 @@ Total tests: 120
 | A2b | `LandingSpotVariantsVisibility` | Landing spot variants - all defs valid, default always buildable, variants follow the setting | every Patient Landing Spot def (default 1x1 + variants) and the variants setting. | validity and build-menu visibility are checked with the setting on and off. | all shipped variants are valid (odd square, not rotatable); the default is always buildable; variants are buildable only when the setting is on. |  |
 | B1 | `EnsureValidSettingsRepairsOldSaveState` | EnsureValidSettings restores null settings and fixes opening hours to 24 entries (pad short, truncate long) | hospital settings as an old save leaves them: null lists, too-short and too-long opening hours. | EnsureValidSettings runs. | null lists are restored to defaults, short hours padded with closed, long hours truncated to 24. |  |
 
+## IVDrugInfuserTests.cs
+
+| ID | Method | Description | Given | When | Then | Requires |
+|---|---|---|---|---|---|---|
+| IVD1 | `InfusedDosesAreBilled` | infused medicine and drug are billed and recorded in LastDrugTick | an active patient. | the infuser gives one medicine and one drug. | the bill grows by the tend price (medicine) and the administer price (drug); LastDrugTick is set for both. | mod IVDrugInfuser |
+| IVD2 | `NonPatientIgnored` | infusing a non-patient does not throw | a pawn that is not a patient. |  | nothing is billed or recorded (no patient data to check, no exception). | mod IVDrugInfuser |
+
 ## ModCompatTests.cs
 
 | ID | Method | Description | Given | When | Then | Requires |
@@ -145,6 +177,14 @@ Total tests: 120
 | MD3 | `LeadTooUnskilled` | a lead below the recipe's skill requirement gives a plain bill | Fast Operation ON but the lead's Medicine is below the recipe's requirement. |  | plain bill. Fails the precondition if no such recipe exists. | mod MultiDoctor |
 | MD4 | `DrugBillStaysPlain` | an administer-drug bill stays a plain bill even with an active team | Fast Operation ON and a capable lead. | the administer-drug bill is created (the call DrugUtility makes for scheduled drugs). | plain bill (MD excludes Administer* recipes). | mod MultiDoctor |
 | MD5 | `DeleteTeamBill` | deleting a team bill clears HasPendingSurgeryBill like a plain bill | a team bill that is the patient's pending cure. | it is deleted. | HasPendingSurgeryBill is cleared (BillStack.Delete handling, same as for a plain bill). | mod MultiDoctor |
+
+## PatientTableSortTests.cs
+
+| ID | Method | Description | Given | When | Then | Requires |
+|---|---|---|---|---|---|---|
+| Sort1 | `BillCompare` | the bill column compares by amount, with a fresh worker instance, non-patients first | two registered patients with bills 9 and 100 (text order "9" > "100", numeric order 9 < 100). | PawnColumnWorker_Bill.Compare is called on a fresh worker, both ways, and against a non-patient. | the larger bill sorts after the smaller one (numeric, not text), the reverse is the opposite sign, and a non-patient sorts before both. |  |
+| Sort2 | `TimeSpentCompare` | the time spent column compares by ticks, with a fresh worker instance | two registered patients, one arrived 10 hours earlier than the other. | PawnColumnWorker_PatientTimeSpent.Compare is called on a fresh worker. | the patient who spent more ticks in the hospital sorts after the other one. |  |
+| Sort3 | `RatingCompareAndFreshWorkers` | the rating column compares by score; text columns work on fresh worker instances | two registered patients whose InitialMood differs (-1 and 1), so the first has the higher rating score. | PawnColumnWorker_PatientRating.Compare is called on a fresh worker; the text columns are asked for text without any drawing. | the higher score sorts after the lower one; Diagnosis and Cure GetTextFor and Compare do not throw on fresh instances. |  |
 
 ## PlasteelSurgeryTests.cs
 

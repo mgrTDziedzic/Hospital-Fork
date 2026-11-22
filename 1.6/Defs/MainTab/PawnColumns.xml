@@ -3,7 +3,7 @@
     <PawnColumnDef>
         <defName>Hospital_LabelCustom</defName>
         <workerClass>Hospital.MainTab.PawnColumnWorker_LabelCustom</workerClass>
-        <sortable>false</sortable>
+        <sortable>true</sortable>
     </PawnColumnDef>
     
     <PawnColumnDef>
@@ -30,7 +30,7 @@
         <label>diagnosis</label>
         <headerTip>What's wrong with this patient?.</headerTip>
         <width>175</width>
-        <sortable>false</sortable>
+        <sortable>true</sortable>
     </PawnColumnDef>
     
     <PawnColumnDef>
@@ -39,7 +39,7 @@
         <label>treatment</label>
         <headerTip>How will we help the patient?</headerTip>
         <width>175</width>
-        <sortable>false</sortable>
+        <sortable>true</sortable>
     </PawnColumnDef>
 
     <PawnColumnDef>
