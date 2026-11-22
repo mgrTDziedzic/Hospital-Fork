@@ -424,12 +424,25 @@ namespace Hospital
             return stacks;
         }
 
+        // Appends the backstory leave line (wounded patients with a backstory, display setting on) to a leave message.
+        // A period is added first when the message does not end with sentence punctuation (trailing markup tags ignored).
+        // Without a leave line the message is returned unchanged.
+        private static string WithLeaveLine(string message, PatientData data, Pawn pawn)
+        {
+            string line = Hospital.Utilities.BackstoryUtility.GetLeaveLine(pawn, data);
+            if (line.NullOrEmpty()) return message;
+            string plain = System.Text.RegularExpressions.Regex.Replace(message, @"(<[^>]*>|\s)+$", "").TrimEnd();
+            char last = plain.Length > 0 ? plain[plain.Length - 1] : '.';
+            return message + (last == '.' || last == '!' || last == '?' ? "" : ".") + " " + line;
+        }
+
         public void PatientLeaves(Pawn pawn)
         {
             if (Patients.TryGetValue(pawn, out var patientData) && !patientData.Dismissed)
             {
                 float silver = PatientUtility.CalculateSilverToReceive(pawn, patientData);
                 silver = Mathf.Clamp(silver, 0, 4000);
+                if (Prefs.DevMode) Log.Message($"[Hospital] Bill paid {pawn.LabelShort}: {silver:0.#} silver (bill {patientData.Bill:0.#})");
 
                 // Goodwill and the departure message are not conditional on the bill. A patient
                 // can legitimately owe nothing - an implant install inflicts no wound, so nothing
@@ -439,14 +452,13 @@ namespace Hospital
                 {
                     int goodwill = PatientUtility.CalculateGoodwillToGain(pawn, patientData);
                     Messages.Message(
-                        "HospitalPatientLeaves".Translate(pawn.NameFullColored, silver.ToStringMoney(), goodwill,
-                            pawn.Faction.name), MessageTypeDefOf.NeutralEvent);
+                        WithLeaveLine("HospitalPatientLeaves".Translate(pawn.NameFullColored, silver.ToStringMoney(), goodwill,
+                            pawn.Faction.name), patientData, pawn), MessageTypeDefOf.NeutralEvent);
                     pawn.Faction.TryAffectGoodwillWith(Faction.OfPlayer, goodwill, false);
-                if (Prefs.DevMode) Log.Message($"[Hospital] Bill paid {pawn.LabelShort}: {silver:0.#} silver (bill {patientData.Bill:0.#})");
                 }
                 else
                 {
-                    Messages.Message("HospitalPatientLeavesNoFaction".Translate(pawn.NameFullColored, silver.ToStringMoney()),
+                    Messages.Message(WithLeaveLine("HospitalPatientLeavesNoFaction".Translate(pawn.NameFullColored, silver.ToStringMoney()), patientData, pawn),
                         MessageTypeDefOf.NeutralEvent);
                 }
 
@@ -510,6 +522,7 @@ namespace Hospital
                         MessageTypeDefOf.NegativeEvent);
                     pawn.Faction.TryAffectGoodwillWith(Faction.OfPlayer, -penalty, false);
                 }
+                if (Prefs.DevMode) Log.Message($"[Hospital] Bill reset {pawn.LabelShort} (was {patientData.Bill:0.#}, surgery failed)");
                 patientData.Bill = 0f;
                 patientData.SurgeryFailedTick = Find.TickManager.TicksGame;
                 // Temporary: the patient stays registered and recovers; Trigger_SentAway sends them home afterwards.
@@ -522,7 +535,6 @@ namespace Hospital
             if (Patients.TryGetValue(pawn, out var patientData) && !patientData.Dismissed)
             {
                 // Clear pending surgery flag when manually dismissing
-                if (Prefs.DevMode) Log.Message($"[Hospital] Bill reset {pawn.LabelShort} (was {patientData.Bill:0.#}, surgery failed)");
                 // (handles case where user removed surgery bill but patient is stuck)
                 patientData.HasPendingSurgeryBill = false;
 
@@ -659,11 +671,12 @@ namespace Hospital
         {
             if (pawn == null) return;
             if (!Patients.TryGetValue(pawn, out var patientData)) return;
+            float before = patientData.Bill;
             patientData.Bill += amount;
             patientData.Bill = Mathf.Clamp(patientData.Bill, 0, 4000);
+            PatientUtility.LogBill(pawn, patientData.Bill - before, patientData.Bill, reason);
         }
     }
 
  
-}            float before = patientData.Bill;
-            PatientUtility.LogBill(pawn, patientData.Bill - before, patientData.Bill, reason);
+}

@@ -1,29 +1,24 @@
 using RimWorld;
-using UnityEngine;
 using Verse;
 
 namespace Hospital.MainTab
 {
     public class PawnColumnWorker_Diagnosis : PawnColumnWorker_Text
     {
-        private float lastTimeCached;
-        private HospitalMapComponent hospital;
-
         public override string GetTextFor(Pawn pawn)
         {
-            if (Time.unscaledTime > lastTimeCached + 2 || Find.CurrentMap != hospital.map)
-            {
-                lastTimeCached = Time.unscaledTime;
-                hospital = Find.CurrentMap.GetComponent<HospitalMapComponent>();
-            }
+            return PatientTableHelper.TextOf(pawn, cure: false);
+        }
 
-            PatientData patientData;
-            if (hospital.GetPatientData(pawn, out patientData))
+        // Tooltip: the generated backstory (empty for other patients, or when the setting is off).
+        public override string GetTip(Pawn pawn)
+        {
+            var hospital = PatientTableHelper.Hospital;
+            if (hospital != null && hospital.GetPatientData(pawn, out PatientData patientData))
             {
-                return patientData.Diagnosis;
+                return Hospital.Utilities.BackstoryUtility.GetBackstory(pawn, patientData);
             }
             return string.Empty;
         }
-        
     }
 }

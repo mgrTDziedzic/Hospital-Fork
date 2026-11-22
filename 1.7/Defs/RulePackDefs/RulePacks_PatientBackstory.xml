@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <!-- Generated backstory of a wounded patient (see Utilities/BackstoryUtility.cs).
+       Constant WOUND = Generic / Gunshot / Burn / Blunt / Sharp picks the activity pool; act_any applies to all.
+       Activities are written as gerund phrases so they fit after "while". Articles: only "the" in front of
+       vanilla word symbols (an animal or weapon may start with a vowel). -->
+  <RulePackDef>
+    <defName>Hospital_WoundBackstory</defName>
+    <rulePack>
+      <rulesStrings>
+        <li>r_backstory(p=3)->[PATIENT_nameDef] suffered [severe] injuries while [activity].</li>
+        <li>r_backstory(p=2)->[PATIENT_nameDef] got hurt [badly] while [activity].</li>
+        <li>r_backstory(p=2)->While [activity], [PATIENT_nameDef] [hadaccident].</li>
+        <li>r_backstory->[PATIENT_nameDef] was injured while [activity] and has been in pain ever since.</li>
+
+        <li>r_leave->[PATIENT_nameDef] went home, swearing never to do things like [activity] again.</li>
+        <li>r_leave->[PATIENT_nameDef] went home, vowing to stay far away from [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, still shaken by the memory of [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, swearing to give up [activity] for good.</li>
+        <li>r_leave->[PATIENT_nameDef] went home with a new respect for the dangers of [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, thinking twice before ever going back to [activity].</li>
+
+        <li>severe->severe</li>
+        <li>severe->serious</li>
+        <li>severe->grave</li>
+        <li>severe->nasty</li>
+        <li>severe->painful</li>
+
+        <li>badly->badly</li>
+        <li>badly->quite badly</li>
+        <li>badly->very badly</li>
+        <li>badly->seriously</li>
+
+        <li>hadaccident->was badly hurt</li>
+        <li>hadaccident->had a terrible accident</li>
+        <li>hadaccident->got injured</li>
+        <li>hadaccident->suffered a nasty accident</li>
+        <li>hadaccident->ended up in need of a doctor</li>
+
+        <li>activity(WOUND==Gunshot,p=3)->[act_gunshot]</li>
+        <li>activity(WOUND==Burn,p=3)->[act_burn]</li>
+        <li>activity(WOUND==Blunt,p=3)->[act_blunt]</li>
+        <li>activity(WOUND==Sharp,p=3)->[act_sharp]</li>
+        <li>activity->[act_any]</li>
+
+        <li>act_gunshot->hunting the [Animal] with a borrowed rifle</li>
+        <li>act_gunshot->cleaning a rifle that was not unloaded</li>
+        <li>act_gunshot->practicing at the shooting range</li>
+        <li>act_gunshot->settling an argument about [TalkTopicLight] with pistols</li>
+        <li>act_gunshot->standing too close to a hunting party</li>
+        <li>act_gunshot->defending a caravan from raiders</li>
+        <li>act_gunshot->guarding a supply shipment</li>
+        <li>act_gunshot->walking across a hunting ground at dawn</li>
+        <li>act_gunshot->testing a newly built rifle</li>
+        <li>act_gunshot->celebrating a wedding with a ceremonial salute</li>
+        <li>act_gunshot->fending off the [Animal] with a pistol</li>
+        <li>act_gunshot->crossing a field during a skirmish between two raider groups</li>
+        <li>act_gunshot->teaching a friend how to shoot</li>
+        <li>act_gunshot->playing [Game] with armed strangers</li>
+
+        <li>act_burn->cooking [Vegetable] stew over an open fire</li>
+        <li>act_burn->refueling a generator</li>
+        <li>act_burn->telling stories about [TalkTopicLight] by the campfire</li>
+        <li>act_burn->roasting a pot of [Vegetable] soup</li>
+        <li>act_burn->lighting fireworks for a birthday</li>
+        <li>act_burn->repairing a chemfuel stove</li>
+        <li>act_burn->boiling [Color] dye in a large pot</li>
+        <li>act_burn->forging the [Weapon] at the smithy</li>
+        <li>act_burn->smoking meat in the smokehouse</li>
+        <li>act_burn->fixing a wiring fault in the dark</li>
+        <li>act_burn->heating water for a bath</li>
+        <li>act_burn->working next to a burning haystack</li>
+        <li>act_burn->testing a new stove</li>
+        <li>act_burn->standing too close to a torch during a festival</li>
+
+        <li>act_blunt->falling off a roof</li>
+        <li>act_blunt->wrestling the [Animal]</li>
+        <li>act_blunt->playing [Game] a bit too seriously</li>
+        <li>act_blunt->sliding down a muddy hill</li>
+        <li>act_blunt->carrying a heavy steel crate</li>
+        <li>act_blunt->hauling stone chunks</li>
+        <li>act_blunt->chasing the [Animal] through a barn</li>
+        <li>act_blunt->walking into a closed door in the dark</li>
+        <li>act_blunt->climbing a tall [TreeType] tree</li>
+        <li>act_blunt->dancing at a party</li>
+        <li>act_blunt->feeding the [Animal]</li>
+        <li>act_blunt->arguing about [TalkTopicLight] in a bar brawl</li>
+        <li>act_blunt->moving a stone statue</li>
+        <li>act_blunt->stacking shelves in a storeroom</li>
+
+        <li>act_sharp->shaving with a straight razor</li>
+        <li>act_sharp->butchering the [Animal]</li>
+        <li>act_sharp->carving a statue of the [Animal]</li>
+        <li>act_sharp->chopping [Vegetable] for dinner</li>
+        <li>act_sharp->sharpening the [Weapon]</li>
+        <li>act_sharp->trimming a hedge</li>
+        <li>act_sharp->gathering firewood</li>
+        <li>act_sharp->skinning the [Animal]</li>
+        <li>act_sharp->cutting a [Color] ribbon at an opening ceremony</li>
+        <li>act_sharp->repairing a fence with rusty wire</li>
+        <li>act_sharp->whittling a toy [Weapon]</li>
+        <li>act_sharp->juggling knives at a festival</li>
+        <li>act_sharp->slicing bread</li>
+        <li>act_sharp->opening a crate with a dull knife</li>
+
+        <li>act_any->eating a simple meal</li>
+        <li>act_any->petting the [Animal]</li>
+        <li>act_any->meditating</li>
+        <li>act_any->writing poetry about [ConceptPositive]</li>
+        <li>act_any->painting the shed [Color]</li>
+        <li>act_any->arguing about [TalkTopicLight]</li>
+        <li>act_any->playing [Game] with friends</li>
+        <li>act_any->knitting a [Color] scarf</li>
+        <li>act_any->taking a nap</li>
+        <li>act_any->watching the clouds</li>
+        <li>act_any->singing about [ConceptPositive]</li>
+        <li>act_any->trying on a new [Apparel]</li>
+        <li>act_any->chatting about [TalkTopicLight]</li>
+        <li>act_any->talking to the [Animal]</li>
+        <li>act_any->sitting quietly</li>
+      </rulesStrings>
+    </rulePack>
+  </RulePackDef>
+</Defs>

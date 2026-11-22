@@ -61,6 +61,7 @@ namespace HospitalTests
                     new DebugActionNode("500 patients", DebugActionType.Action, () => PatientSampler.Run(500))
                 }
             };
+            yield return new DebugActionNode("Backstory sample...", DebugActionType.Action, BackstorySample) { category = Category };
             yield return new DebugActionNode("Mass casualty (specific)...")
             {
                 category = Category,
@@ -73,6 +74,40 @@ namespace HospitalTests
                         }
                     }).ToList()
             };
+        }
+
+        // Shows 20 generated wound backstories per category in a window (and logs a copy) for a throwaway test pawn.
+        private static void BackstorySample()
+        {
+            bool openBefore = Log.openOnMessage;
+            Log.openOnMessage = false;
+            Pawn pawn = null;
+            try
+            {
+                pawn = PawnGenerator.GeneratePawn(new PawnGenerationRequest(PawnKindDefOf.Colonist, Faction.OfPlayer));
+                var sb = new System.Text.StringBuilder();
+                sb.AppendLine("Hospital backstory sample (pawn " + pawn.Name.ToStringShort + ")");
+                foreach (WoundCategory category in Enum.GetValues(typeof(WoundCategory)))
+                {
+                    sb.AppendLine();
+                    sb.AppendLine("== " + category);
+                    for (int i = 0; i < 20; i++)
+                    {
+                        int seed = Rand.Int;
+                        sb.AppendLine(BackstoryUtility.Resolve(pawn, seed, category));
+                        sb.AppendLine("    " + BackstoryUtility.ResolveLeave(pawn, seed, category));
+                    }
+                }
+                string text = sb.ToString();
+                Log.Message(System.Text.RegularExpressions.Regex.Replace(text, "<[^>]+>", ""));
+                Find.WindowStack.Add(new Window_TextSample("Backstory sample", text));
+            }
+            finally
+            {
+                Log.openOnMessage = openBefore;
+                // Generated, never passed to the world: discard without WorldPawns warnings.
+                if (pawn != null) IncidentHelper.DiscardGeneratedPawn(pawn, silent: true);
+            }
         }
 
         private static List<DebugActionNode> SurgeryNodes()
@@ -133,6 +168,8 @@ namespace HospitalTests
                 return;
             }
 
+            bool logOpenBefore = Log.openOnMessage;
+            Log.openOnMessage = false; // the arrival writes dev-mode log lines; do not pop the log window open
             bool open = hospital.openForBusiness;
             var hours = hospital.openingHours;
             bool danger = hospital.AcceptDanger;
@@ -155,6 +192,7 @@ namespace HospitalTests
             }
             finally
             {
+                Log.openOnMessage = logOpenBefore;
                 hospital.openForBusiness = open;
                 hospital.openingHours = hours;
                 hospital.AcceptDanger = danger;
