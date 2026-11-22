@@ -405,6 +405,7 @@ namespace Hospital
         public void PatientArrived(Pawn pawn, PatientData data)
         {
             Patients.Add(pawn, data);
+            if (Prefs.DevMode) PatientUtility.LogBill(pawn, data.Bill, data.Bill, "base fee");
             MainTabWindowUtility.NotifyAllPawnTables_PawnsChanged();
         }
         
@@ -441,6 +442,7 @@ namespace Hospital
                         "HospitalPatientLeaves".Translate(pawn.NameFullColored, silver.ToStringMoney(), goodwill,
                             pawn.Faction.name), MessageTypeDefOf.NeutralEvent);
                     pawn.Faction.TryAffectGoodwillWith(Faction.OfPlayer, goodwill, false);
+                if (Prefs.DevMode) Log.Message($"[Hospital] Bill paid {pawn.LabelShort}: {silver:0.#} silver (bill {patientData.Bill:0.#})");
                 }
                 else
                 {
@@ -520,6 +522,7 @@ namespace Hospital
             if (Patients.TryGetValue(pawn, out var patientData) && !patientData.Dismissed)
             {
                 // Clear pending surgery flag when manually dismissing
+                if (Prefs.DevMode) Log.Message($"[Hospital] Bill reset {pawn.LabelShort} (was {patientData.Bill:0.#}, surgery failed)");
                 // (handles case where user removed surgery bill but patient is stuck)
                 patientData.HasPendingSurgeryBill = false;
 
@@ -652,7 +655,7 @@ namespace Hospital
             return Patients.TryGetValue(pawn, out patientData);
         }
 
-        public void AddSurgeryBill(Pawn pawn, float amount)
+        public void AddSurgeryBill(Pawn pawn, float amount, string reason = null)
         {
             if (pawn == null) return;
             if (!Patients.TryGetValue(pawn, out var patientData)) return;
@@ -662,4 +665,5 @@ namespace Hospital
     }
 
  
-}
+}            float before = patientData.Bill;
+            PatientUtility.LogBill(pawn, patientData.Bill - before, patientData.Bill, reason);

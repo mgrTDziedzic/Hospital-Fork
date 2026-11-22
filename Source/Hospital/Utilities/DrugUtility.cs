@@ -141,6 +141,46 @@ public static class DrugUtility
     }
 
     /// <summary>
+    /// Would a patient drug policy hand out this drug right now (same list rules as ScheduleFor: teetotaler, applicable
+    /// list, entry due)? Healed patients (IsOtherwiseHealed) get nothing, like in ScheduleFor. Allocation-free.
+    /// </summary>
+    public static bool PolicyAllowsNow(HospitalMapComponent hospital, Pawn pawn, PatientData data, ThingDef drug, int now)
+    {
+        if (hospital == null || pawn == null || data == null || drug == null) return false;
+        if (IsOtherwiseHealed(pawn, data)) return false;
+        bool teetotaler = false, teetotalerKnown = false;
+        foreach (DrugList list in AllLists)
+        {
+            var policy = hospital.GetDrugPolicy(list);
+            if (policy == null) continue;
+            if (!teetotalerKnown) { teetotaler = pawn.IsTeetotaler(); teetotalerKnown = true; }
+            if (teetotaler && !hospital.GetDrugTeetotal(list)) continue;
+            if (!ListApplies(list, pawn, data)) continue;
+            for (int i = 0; i < policy.Count; i++)
+            {
+                var entry = policy[i];
+                if (entry != null && entry.drug == drug && EntryDue(entry, pawn, data, now)) return true;
+            }
+        }
+        return false;
+    }
+
+    private static readonly DrugList[] AllLists = (DrugList[])System.Enum.GetValues(typeof(DrugList));
+
+    /// <summary>Removes the administer bills waiting for one drug (the infuser just gave it). Returns the number removed.</summary>
+    public static int RemoveAdministerBillsFor(Pawn pawn, ThingDef drug)
+    {
+        var stack = pawn?.health?.surgeryBills;
+        if (stack == null || drug == null) return 0;
+        List<Bill> found = null;
+        foreach (var bill in stack.Bills)
+            if (IsAdministerBill(bill) && DrugOf(bill.recipe) == drug) (found ??= new List<Bill>()).Add(bill);
+        if (found == null) return 0;
+        foreach (var bill in found) stack.Delete(bill);
+        return found.Count;
+    }
+
+    /// <summary>
     /// Adds the administer bills a patient is due, at the top of their bill list. Returns the number added.
     /// Union of every applicable list; one waiting bill per drug.
     /// </summary>

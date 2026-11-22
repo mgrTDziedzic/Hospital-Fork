@@ -57,6 +57,11 @@ What's supported:
   price of a tend, other drugs at the price of an Administer bill.
 - Hospital's patient drug policies count infused doses as given, so a scheduled drug is not
   administered again right after an infusion.
+- The infuser gives a patient only the drugs their patient drug policies allow, at the
+  policy's frequency. Medicine is always given. A drug the policies do not allow is not
+  infused, and no fuel is used.
+
+Support suggested by: Pasaway
 
 ### Multi-Doctor Surgery
 

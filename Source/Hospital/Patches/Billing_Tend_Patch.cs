@@ -22,7 +22,8 @@ public class Billing_Tend_Patch
                 doctor != patient
                 && medicine != null && patient.IsPatient(out hospitalMapComponent))
             {
-                patient.AddToBill(hospitalMapComponent, Mathf.Clamp(medicine.MarketValue * 1.2f, 0, 70));
+                patient.AddToBill(hospitalMapComponent, Mathf.Clamp(medicine.MarketValue * 1.2f, 0, 70),
+                    Prefs.DevMode ? "tend: " + medicine.def.label : null);
             }
         }
     }

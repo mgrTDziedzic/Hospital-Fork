@@ -106,7 +106,7 @@ public class Billing_Surgery_Patch
             // a patient who owes nothing walks out having cost us the operation for free.
             if (surgeryBill <= 0f) surgeryBill = Mathf.Clamp(recipe.workAmount / 100f, 10f, 100f);
 
-            hospital.AddSurgeryBill(pawn, surgeryBill);
+            hospital.AddSurgeryBill(pawn, surgeryBill, Prefs.DevMode ? "medical bill: " + recipe.label : null);
 
             // Only the cure surgery settles the pending flag; other medical bills (drugs, extra operations) do not.
             if (recipe == patientData.CureRecipe) patientData.HasPendingSurgeryBill = false;
