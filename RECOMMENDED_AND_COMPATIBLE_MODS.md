@@ -47,6 +47,17 @@ What's supported:
 
 Link: [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=2153065191)
 
+### IV Drug Infuser
+
+**Medicine on a drip.** Link a bed to an infuser and it doses the patient straight from its
+tank, no doctor needed.
+
+What's supported:
+- Every dose the infuser gives a patient is added to the patient's bill: medicine at the
+  price of a tend, other drugs at the price of an Administer bill.
+- Hospital's patient drug policies count infused doses as given, so a scheduled drug is not
+  administered again right after an infusion.
+
 ### Multi-Doctor Surgery
 
 **Real surgical teams.** Big operations deserve more than one pair of hands. Put together

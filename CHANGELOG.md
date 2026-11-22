@@ -6,6 +6,7 @@ Original code is © its author, licensed under GPLv3; modifications are © mgrTD
 
 ## 3.0.1
 - Patients arrive while visitors from factions hostile to each other are on the map; only pawns that are not guests of the colony are checked for hostility between factions (`IncidentHelper.GetPotentialPatientFactions`). Pawns hostile to the player still block arrivals.
+- Optional compatibility with IV Drug Infuser (`akaster.ivdruginfuser`, `Compat/IVDrugInfuserCompat.cs`, key added to `Compat/SupportedMods.cs`): Doses given by IV Drug Infuser to patients are added to the patient's bill; Hospital's patient drug policies count them as given. Hospital patches `IVDrugInfuser.Helper.Infused(Thing, Pawn)` by reflection (Prefix keeps the thing's def, Postfix bills active patients: medicine like the tend bill, `min(1.2 x market value, 70)`; other drugs like an Administer bill, `max(market value, 10)`; and sets `LastDrugTick`). One info log line when the mod is detected; nothing when it is absent.
 
 ## 3.0.0 (2026-11-20)
 - First release as its own Steam Workshop item, published with the permission of Adamas (tomvd). Version 3.0.0 continues the 2.9.6 history.

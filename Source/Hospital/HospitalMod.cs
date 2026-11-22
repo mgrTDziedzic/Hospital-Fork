@@ -24,6 +24,7 @@ namespace Hospital
                 Compat.MultiDoctorCompat.Startup();
                 Compat.PlasteelCompat.Startup();
                 Compat.MedPodCompat.Startup();
+                Compat.IVDrugInfuserCompat.Startup();
             });
         }
         /// <summary>

@@ -13,6 +13,7 @@ public static class SupportedMods
         public const string PlasteelSurgery = "PlasteelSurgery";
         public const string MedPod = "MedPod";
         public const string EnemySelfPreservation = "EnemySelfPreservation";
+        public const string IVDrugInfuser = "IVDrugInfuser";
 
         private class Entry
         {
@@ -26,6 +27,7 @@ public static class SupportedMods
                 { PlasteelSurgery, new Entry { Name = "Plasteel Surgery", Ids = new[] { "Mlie.PlasteelSurgery" } } },
                 { MedPod, new Entry { Name = "MedPod", Ids = new[] { "sumghai.Medpod" } } },
                 { EnemySelfPreservation, new Entry { Name = "Enemy Self Preservation", Ids = new[] { "Mlie.EnemySelfPreservation" } } },
+                { IVDrugInfuser, new Entry { Name = "IV Drug Infuser", Ids = new[] { "akaster.ivdruginfuser" } } },
         };
 
         private static readonly Dictionary<string, string> Detected = new Dictionary<string, string>();
