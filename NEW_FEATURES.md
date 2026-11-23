@@ -22,7 +22,8 @@ Lets you choose which drugs patients receive while in your care.
 - Only drugs marked **Scheduled** in the policy are given. Doctors administer them as
   medical bills, following the policy's frequency and mood/joy limits.
 - **Include teetotalers** – per list, whether teetotaler patients also get those drugs.
-- Drugs are billed to the patient like other treatment.
+- Drugs are billed to the patient like other treatment. Billing for drugs comes from the original
+  Hospital; what is new is that the drugs are given automatically.
 - **Manage drug policies** creates policies for the hospital. Examples:
   - **All patients** ("Include teetotalers" off): psychite tea for mood.
   - **Infection**: Masala Chai from Vanilla Brewing Expanded.
@@ -65,6 +66,17 @@ blocks its whole area for walls and furniture, and cannot be rotated. The mod se
 variants" (default on) hides them from the build menu. The default 1x1 spot is always available, and pads
 already placed keep working when the setting is off.
 
+### Patient backstories (optional)
+Wounded and sick patients arrive with a short generated story of how they got hurt or ill, e.g.
+"Name was settling an argument about practicing dice with pistols when the thicket turned out to be
+steeper than it looked, and the result was nasty injuries." or "Name caught gut worms while sharing
+a spoon with the owl on a bet with the archaeologist."
+The story matches the kind of wound or disease (modded diseases are named too) and can mention the
+patient's faction or title. It appears in the arrival letter and as a tooltip in the Hospital tab
+and the patient's Bio tab. When a wounded or sick patient leaves, the message adds a line that refers back
+to the story. Surgery and mass casualty patients get none. The mod setting "Show patient backstories"
+(default on) hides them.
+
 ### Failed surgery
 After a failed operation the patient stays to recover instead of leaving, so the surgery can be
 added again.
@@ -82,6 +94,7 @@ comes from the original Hospital.
 ## Fixes and adjustments
 
 - Disease, plague and wound patients are generated without freezing the game.
+- Patients arrive while visitors (e.g. from Hospitality) from factions hostile to each other are on the map.
 - Patients are assigned only surgeries the game can perform on them.
 - Wound and infection patients arrive with the condition they came for.
 - Payment: silver arrives in valid stacks; large payments are split by the stack limit.

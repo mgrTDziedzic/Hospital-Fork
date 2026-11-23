@@ -60,6 +60,10 @@ What's supported:
 - The infuser gives a patient only the drugs their patient drug policies allow, at the
   policy's frequency. Medicine is always given. A drug the policies do not allow is not
   infused, and no fuel is used.
+- Patients ignore infusers when choosing the best bed. This is on purpose: an infuser is
+  free and instant to build, so either every bed already has one or the player can add one
+  when needed. Taking infusers into account would complicate bed choice for an effect that
+  would rarely be noticeable.
 
 Support suggested by: Pasaway
 
