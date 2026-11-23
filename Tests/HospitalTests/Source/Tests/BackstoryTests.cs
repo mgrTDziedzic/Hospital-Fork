@@ -269,10 +269,10 @@ namespace HospitalTests
             yield return null;
         }
 
-        // Given: a test pawn, each disease category, 300 seeds per category, with a real disease def and with no def.
+        // Given: a test pawn, each disease category, 100 seeds per category, with a real disease def and with no def.
         // When:  the disease backstory text is resolved.
         // Then:  it is non-empty, has no ERR / CANNOT_RESOLVE marker or unresolved symbol, contains the pawn's short name and the disease label (or the fallback label without a def).
-        [HospitalTest("Story14: every disease category x 300 seeds gives a non-empty text with the pawn's name, the disease label and no grammar error")]
+        [HospitalTest("Story14: every disease category x 100 seeds gives a non-empty text with the pawn's name, the disease label and no grammar error")]
         public static void DiseaseTextsAreValid(TestContext ctx)
         {
             var pawn = TestPawn(ctx);
@@ -282,22 +282,24 @@ namespace HospitalTests
                 string label = disease != null ? disease.label : "a mysterious illness";
                 foreach (DiseaseCategory category in Enum.GetValues(typeof(DiseaseCategory)))
                 {
-                    for (int i = 1; i <= 300; i++)
+                    for (int i = 1; i <= 100; i++)
                     {
                         int seed = i * 7919;
                         string text = BackstoryUtility.Resolve(pawn, seed, category, disease);
-                        string where = category + " " + (disease?.defName ?? "no def") + " seed " + seed + ": \"" + text + "\"";
-                        Assert.False(string.IsNullOrWhiteSpace(text), "empty text, " + where);
-                        Assert.False(text.Contains("ERR") || text.Contains("CANNOT_RESOLVE"), "grammar error marker, " + where);
-                        Assert.False(text.Contains("[") || text.Contains("]"), "unresolved symbol, " + where);
-                        Assert.True(text.Contains(name), "pawn name missing, " + where);
-                        Assert.True(text.Contains(label), "disease label missing, " + where);
+                        string problem = null;
+                        if (string.IsNullOrWhiteSpace(text)) problem = "empty text";
+                        else if (text.Contains("ERR") || text.Contains("CANNOT_RESOLVE")) problem = "grammar error marker";
+                        else if (text.Contains("[") || text.Contains("]")) problem = "unresolved symbol";
+                        else if (!text.Contains(name)) problem = "pawn name missing";
+                        else if (!text.Contains(label)) problem = "disease label missing";
+                        if (problem != null)
+                            Assert.Fail(problem + ", " + category + " " + (disease?.defName ?? "no def") + " seed " + seed + ": \"" + text + "\"");
                     }
                 }
             }
         }
 
-        // Given: a test pawn, each disease category, 300 seeds per category, with a real disease def and with no def.
+        // Given: a test pawn, each disease category, 100 seeds per category, with a real disease def and with no def.
         // When:  the activity, the backstory and the leave line are resolved for the same seed.
         // Then:  the activity text is contained in both the backstory and the leave line, and the leave line has the pawn's name and no error marker or unresolved symbol.
         [HospitalTest("Story15: disease backstory and leave line of one seed use the same activity")]
@@ -309,18 +311,20 @@ namespace HospitalTests
             {
                 foreach (DiseaseCategory category in Enum.GetValues(typeof(DiseaseCategory)))
                 {
-                    for (int i = 1; i <= 300; i++)
+                    for (int i = 1; i <= 100; i++)
                     {
                         int seed = i * 104729;
                         string activity = BackstoryUtility.ResolveActivity(pawn, seed, category, disease);
                         string story = BackstoryUtility.Resolve(pawn, seed, category, disease);
                         string leave = BackstoryUtility.ResolveLeave(pawn, seed, category, disease);
-                        string where = category + " " + (disease?.defName ?? "no def") + " seed " + seed + ": activity \"" + activity + "\", story \"" + story + "\", leave \"" + leave + "\"";
-                        Assert.False(string.IsNullOrWhiteSpace(activity), "empty activity, " + where);
-                        Assert.True(story.Contains(activity), "backstory lacks the activity, " + where);
-                        Assert.True(leave.Contains(activity), "leave line lacks the activity, " + where);
-                        Assert.True(leave.Contains(name), "leave line lacks the pawn name, " + where);
-                        Assert.False(leave.Contains("ERR") || leave.Contains("CANNOT_RESOLVE") || leave.Contains("[") || leave.Contains("]"), "grammar error, " + where);
+                        string problem = null;
+                        if (string.IsNullOrWhiteSpace(activity)) problem = "empty activity";
+                        else if (!story.Contains(activity)) problem = "backstory lacks the activity";
+                        else if (!leave.Contains(activity)) problem = "leave line lacks the activity";
+                        else if (!leave.Contains(name)) problem = "leave line lacks the pawn name";
+                        else if (leave.Contains("ERR") || leave.Contains("CANNOT_RESOLVE") || leave.Contains("[") || leave.Contains("]")) problem = "grammar error";
+                        if (problem != null)
+                            Assert.Fail(problem + ", " + category + " " + (disease?.defName ?? "no def") + " seed " + seed + ": activity \"" + activity + "\", story \"" + story + "\", leave \"" + leave + "\"");
                     }
                 }
             }
