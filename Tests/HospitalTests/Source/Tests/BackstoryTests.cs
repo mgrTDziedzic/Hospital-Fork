@@ -41,17 +41,17 @@ namespace HospitalTests
             Assert.Equal(WoundCategory.Generic, BackstoryUtility.Classify(new[] { (Def("Flu"), 1f) }), "unknown def");
         }
 
-        // Given: a test pawn and each wound category, 100 seeds per category.
+        // Given: a test pawn and each wound category, 300 seeds per category.
         // When:  the backstory text is resolved.
         // Then:  it is non-empty, has no ERR / CANNOT_RESOLVE marker or unresolved symbol and contains the pawn's short name.
-        [HospitalTest("Story2: every category x 100 seeds gives a non-empty text with the pawn's name and no grammar error")]
+        [HospitalTest("Story2: every category x 300 seeds gives a non-empty text with the pawn's name and no grammar error")]
         public static void TextsAreValid(TestContext ctx)
         {
             var pawn = TestPawn(ctx);
             string name = pawn.Name.ToStringShort;
             foreach (WoundCategory category in Enum.GetValues(typeof(WoundCategory)))
             {
-                for (int i = 1; i <= 100; i++)
+                for (int i = 1; i <= 300; i++)
                 {
                     int seed = i * 7919;
                     string text = BackstoryUtility.Resolve(pawn, seed, category);
@@ -157,7 +157,7 @@ namespace HospitalTests
             }
         }
 
-        // Given: a test pawn and each wound category, 100 seeds per category.
+        // Given: a test pawn and each wound category, 300 seeds per category.
         // When:  the activity, the backstory and the leave line are resolved for the same seed.
         // Then:  the activity text (resolved separately) is contained in both the backstory and the leave line, and the leave line has no error marker or unresolved symbol.
         [HospitalTest("Story10: backstory and leave line of one seed use the same activity")]
@@ -167,7 +167,7 @@ namespace HospitalTests
             string name = pawn.Name.ToStringShort;
             foreach (WoundCategory category in Enum.GetValues(typeof(WoundCategory)))
             {
-                for (int i = 1; i <= 100; i++)
+                for (int i = 1; i <= 300; i++)
                 {
                     int seed = i * 104729;
                     string activity = BackstoryUtility.ResolveActivity(pawn, seed, category);

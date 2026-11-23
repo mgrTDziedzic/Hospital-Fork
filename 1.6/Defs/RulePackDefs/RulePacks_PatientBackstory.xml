@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
   <!-- Generated backstory of a wounded patient (see Utilities/BackstoryUtility.cs).
+       Roots: r_backstory (arrival text), r_leave (leave message, every line must contain [activity]) and activity.
        Constant WOUND = Generic / Gunshot / Burn / Blunt / Sharp picks the activity pool; act_any applies to all.
-       Activities are written as gerund phrases so they fit after "while". Articles: only "the" in front of
-       vanilla word symbols (an animal or weapon may start with a vowel). -->
+       The resolved activity is injected into r_backstory and r_leave, so it must stay a standalone gerund phrase
+       that fits after "while", "doing things like" and "memory of". Cause chains ([hosp_twist]) live in r_backstory only.
+       Pawn symbols use the PATIENT_ prefix. Faction and title lines use the constants PATIENT_faction (defName),
+       PATIENT_royalInCurrentFaction and PATIENT_factionLeader; a missing constant never matches, so such lines
+       are skipped for other patients.
+       Own word files use the hosp_ prefix (vanilla Strings paths); other symbols come from vanilla GlobalUtility.
+       Articles: only "the" (or a fixed adjective such as "runaway") in front of word symbols, because word-file
+       entries may start with a vowel. No plurals by appending "s". The AnimalGroups entries all start with a
+       consonant, so "a [AnimalGroup]" is safe. -->
   <RulePackDef>
     <defName>Hospital_WoundBackstory</defName>
     <rulePack>
@@ -13,12 +21,67 @@
         <li>r_backstory(p=2)->While [activity], [PATIENT_nameDef] [hadaccident].</li>
         <li>r_backstory->[PATIENT_nameDef] was injured while [activity] and has been in pain ever since.</li>
 
+        <!-- Cause chains -->
+        <li>r_backstory(p=2)->[PATIENT_nameDef] was [activity] when [hosp_twist], and the result was [severe] injuries.</li>
+        <li>r_backstory->[PATIENT_nameDef] was [activity] when [hosp_twist]. [PATIENT_nameDef] [hadaccident].</li>
+        <!-- Third parties, bets and blame -->
+        <li>r_backstory->[PATIENT_nameDef] suffered [severe] injuries while [activity] on a bet with the [PersonJob].</li>
+        <li>r_backstory->[PATIENT_nameDef] got hurt [badly] while [activity] to impress [PATIENT_possessive] [PersonAlly].</li>
+        <li>r_backstory->[PATIENT_nameDef] was injured while [activity] and still blames the [Animal].</li>
+        <li>r_backstory->[PATIENT_nameDef] was injured while [activity] and blames [PATIENT_possessive] [PersonFamily] for the whole thing.</li>
+        <li>r_backstory->While [activity], [PATIENT_nameDef] [hadaccident], watched by the [AdjectiveFriendly] [PersonJob].</li>
+        <li>r_backstory->[PATIENT_nameDef] [hadaccident] while [activity] out of [hosp_curious] curiosity.</li>
+
+        <!-- Faction and title lines (only for matching patients) -->
+        <li>r_backstory(PATIENT_faction==TribeCivil,p=2)->[hosp_story_tribe]</li>
+        <li>r_backstory(PATIENT_faction==TribeRough,p=2)->[hosp_story_tribe]</li>
+        <li>r_backstory(PATIENT_faction==TribeSavage,p=2)->[hosp_story_tribe]</li>
+        <li>r_backstory(PATIENT_faction==OutlanderCivil,p=2)->[hosp_story_outlander]</li>
+        <li>r_backstory(PATIENT_faction==OutlanderRough,p=2)->[hosp_story_outlander]</li>
+        <li>r_backstory(PATIENT_faction==Pirate,p=2)->[hosp_story_pirate]</li>
+        <li>r_backstory(PATIENT_royalInCurrentFaction==True,p=4)->[PATIENT_nameDef], [PATIENT_royalTitleInCurrentFactionIndef] of [PATIENT_factionName], was injured while [activity]. No court etiquette covers this.</li>
+        <li>r_backstory(PATIENT_factionLeader==True,p=3)->[PATIENT_nameDef], leader of [PATIENT_factionName], got hurt while [activity] and left the paperwork to [PATIENT_possessive] [PersonFamily].</li>
+
+        <li>hosp_story_tribe->[PATIENT_nameDef] of [PATIENT_factionName] was hurt while [activity], and the elders are still debating whether it counts as a ritual.</li>
+        <li>hosp_story_tribe->[PATIENT_nameDef] of [PATIENT_factionName] suffered [severe] injuries while [activity] and now owes the tribe a good story.</li>
+        <li>hosp_story_outlander->[PATIENT_nameDef] of [PATIENT_factionName] was hurt while [activity], and has been filling in forms about it ever since.</li>
+        <li>hosp_story_outlander->[PATIENT_nameDef] of [PATIENT_factionName] got hurt [badly] while [activity] during a lunch break.</li>
+        <li>hosp_story_pirate->[PATIENT_nameDef], a proud member of [PATIENT_factionName], got hurt while [activity] and blames a bad map.</li>
+        <li>hosp_story_pirate->[PATIENT_nameDef] of [PATIENT_factionName] was [activity] on a day off, and [PATIENT_pronoun] ended up in need of a doctor.</li>
+
+        <li>hosp_twist->the [AdjectiveLarge] [Animal] showed up</li>
+        <li>hosp_twist->a [AnimalGroup] of animals showed up</li>
+        <li>hosp_twist->[PATIENT_possessive] [PersonFamily] arrived with the [Weapon]</li>
+        <li>hosp_twist->the [PersonBadass] walked in with the [Weapon]</li>
+        <li>hosp_twist->the [Mechanoid] woke up</li>
+        <li>hosp_twist->the [Enemy] asked a very awkward question about [TalkTopicLight]</li>
+        <li>hosp_twist->[PATIENT_possessive] [PersonAlly] shouted something about [ConceptBadass]</li>
+        <li>hosp_twist->the [AdjectiveAngsty] [PersonJob] began a lecture about [ConceptAngsty]</li>
+        <li>hosp_twist->a stranger from [hosp_town] sneezed</li>
+        <li>hosp_twist->the [Animal] named [hosp_petname] got loose</li>
+        <li>hosp_twist->someone left the [NaturalObject] in the wrong place</li>
+        <li>hosp_twist->the [TerrainFeature] turned out to be steeper than it looked</li>
+
         <li>r_leave->[PATIENT_nameDef] went home, swearing never to do things like [activity] again.</li>
         <li>r_leave->[PATIENT_nameDef] went home, vowing to stay far away from [activity].</li>
         <li>r_leave->[PATIENT_nameDef] went home, still shaken by the memory of [activity].</li>
         <li>r_leave->[PATIENT_nameDef] went home, swearing to give up [activity] for good.</li>
         <li>r_leave->[PATIENT_nameDef] went home with a new respect for the dangers of [activity].</li>
         <li>r_leave->[PATIENT_nameDef] went home, thinking twice before ever going back to [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, already planning to try [activity] again with a bigger [Weapon].</li>
+        <li>r_leave->[PATIENT_nameDef] went home and told everyone the injuries came from the [AdjectiveLarge] [Animal], not from [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, still insisting that [activity] was perfectly safe.</li>
+        <li>r_leave->[PATIENT_nameDef] went home, thanking the doctors and the [PersonAlly] who dragged [PATIENT_objective] away from [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, already telling the [PersonJob] an embellished tale of [activity].</li>
+        <li>r_leave(PATIENT_faction==TribeCivil,p=2)->[hosp_leave_tribe]</li>
+        <li>r_leave(PATIENT_faction==TribeRough,p=2)->[hosp_leave_tribe]</li>
+        <li>r_leave(PATIENT_faction==TribeSavage,p=2)->[hosp_leave_tribe]</li>
+        <li>r_leave(PATIENT_faction==OutlanderCivil,p=2)->[hosp_leave_outlander]</li>
+        <li>r_leave(PATIENT_faction==OutlanderRough,p=2)->[hosp_leave_outlander]</li>
+        <li>r_leave(PATIENT_faction==Pirate,p=2)->[PATIENT_nameDef] went back to [PATIENT_factionName], still blaming a bad map for [activity].</li>
+        <li>r_leave(PATIENT_royalInCurrentFaction==True,p=4)->[PATIENT_nameDef] went home and told the court that [activity] had been an official duty.</li>
+        <li>hosp_leave_tribe->[PATIENT_nameDef] went home to [PATIENT_factionName], where the elders will hear a heavily edited version of [activity].</li>
+        <li>hosp_leave_outlander->[PATIENT_nameDef] went home to [PATIENT_factionName] with a bandage and a long story about [activity].</li>
 
         <li>severe->severe</li>
         <li>severe->serious</li>
@@ -57,6 +120,14 @@
         <li>act_gunshot->crossing a field during a skirmish between two raider groups</li>
         <li>act_gunshot->teaching a friend how to shoot</li>
         <li>act_gunshot->playing [Game] with armed strangers</li>
+        <li>act_gunshot->chasing the [AdjectiveLarge] [Animal] off the farm with a shotgun</li>
+        <li>act_gunshot->negotiating with the [Enemy] across a very thin wall</li>
+        <li>act_gunshot->waving a loaded pistol at the [Mechanoid]</li>
+        <li>act_gunshot->hunting the [AdjectiveBadass] [AnimalBadass] near the [TerrainFeature]</li>
+        <li>act_gunshot->arguing with the [PersonBadass] about [ConceptBadass] at the wrong moment</li>
+        <li>act_gunshot->showing [PATIENT_possessive] [PersonFamily] a new trick with a revolver</li>
+        <li>act_gunshot->defending the [Community] from the [Enemy]</li>
+        <li>act_gunshot->taking a shortcut across the [TerrainFeature] during hunting season</li>
 
         <li>act_burn->cooking [Vegetable] stew over an open fire</li>
         <li>act_burn->refueling a generator</li>
@@ -72,6 +143,14 @@
         <li>act_burn->working next to a burning haystack</li>
         <li>act_burn->testing a new stove</li>
         <li>act_burn->standing too close to a torch during a festival</li>
+        <li>act_burn->roasting the [Animal] over a campfire that was far too enthusiastic</li>
+        <li>act_burn->experimenting with fireworks near the [Community]</li>
+        <li>act_burn->lighting a bonfire to impress [PATIENT_possessive] [PersonAlly]</li>
+        <li>act_burn->defending a campfire from the [AdjectiveLarge] [Animal]</li>
+        <li>act_burn->dyeing the [Apparel] [Color] over an open flame</li>
+        <li>act_burn->melting down the [Weapon] at the forge</li>
+        <li>act_burn->lighting torches for a ceremony in honor of the [PersonJob]</li>
+        <li>act_burn->arguing about [TalkTopicLight] next to an open fire</li>
 
         <li>act_blunt->falling off a roof</li>
         <li>act_blunt->wrestling the [Animal]</li>
@@ -87,6 +166,14 @@
         <li>act_blunt->arguing about [TalkTopicLight] in a bar brawl</li>
         <li>act_blunt->moving a stone statue</li>
         <li>act_blunt->stacking shelves in a storeroom</li>
+        <li>act_blunt->wrestling the [AdjectiveLarge] [Animal] for the title of local champion</li>
+        <li>act_blunt->tripping over the [NaturalObject]</li>
+        <li>act_blunt->racing the [PersonJob] down the [TerrainFeature]</li>
+        <li>act_blunt->dancing with the [Mechanoid] at a party</li>
+        <li>act_blunt->being hugged by the [AdjectiveLarge] [Animal]</li>
+        <li>act_blunt->debating [TalkTopicHeavy] with the [PersonJob] a bit too passionately</li>
+        <li>act_blunt->sparring with the [PersonBadass] for fun</li>
+        <li>act_blunt->chasing a runaway [Animal] named [hosp_petname]</li>
 
         <li>act_sharp->shaving with a straight razor</li>
         <li>act_sharp->butchering the [Animal]</li>
@@ -102,6 +189,13 @@
         <li>act_sharp->juggling knives at a festival</li>
         <li>act_sharp->slicing bread</li>
         <li>act_sharp->opening a crate with a dull knife</li>
+        <li>act_sharp->carving a portrait of [hosp_petname] the [Animal]</li>
+        <li>act_sharp->trimming the [AdjectiveLarge] [Animal]'s claws</li>
+        <li>act_sharp->shaving the [Animal] named [hosp_petname]</li>
+        <li>act_sharp->slicing [Vegetable] for the [Community] cooking contest</li>
+        <li>act_sharp->opening a parcel from [hosp_bizname] [hosp_business] with a rusty [Weapon]</li>
+        <li>act_sharp->teaching the [PersonJob] to juggle knives</li>
+        <li>act_sharp->sharpening the [Weapon] for the [PersonBadass]</li>
 
         <li>act_any->eating a simple meal</li>
         <li>act_any->petting the [Animal]</li>
@@ -118,7 +212,27 @@
         <li>act_any->chatting about [TalkTopicLight]</li>
         <li>act_any->talking to the [Animal]</li>
         <li>act_any->sitting quietly</li>
+        <li>act_any->writing a song about [ConceptAngsty]</li>
+        <li>act_any->writing a letter to [PATIENT_possessive] [PersonFamily] about [ConceptBadass]</li>
+        <li>act_any->naming the [Animal] [hosp_petname]</li>
+        <li>act_any->arguing with the [PersonJob] about [TalkTopicHeavy]</li>
+        <li>act_any->inspecting the [NaturalObject] out of [hosp_curious] curiosity</li>
+        <li>act_any->joining the [AdjectiveBadass] [Animal] [hosp_group]</li>
+        <li>act_any->delivering a package from [hosp_bizname] [hosp_business] to [hosp_town]</li>
+        <li>act_any->hiding from the [Mechanoid] in the [TerrainFeature]</li>
+        <li>act_any->taking a photograph of the [TerrainFeature] for [PATIENT_possessive] [PersonFamily]</li>
+        <li>act_any->sharing a quiet moment with [PATIENT_possessive] [PersonAlly] near the [TerrainFeature]</li>
+        <li>act_any->chatting with the [AdjectiveFriendly] [PersonJob] and [VerbFriendly] the whole time</li>
+        <li>act_any->telling the legend of the [AdjectiveLarge] [Animal] to the [PersonJob]</li>
       </rulesStrings>
+      <rulesFiles>
+        <li>hosp_business->Words/Nouns/BusinessTypes</li>
+        <li>hosp_bizname->Names/Business</li>
+        <li>hosp_petname->Names/Animal_Unisex</li>
+        <li>hosp_town->Names/OutlanderTown</li>
+        <li>hosp_curious->Words/Adjectives/Curious</li>
+        <li>hosp_group->Words/Nouns/GroupNames</li>
+      </rulesFiles>
     </rulePack>
   </RulePackDef>
 </Defs>
