@@ -17,10 +17,22 @@ public enum WoundCategory
     Sharp = 4
 }
 
+/// <summary>Kind of disease of a sick patient; picks the activity pool of the backstory text.</summary>
+public enum DiseaseCategory
+{
+    Generic = 0,
+    Respiratory = 1,
+    Insect = 2,
+    Parasite = 3,
+    Mechanites = 4,
+    Infection = 5,
+    Toxic = 6
+}
+
 /// <summary>
-/// Generated backstory of wounded patients ("X suffered severe injuries while petting the hare.").
-/// Text comes from the vanilla grammar engine (RulePackDef Hospital_WoundBackstory). Only a seed and the wound
-/// category are saved; the text is resolved on demand with its own Rand state, so the game RNG is untouched
+/// Generated backstory of wounded and sick patients ("X suffered severe injuries while petting the hare.").
+/// Text comes from the vanilla grammar engine (RulePackDef Hospital_WoundBackstory / Hospital_DiseaseBackstory).
+/// Only a seed, the category and (diseases) the disease defName are saved; the text is resolved on demand with its own Rand state, so the game RNG is untouched
 /// and the text is the same after every load.
 /// </summary>
 public static class BackstoryUtility
@@ -75,9 +87,59 @@ public static class BackstoryUtility
     public static void AssignWoundBackstory(Pawn pawn, PatientData data)
     {
         data.BackstoryWound = Classify(pawn).ToString();
+        data.BackstoryDisease = null;
         int seed = Rand.Int;
         data.BackstorySeed = seed == 0 ? 1 : seed;
         data.ClearBackstoryCache();
+    }
+
+    /// <summary>Pure: disease category of a hediff defName (vanilla names, then substrings for modded diseases). Unknown gives Generic.</summary>
+    public static DiseaseCategory CategoryOfDisease(string defName)
+    {
+        if (defName.NullOrEmpty()) return DiseaseCategory.Generic;
+        switch (defName)
+        {
+            case "Flu":
+            case "Plague":
+            case "LungRot": return DiseaseCategory.Respiratory;
+            case "Malaria":
+            case "SleepingSickness": return DiseaseCategory.Insect;
+            case "GutWorms":
+            case "MuscleParasites": return DiseaseCategory.Parasite;
+            case "FibrousMechanites":
+            case "SensoryMechanites": return DiseaseCategory.Mechanites;
+            case "WoundInfection": return DiseaseCategory.Infection;
+            case "ToxicBuildup": return DiseaseCategory.Toxic;
+        }
+        string lower = defName.ToLowerInvariant();
+        if (lower.Contains("mechanite")) return DiseaseCategory.Mechanites;
+        if (lower.Contains("infection")) return DiseaseCategory.Infection;
+        if (lower.Contains("worm") || lower.Contains("parasite")) return DiseaseCategory.Parasite;
+        if (lower.Contains("malaria") || lower.Contains("sleepingsickness") || lower.Contains("mosquito")) return DiseaseCategory.Insect;
+        if (lower.Contains("lung") || lower.Contains("flu") || lower.Contains("plague") || lower.Contains("pneumon")) return DiseaseCategory.Respiratory;
+        if (lower.Contains("toxic") || lower.Contains("poison")) return DiseaseCategory.Toxic;
+        return DiseaseCategory.Generic;
+    }
+
+    /// <summary>Stores the disease category, keeps the disease defName (set by DiseaseUtility) and stores a new non-zero seed. Call once, right after the arrival disease exists.</summary>
+    public static void AssignDiseaseBackstory(Pawn pawn, PatientData data)
+    {
+        if (data.BackstoryDisease.NullOrEmpty())
+        {
+            AssignWoundBackstory(pawn, data); // no disease recorded: use the wound texts
+            return;
+        }
+        data.BackstoryWound = CategoryOfDisease(data.BackstoryDisease).ToString();
+        int seed = Rand.Int;
+        data.BackstorySeed = seed == 0 ? 1 : seed;
+        data.ClearBackstoryCache();
+    }
+
+    /// <summary>Assigns the wound or disease backstory by the patient's current type (Type is Wounds after a fallback from a disease). Surgery patients get none.</summary>
+    public static void AssignBackstory(Pawn pawn, PatientData data)
+    {
+        if (data.Type == PatientType.Disease) AssignDiseaseBackstory(pawn, data);
+        else if (data.Type == PatientType.Wounds) AssignWoundBackstory(pawn, data);
     }
 
     private const int ActivitySalt = 0;
@@ -106,9 +168,19 @@ public static class BackstoryUtility
         if (pawn == null || data == null || data.BackstorySeed == 0) return false;
         if (data.BackstoryCache == null || data.BackstoryCacheSeed != data.BackstorySeed)
         {
-            var category = ParseCategory(data.BackstoryWound);
-            data.BackstoryCache = Resolve(pawn, data.BackstorySeed, category);
-            data.LeaveCache = ResolveLeave(pawn, data.BackstorySeed, category);
+            if (data.BackstoryDisease.NullOrEmpty())
+            {
+                var category = ParseCategory(data.BackstoryWound);
+                data.BackstoryCache = Resolve(pawn, data.BackstorySeed, category);
+                data.LeaveCache = ResolveLeave(pawn, data.BackstorySeed, category);
+            }
+            else
+            {
+                var category = ParseDiseaseCategory(data.BackstoryWound);
+                var disease = DefDatabase<HediffDef>.GetNamedSilentFail(data.BackstoryDisease); // null (mod removed): fallback label
+                data.BackstoryCache = Resolve(pawn, data.BackstorySeed, category, disease);
+                data.LeaveCache = ResolveLeave(pawn, data.BackstorySeed, category, disease);
+            }
             data.BackstoryCacheSeed = data.BackstorySeed;
         }
         return true;
@@ -119,39 +191,96 @@ public static class BackstoryUtility
         return Enum.TryParse(name, out WoundCategory category) ? category : WoundCategory.Generic;
     }
 
+    public static DiseaseCategory ParseDiseaseCategory(string name)
+    {
+        return Enum.TryParse(name, out DiseaseCategory category) ? category : DiseaseCategory.Generic;
+    }
+
     /// <summary>The activity phrase of a seed (e.g. "petting the hare"); backstory and leave line both use it. "" on error.</summary>
     public static string ResolveActivity(Pawn pawn, int seed, WoundCategory category)
     {
-        return ResolveRoot(pawn, seed ^ ActivitySalt, category, "activity", null, false);
+        return ResolveRoot(pawn, seed ^ ActivitySalt, Wound(category), "activity", null, false);
+    }
+
+    public static string ResolveActivity(Pawn pawn, int seed, DiseaseCategory category, HediffDef disease)
+    {
+        return ResolveRoot(pawn, seed ^ ActivitySalt, Disease(category, disease), "activity", null, false);
     }
 
     /// <summary>Resolves the backstory for a seed and category. Rand state is restored afterwards; any error gives "" (cosmetic only).</summary>
     public static string Resolve(Pawn pawn, int seed, WoundCategory category)
     {
-        string activity = ResolveActivity(pawn, seed, category);
-        if (activity.NullOrEmpty()) return string.Empty;
-        return ResolveRoot(pawn, seed ^ BackstorySalt, category, "r_backstory", activity, true);
+        return ResolveBackstory(pawn, seed, Wound(category));
     }
 
-    /// <summary>Resolves the leave line for a seed and category, with the same activity as <see cref="Resolve"/>.</summary>
+    /// <summary>Disease variant; <paramref name="disease"/> null (unknown def) uses a generic illness label.</summary>
+    public static string Resolve(Pawn pawn, int seed, DiseaseCategory category, HediffDef disease)
+    {
+        return ResolveBackstory(pawn, seed, Disease(category, disease));
+    }
+
+    /// <summary>Resolves the leave line for a seed and category, with the same activity as the backstory.</summary>
     public static string ResolveLeave(Pawn pawn, int seed, WoundCategory category)
     {
-        string activity = ResolveActivity(pawn, seed, category);
+        return ResolveLeaveLine(pawn, seed, Wound(category));
+    }
+
+    public static string ResolveLeave(Pawn pawn, int seed, DiseaseCategory category, HediffDef disease)
+    {
+        return ResolveLeaveLine(pawn, seed, Disease(category, disease));
+    }
+
+    // What a text is about: the rule pack, the category constant and (diseases) the disease def.
+    private struct Subject
+    {
+        public RulePackDef Pack;
+        public string ConstantName;
+        public string Category;
+        public bool IsDisease;
+        public HediffDef Disease;
+    }
+
+    private static Subject Wound(WoundCategory category) => new Subject
+    {
+        Pack = HospitalDefOf.Hospital_WoundBackstory, ConstantName = "WOUND", Category = category.ToString()
+    };
+
+    private static Subject Disease(DiseaseCategory category, HediffDef disease) => new Subject
+    {
+        Pack = HospitalDefOf.Hospital_DiseaseBackstory, ConstantName = "DISEASE_category", Category = category.ToString(),
+        IsDisease = true, Disease = disease
+    };
+
+    private static string ResolveBackstory(Pawn pawn, int seed, Subject subject)
+    {
+        string activity = ResolveRoot(pawn, seed ^ ActivitySalt, subject, "activity", null, false);
         if (activity.NullOrEmpty()) return string.Empty;
-        return ResolveRoot(pawn, seed ^ LeaveSalt, category, "r_leave", activity, true);
+        return ResolveRoot(pawn, seed ^ BackstorySalt, subject, "r_backstory", activity, true);
+    }
+
+    private static string ResolveLeaveLine(Pawn pawn, int seed, Subject subject)
+    {
+        string activity = ResolveRoot(pawn, seed ^ ActivitySalt, subject, "activity", null, false);
+        if (activity.NullOrEmpty()) return string.Empty;
+        return ResolveRoot(pawn, seed ^ LeaveSalt, subject, "r_leave", activity, true);
     }
 
     // fixedActivity: injected as a high priority rule, so the pack's own activity rules are ignored.
-    private static string ResolveRoot(Pawn pawn, int seed, WoundCategory category, string root, string fixedActivity, bool capitalize)
+    private static string ResolveRoot(Pawn pawn, int seed, Subject subject, string root, string fixedActivity, bool capitalize)
     {
-        if (HospitalDefOf.Hospital_WoundBackstory == null) return string.Empty;
+        if (subject.Pack == null) return string.Empty;
         Rand.PushState(seed);
         try
         {
             var request = default(GrammarRequest);
-            request.Includes.Add(HospitalDefOf.Hospital_WoundBackstory);
+            request.Includes.Add(subject.Pack);
             request.Rules.AddRange(GrammarUtility.RulesForPawn("PATIENT", pawn, request.Constants));
-            request.Constants["WOUND"] = category.ToString();
+            request.Constants[subject.ConstantName] = subject.Category;
+            if (subject.IsDisease)
+            {
+                if (subject.Disease != null) request.Rules.AddRange(GrammarUtility.RulesForDef("DISEASE", subject.Disease));
+                else request.Rules.Add(new Rule_String("DISEASE_label", "a mysterious illness"));
+            }
             if (fixedActivity != null) request.Rules.Add(new Rule_String("activity(priority=10)->" + fixedActivity));
             return GrammarResolver.Resolve(root, request, "Hospital patient backstory", capitalizeFirstSentence: capitalize) ?? string.Empty;
         }

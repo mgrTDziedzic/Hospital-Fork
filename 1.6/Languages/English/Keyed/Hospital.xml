@@ -84,7 +84,7 @@
     <ShowMessageAtArrival>Show message instead of letter</ShowMessageAtArrival>
     <ShowMessageAtArrivalTooltip>When enabled, a new patient's arrival is shown as a message instead of a letter.\n\nDefault: Disabled</ShowMessageAtArrivalTooltip>
     <ShowPatientBackstories>Show patient backstories</ShowPatientBackstories>
-    <ShowPatientBackstoriesTooltip>When enabled, the generated backstory of wounded patients is shown in the arrival letter and in tooltips (Diagnosis column of the Hospital tab, patient chip in the Bio tab).\n\nDefault: Enabled</ShowPatientBackstoriesTooltip>
+    <ShowPatientBackstoriesTooltip>When enabled, the generated backstory of wounded and sick patients is shown in the arrival letter and in tooltips (Diagnosis column of the Hospital tab, patient chip in the Bio tab).\n\nDefault: Enabled</ShowPatientBackstoriesTooltip>
     <PreventIncapacitatedArrivals>Prevent incapacitated arrivals</PreventIncapacitatedArrivals>
     <PreventIncapacitatedArrivalsTooltip>When enabled, arriving patients are wounded only up to the point of collapse, so they can still walk. Disable it for harder mass casualty events with downed patients you must rescue.\n\nDefault: Enabled</PreventIncapacitatedArrivalsTooltip>
     <EnableLandingSpotVariants>Show patient landing pads</EnableLandingSpotVariants>

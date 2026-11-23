@@ -45,9 +45,12 @@ public class PatientData : IExposable
     // Tick the hospital last finished administering each drug (saved); drives the drug policy frequency.
     public Dictionary<ThingDef, int> LastDrugTick = new Dictionary<ThingDef, int>();
 
-    // Generated backstory (see Utilities/BackstoryUtility.cs). Seed 0 = none (old saves, non-wound patients).
+    // Generated backstory (see Utilities/BackstoryUtility.cs). Seed 0 = none (old saves, surgery patients).
     public int BackstorySeed;
+    // Category name: a WoundCategory, or a DiseaseCategory when BackstoryDisease is set (field name kept for old saves).
     public string BackstoryWound;
+    // Defname of the disease hediff of a disease patient's backstory; null = wound backstory (saved).
+    public string BackstoryDisease;
     // Not saved: resolved text for BackstoryCacheSeed.
     public string BackstoryCache;
     public string LeaveCache;
@@ -74,6 +77,7 @@ public class PatientData : IExposable
         Scribe_Values.Look(ref Sedated, "Sedated");
         Scribe_Values.Look(ref BackstorySeed, "BackstorySeed");
         Scribe_Values.Look(ref BackstoryWound, "BackstoryWound");
+        Scribe_Values.Look(ref BackstoryDisease, "BackstoryDisease");
         Scribe_Values.Look(ref TrackedHediffSeverity, "TrackedHediffSeverity", -1f);
         Scribe_Defs.Look(ref CureRecipe, "CureRecipe");
         Scribe_Collections.Look(ref LastDrugTick, "LastDrugTick", LookMode.Def, LookMode.Value);

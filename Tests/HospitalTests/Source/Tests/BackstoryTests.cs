@@ -9,7 +9,7 @@ using Verse;
 
 namespace HospitalTests
 {
-    // Generated wound backstories (BackstoryUtility, RulePackDef Hospital_WoundBackstory).
+    // Generated wound and disease backstories (BackstoryUtility, RulePackDefs Hospital_WoundBackstory / Hospital_DiseaseBackstory).
     public static class BackstoryTests
     {
         private static HediffDef Def(string defName)
@@ -108,9 +108,9 @@ namespace HospitalTests
 
         // Given: the hospital is open with a free bed; wounds, disease and surgery arrivals are forced one by one.
         // When:  PatientArrives fires.
-        // Then:  a Wounds patient has BackstorySeed != 0, a known category and a non-empty text; Disease and Surgery patients have seed 0.
-        [HospitalTest("Story5: arrival smoke - Wounds patients get a backstory seed, Disease and Surgery patients do not")]
-        public static void ArrivalAssignsOnlyForWounds(TestContext ctx)
+        // Then:  Wounds and Disease patients get a backstory seed, a known category and a non-empty text (a disease patient also its disease defName, a wounds patient none); Surgery patients have seed 0.
+        [HospitalTest("Story5: arrival smoke - Wounds and Disease patients get a backstory seed, Surgery patients do not")]
+        public static void ArrivalAssignsForWoundsAndDisease(TestContext ctx)
         {
             SetShow(ctx, true);
             var wounds = ArrivalTests.FireArrival(ctx, out _, new PatientSpec { Type = PatientType.Wounds, IgnoreRestrictions = true });
@@ -120,11 +120,27 @@ namespace HospitalTests
                 Assert.True(pair.Value.Type == PatientType.Wounds, "forced Wounds gave " + pair.Value.Type);
                 Assert.True(pair.Value.BackstorySeed != 0, "Wounds patient without backstory seed");
                 Assert.True(Enum.TryParse(pair.Value.BackstoryWound, out WoundCategory _), "unknown category " + pair.Value.BackstoryWound);
+                Assert.True(string.IsNullOrEmpty(pair.Value.BackstoryDisease), "Wounds patient with a disease defName");
                 Assert.False(string.IsNullOrEmpty(BackstoryUtility.GetBackstory(pair.Key, pair.Value)), "empty backstory text");
             }
             var disease = ArrivalTests.FireArrival(ctx, out _, new PatientSpec { Type = PatientType.Disease, IgnoreRestrictions = true });
-            foreach (var pair in disease.Where(p => p.Value.Type == PatientType.Disease))
-                Assert.Equal(0, pair.Value.BackstorySeed, "Disease patient backstory seed");
+            Assert.True(disease.Count >= 1, "no disease patient arrived");
+            foreach (var pair in disease)
+            {
+                // A disease that could not be applied falls back to wounds (Type Wounds): then the wound backstory applies.
+                Assert.True(pair.Value.BackstorySeed != 0, "Disease/fallback patient without backstory seed");
+                Assert.False(string.IsNullOrEmpty(BackstoryUtility.GetBackstory(pair.Key, pair.Value)), "empty backstory text");
+                if (pair.Value.Type == PatientType.Disease)
+                {
+                    Assert.False(string.IsNullOrEmpty(pair.Value.BackstoryDisease), "Disease patient without disease defName");
+                    Assert.True(Enum.TryParse(pair.Value.BackstoryWound, out DiseaseCategory _), "unknown disease category " + pair.Value.BackstoryWound);
+                }
+                else
+                {
+                    Assert.True(string.IsNullOrEmpty(pair.Value.BackstoryDisease), "fallback wounds patient with a disease defName");
+                    Assert.True(Enum.TryParse(pair.Value.BackstoryWound, out WoundCategory _), "unknown wound category " + pair.Value.BackstoryWound);
+                }
+            }
             var surgery = ArrivalTests.FireArrival(ctx, out _, new PatientSpec { Type = PatientType.Surgery, IgnoreRestrictions = true });
             foreach (var pair in surgery.Where(p => p.Value.Type == PatientType.Surgery))
                 Assert.Equal(0, pair.Value.BackstorySeed, "Surgery patient backstory seed");
@@ -220,6 +236,149 @@ namespace HospitalTests
             Assert.Equal(string.Empty, BackstoryUtility.GetLeaveLine(pawn, new PatientData { Type = PatientType.Wounds }), "seed 0");
             HospitalMod.Settings.ShowPatientBackstories = false;
             Assert.Equal(string.Empty, BackstoryUtility.GetLeaveLine(pawn, data), "setting off");
+        }
+
+        // Given: disease defNames (vanilla, modded-style names, unknown, null).
+        // When:  BackstoryUtility.CategoryOfDisease runs on them.
+        // Then:  vanilla diseases map to Respiratory / Insect / Parasite / Mechanites / Infection / Toxic, name fragments catch modded names, anything else gives Generic.
+        [HospitalTest("Story13: CategoryOfDisease maps vanilla defNames and name fragments, Generic otherwise")]
+        public static void DiseaseClassifyPure(TestContext ctx)
+        {
+            Assert.Equal(DiseaseCategory.Respiratory, BackstoryUtility.CategoryOfDisease("Flu"), "Flu");
+            Assert.Equal(DiseaseCategory.Respiratory, BackstoryUtility.CategoryOfDisease("Plague"), "Plague");
+            Assert.Equal(DiseaseCategory.Respiratory, BackstoryUtility.CategoryOfDisease("LungRot"), "LungRot");
+            Assert.Equal(DiseaseCategory.Insect, BackstoryUtility.CategoryOfDisease("Malaria"), "Malaria");
+            Assert.Equal(DiseaseCategory.Insect, BackstoryUtility.CategoryOfDisease("SleepingSickness"), "SleepingSickness");
+            Assert.Equal(DiseaseCategory.Parasite, BackstoryUtility.CategoryOfDisease("GutWorms"), "GutWorms");
+            Assert.Equal(DiseaseCategory.Parasite, BackstoryUtility.CategoryOfDisease("MuscleParasites"), "MuscleParasites");
+            Assert.Equal(DiseaseCategory.Mechanites, BackstoryUtility.CategoryOfDisease("FibrousMechanites"), "FibrousMechanites");
+            Assert.Equal(DiseaseCategory.Mechanites, BackstoryUtility.CategoryOfDisease("SomeMod_SensoryMechanites2"), "mechanite fragment");
+            Assert.Equal(DiseaseCategory.Infection, BackstoryUtility.CategoryOfDisease("WoundInfection"), "WoundInfection");
+            Assert.Equal(DiseaseCategory.Infection, BackstoryUtility.CategoryOfDisease("ModdedInfectionX"), "infection fragment");
+            Assert.Equal(DiseaseCategory.Toxic, BackstoryUtility.CategoryOfDisease("ToxicBuildup"), "ToxicBuildup");
+            Assert.Equal(DiseaseCategory.Respiratory, BackstoryUtility.CategoryOfDisease("SuperFlu"), "flu fragment");
+            Assert.Equal(DiseaseCategory.Generic, BackstoryUtility.CategoryOfDisease("SomethingElse"), "unknown");
+            Assert.Equal(DiseaseCategory.Generic, BackstoryUtility.CategoryOfDisease(null), "null");
+            Assert.Equal(DiseaseCategory.Generic, BackstoryUtility.CategoryOfDisease(""), "empty");
+        }
+
+        // The defs used with every category in the text tests: a real vanilla disease, and null (unknown def).
+        private static IEnumerable<HediffDef> DiseaseDefsForText()
+        {
+            yield return Def("Flu");
+            yield return null;
+        }
+
+        // Given: a test pawn, each disease category, 300 seeds per category, with a real disease def and with no def.
+        // When:  the disease backstory text is resolved.
+        // Then:  it is non-empty, has no ERR / CANNOT_RESOLVE marker or unresolved symbol, contains the pawn's short name and the disease label (or the fallback label without a def).
+        [HospitalTest("Story14: every disease category x 300 seeds gives a non-empty text with the pawn's name, the disease label and no grammar error")]
+        public static void DiseaseTextsAreValid(TestContext ctx)
+        {
+            var pawn = TestPawn(ctx);
+            string name = pawn.Name.ToStringShort;
+            foreach (var disease in DiseaseDefsForText())
+            {
+                string label = disease != null ? disease.label : "a mysterious illness";
+                foreach (DiseaseCategory category in Enum.GetValues(typeof(DiseaseCategory)))
+                {
+                    for (int i = 1; i <= 300; i++)
+                    {
+                        int seed = i * 7919;
+                        string text = BackstoryUtility.Resolve(pawn, seed, category, disease);
+                        string where = category + " " + (disease?.defName ?? "no def") + " seed " + seed + ": \"" + text + "\"";
+                        Assert.False(string.IsNullOrWhiteSpace(text), "empty text, " + where);
+                        Assert.False(text.Contains("ERR") || text.Contains("CANNOT_RESOLVE"), "grammar error marker, " + where);
+                        Assert.False(text.Contains("[") || text.Contains("]"), "unresolved symbol, " + where);
+                        Assert.True(text.Contains(name), "pawn name missing, " + where);
+                        Assert.True(text.Contains(label), "disease label missing, " + where);
+                    }
+                }
+            }
+        }
+
+        // Given: a test pawn, each disease category, 300 seeds per category, with a real disease def and with no def.
+        // When:  the activity, the backstory and the leave line are resolved for the same seed.
+        // Then:  the activity text is contained in both the backstory and the leave line, and the leave line has the pawn's name and no error marker or unresolved symbol.
+        [HospitalTest("Story15: disease backstory and leave line of one seed use the same activity")]
+        public static void DiseaseLeaveLineSharesActivity(TestContext ctx)
+        {
+            var pawn = TestPawn(ctx);
+            string name = pawn.Name.ToStringShort;
+            foreach (var disease in DiseaseDefsForText())
+            {
+                foreach (DiseaseCategory category in Enum.GetValues(typeof(DiseaseCategory)))
+                {
+                    for (int i = 1; i <= 300; i++)
+                    {
+                        int seed = i * 104729;
+                        string activity = BackstoryUtility.ResolveActivity(pawn, seed, category, disease);
+                        string story = BackstoryUtility.Resolve(pawn, seed, category, disease);
+                        string leave = BackstoryUtility.ResolveLeave(pawn, seed, category, disease);
+                        string where = category + " " + (disease?.defName ?? "no def") + " seed " + seed + ": activity \"" + activity + "\", story \"" + story + "\", leave \"" + leave + "\"";
+                        Assert.False(string.IsNullOrWhiteSpace(activity), "empty activity, " + where);
+                        Assert.True(story.Contains(activity), "backstory lacks the activity, " + where);
+                        Assert.True(leave.Contains(activity), "leave line lacks the activity, " + where);
+                        Assert.True(leave.Contains(name), "leave line lacks the pawn name, " + where);
+                        Assert.False(leave.Contains("ERR") || leave.Contains("CANNOT_RESOLVE") || leave.Contains("[") || leave.Contains("]"), "grammar error, " + where);
+                    }
+                }
+            }
+        }
+
+        // Given: a PatientData with a disease backstory (seed, category, disease defName), one whose disease def does not exist (mod removed), and a wound PatientData.
+        // When:  they are saved with the Scribe and loaded back, and GetBackstory / GetLeaveLine are called.
+        // Then:  seed, category and defName survive and give the same text; the unknown def gives a non-empty text with the fallback label and no unresolved symbol; the wound data keeps loading as before with no disease defName.
+        [HospitalTest("Story16: disease backstory survives save/load; a missing disease def falls back to a generic label; wound data is unchanged")]
+        public static void DiseaseRoundTrip(TestContext ctx)
+        {
+            SetShow(ctx, true);
+            var pawn = TestPawn(ctx);
+            var data = new PatientData { Type = PatientType.Disease, BackstorySeed = 515151, BackstoryWound = DiseaseCategory.Respiratory.ToString(), BackstoryDisease = "Flu" };
+            var loaded = SaveAndLoad(data);
+            Assert.Equal(515151, loaded.BackstorySeed, "seed");
+            Assert.Equal(DiseaseCategory.Respiratory.ToString(), loaded.BackstoryWound, "disease category");
+            Assert.Equal("Flu", loaded.BackstoryDisease, "disease defName");
+            string text = BackstoryUtility.GetBackstory(pawn, loaded);
+            Assert.False(string.IsNullOrEmpty(text), "empty text after load");
+            Assert.Equal(BackstoryUtility.GetBackstory(pawn, data), text, "text after load");
+            Assert.True(text.Contains(Def("Flu").label), "disease label missing: " + text);
+            Assert.False(string.IsNullOrEmpty(BackstoryUtility.GetLeaveLine(pawn, loaded)), "empty leave line after load");
+
+            var missing = SaveAndLoad(new PatientData { Type = PatientType.Disease, BackstorySeed = 616161, BackstoryWound = DiseaseCategory.Insect.ToString(), BackstoryDisease = "Hospital_NoSuchDisease" });
+            string missingText = BackstoryUtility.GetBackstory(pawn, missing);
+            Assert.False(string.IsNullOrEmpty(missingText), "empty text for a missing def");
+            Assert.True(missingText.Contains("a mysterious illness"), "fallback label missing: " + missingText);
+            Assert.False(missingText.Contains("[") || missingText.Contains("]") || missingText.Contains("ERR"), "grammar error: " + missingText);
+            Assert.False(string.IsNullOrEmpty(BackstoryUtility.GetLeaveLine(pawn, missing)), "empty leave line for a missing def");
+
+            var wound = SaveAndLoad(new PatientData { Type = PatientType.Wounds, BackstorySeed = 424242, BackstoryWound = WoundCategory.Burn.ToString() });
+            Assert.True(string.IsNullOrEmpty(wound.BackstoryDisease), "wound data with a disease defName");
+            Assert.Equal(BackstoryUtility.Resolve(pawn, 424242, WoundCategory.Burn), BackstoryUtility.GetBackstory(pawn, wound), "wound text unchanged");
+        }
+
+        // Given: a patient whose disease could not be applied (Type already Wounds), a Disease patient with a defName and a Surgery patient.
+        // When:  BackstoryUtility.AssignBackstory runs on each.
+        // Then:  the fallback patient gets a wound category and no disease defName; the disease patient keeps its defName and gets a disease category; the surgery patient gets nothing.
+        [HospitalTest("Story17: AssignBackstory picks wound or disease texts by the final patient type, none for surgery")]
+        public static void AssignByType(TestContext ctx)
+        {
+            var pawn = TestPawn(ctx);
+            var fallback = new PatientData { Type = PatientType.Wounds, BackstoryDisease = null };
+            BackstoryUtility.AssignBackstory(pawn, fallback);
+            Assert.True(fallback.BackstorySeed != 0, "fallback seed");
+            Assert.True(Enum.TryParse(fallback.BackstoryWound, out WoundCategory _), "fallback category " + fallback.BackstoryWound);
+            Assert.True(string.IsNullOrEmpty(fallback.BackstoryDisease), "fallback disease defName");
+
+            var sick = new PatientData { Type = PatientType.Disease, BackstoryDisease = "Malaria" };
+            BackstoryUtility.AssignBackstory(pawn, sick);
+            Assert.True(sick.BackstorySeed != 0, "disease seed");
+            Assert.Equal(DiseaseCategory.Insect.ToString(), sick.BackstoryWound, "disease category");
+            Assert.Equal("Malaria", sick.BackstoryDisease, "disease defName kept");
+
+            var surgery = new PatientData { Type = PatientType.Surgery };
+            BackstoryUtility.AssignBackstory(pawn, surgery);
+            Assert.Equal(0, surgery.BackstorySeed, "surgery seed");
         }
 
         private static PatientData SaveAndLoad(PatientData data)

@@ -98,6 +98,20 @@ namespace HospitalTests
                         sb.AppendLine("    " + BackstoryUtility.ResolveLeave(pawn, seed, category));
                     }
                 }
+                foreach (DiseaseCategory category in Enum.GetValues(typeof(DiseaseCategory)))
+                {
+                    sb.AppendLine();
+                    string defName = category == DiseaseCategory.Insect ? "Malaria" : category == DiseaseCategory.Parasite ? "GutWorms"
+                        : category == DiseaseCategory.Infection ? "WoundInfection" : category == DiseaseCategory.Toxic ? "ToxicBuildup" : "Flu";
+                    var flu = DefDatabase<HediffDef>.GetNamedSilentFail(defName);
+                    sb.AppendLine("== Disease " + category + " (" + defName + ")");
+                    for (int i = 0; i < 20; i++)
+                    {
+                        int seed = Rand.Int;
+                        sb.AppendLine(BackstoryUtility.Resolve(pawn, seed, category, flu));
+                        sb.AppendLine("    " + BackstoryUtility.ResolveLeave(pawn, seed, category, flu));
+                    }
+                }
                 string text = sb.ToString();
                 Log.Message(System.Text.RegularExpressions.Regex.Replace(text, "<[^>]+>", ""));
                 Find.WindowStack.Add(new Window_TextSample("Backstory sample", text));

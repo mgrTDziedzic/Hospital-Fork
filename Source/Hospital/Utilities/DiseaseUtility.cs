@@ -144,6 +144,7 @@ public class DiseaseUtility
 
         patientData.Bill = 10;//Medicine.GetMedicineCountToFullyHeal(pawn) * ((int)pawn.playerSettings.medCare * 15.0f) * 2;
         patientData.Diagnosis = hediff.Label;
+        patientData.BackstoryDisease = hediff.def.defName; // for the generated backstory
         patientData.Cure = "CureDisease".Translate();
         return false;
     }
@@ -166,6 +167,7 @@ public class DiseaseUtility
                 {
                     patientData.Bill = 10;//Medicine.GetMedicineCountToFullyHeal(pawn) * ((int)pawn.playerSettings.medCare * 15.0f) * 2;
                     patientData.Diagnosis = hediff.Label;
+                    patientData.BackstoryDisease = hediff.def.defName; // for the generated backstory
                     patientData.Cure = "CureDisease".Translate();
                     return false;
                 }

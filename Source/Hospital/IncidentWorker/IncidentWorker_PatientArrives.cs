@@ -92,9 +92,9 @@ namespace Hospital
             {
                 text += "\n\n" + "PatientSedatedWarning".Translate(HospitalMod.Settings.SedationHours.ToString("0.#"));
             }
-            if (patient.Type == PatientType.Wounds)
+            if (patient.Type == PatientType.Wounds || patient.Type == PatientType.Disease)
             {
-                BackstoryUtility.AssignWoundBackstory(pawn, patient);
+                BackstoryUtility.AssignBackstory(pawn, patient); // wound or disease texts by type
                 string backstory = BackstoryUtility.GetBackstory(pawn, patient);
                 if (!backstory.NullOrEmpty()) text += "\n\n" + backstory;
             }

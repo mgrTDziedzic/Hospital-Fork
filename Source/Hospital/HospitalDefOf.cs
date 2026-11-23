@@ -11,6 +11,7 @@ public static class HospitalDefOf
 
     // Generated wound backstory grammar (see Utilities/BackstoryUtility.cs).
     public static RulePackDef Hospital_WoundBackstory;
+    public static RulePackDef Hospital_DiseaseBackstory;
 
     static HospitalDefOf()
     {

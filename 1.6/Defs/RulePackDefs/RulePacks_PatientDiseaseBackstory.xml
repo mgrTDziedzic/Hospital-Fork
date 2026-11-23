@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <!-- Generated backstory of a patient with a disease (see Utilities/BackstoryUtility.cs). Counterpart of Hospital_WoundBackstory.
+       Roots: r_backstory (arrival text), r_leave (leave message, every line must contain [activity]) and activity.
+       Constant DISEASE_category = Generic / Respiratory / Insect / Parasite / Mechanites / Infection / Toxic picks the
+       activity pool; act_any applies to all.
+       [DISEASE_label] is the label of the patient's disease hediff (vanilla GrammarUtility.RulesForDef, so modded
+       diseases are named automatically); without a known def the code injects a fallback label. Use the label without
+       an article ("caught [DISEASE_label]"): labels such as "flu" or "gut worms" do not fit "a ...".
+       The resolved activity is injected into r_backstory and r_leave, so it must stay a standalone gerund phrase
+       that fits after "while", "after", "since", "by", "doing things like" and "memory of".
+       Pawn symbols use the PATIENT_ prefix. Faction and title lines use the constants PATIENT_faction (defName),
+       PATIENT_royalInCurrentFaction and PATIENT_factionLeader; a missing constant never matches.
+       Own word files use the hosp_ prefix (same as the wound pack); other symbols come from vanilla GlobalUtility.
+       Articles: only "the" (or a fixed adjective) in front of word symbols, because word-file entries may start with
+       a vowel. No plurals by appending "s". The AnimalGroups entries all start with a consonant, so "a [AnimalGroup]" is safe. -->
+  <RulePackDef>
+    <defName>Hospital_DiseaseBackstory</defName>
+    <rulePack>
+      <rulesStrings>
+        <li>r_backstory(p=3)->[PATIENT_nameDef] caught [DISEASE_label] while [activity].</li>
+        <li>r_backstory(p=2)->[PATIENT_nameDef] came down with [DISEASE_label] after [activity].</li>
+        <li>r_backstory(p=2)->While [activity], [PATIENT_nameDef] caught [DISEASE_label].</li>
+        <li>r_backstory->[PATIENT_nameDef] has had [DISEASE_label] since [activity], and [hosp_sick].</li>
+
+        <!-- Cause chains -->
+        <li>r_backstory(p=2)->[PATIENT_nameDef] was [activity] when [hosp_twist], and soon had [DISEASE_label].</li>
+        <li>r_backstory->[PATIENT_nameDef] was [activity] when [hosp_twist]. [PATIENT_nameDef] caught [DISEASE_label] soon afterwards.</li>
+        <!-- Third parties, bets and blame -->
+        <li>r_backstory->[PATIENT_nameDef] caught [DISEASE_label] while [activity] on a bet with the [PersonJob].</li>
+        <li>r_backstory->[PATIENT_nameDef] came down with [DISEASE_label] while [activity] to impress [PATIENT_possessive] [PersonAlly].</li>
+        <li>r_backstory->[PATIENT_nameDef] caught [DISEASE_label] while [activity] and still blames the [Animal].</li>
+        <li>r_backstory->[PATIENT_nameDef] caught [DISEASE_label] while [activity] and blames [PATIENT_possessive] [PersonFamily] for the whole thing.</li>
+        <li>r_backstory->While [activity], [PATIENT_nameDef] caught [DISEASE_label], watched by the [AdjectiveFriendly] [PersonJob].</li>
+        <li>r_backstory->[PATIENT_nameDef] caught [DISEASE_label] while [activity] out of [hosp_curious] curiosity.</li>
+        <li>r_backstory->[PATIENT_nameDef] ignored every warning from the [PersonJob], kept [activity] and caught [DISEASE_label].</li>
+
+        <!-- Faction and title lines (only for matching patients) -->
+        <li>r_backstory(PATIENT_faction==TribeCivil,p=2)->[hosp_story_tribe]</li>
+        <li>r_backstory(PATIENT_faction==TribeRough,p=2)->[hosp_story_tribe]</li>
+        <li>r_backstory(PATIENT_faction==TribeSavage,p=2)->[hosp_story_tribe]</li>
+        <li>r_backstory(PATIENT_faction==OutlanderCivil,p=2)->[hosp_story_outlander]</li>
+        <li>r_backstory(PATIENT_faction==OutlanderRough,p=2)->[hosp_story_outlander]</li>
+        <li>r_backstory(PATIENT_faction==Pirate,p=2)->[hosp_story_pirate]</li>
+        <li>r_backstory(PATIENT_royalInCurrentFaction==True,p=4)->[PATIENT_nameDef], [PATIENT_royalTitleInCurrentFactionIndef] of [PATIENT_factionName], caught [DISEASE_label] while [activity]. No court etiquette covers this.</li>
+        <li>r_backstory(PATIENT_factionLeader==True,p=3)->[PATIENT_nameDef], leader of [PATIENT_factionName], caught [DISEASE_label] while [activity] and left the paperwork to [PATIENT_possessive] [PersonFamily].</li>
+
+        <li>hosp_story_tribe->[PATIENT_nameDef] of [PATIENT_factionName] caught [DISEASE_label] while [activity], and the elders are still debating whether it was a curse.</li>
+        <li>hosp_story_tribe->[PATIENT_nameDef] of [PATIENT_factionName] came down with [DISEASE_label] after [activity] and now owes the tribe a good story.</li>
+        <li>hosp_story_outlander->[PATIENT_nameDef] of [PATIENT_factionName] caught [DISEASE_label] while [activity], and has been filling in forms about it ever since.</li>
+        <li>hosp_story_outlander->[PATIENT_nameDef] of [PATIENT_factionName] came down with [DISEASE_label] after [activity] during a lunch break.</li>
+        <li>hosp_story_pirate->[PATIENT_nameDef], a proud member of [PATIENT_factionName], caught [DISEASE_label] while [activity] and blames a bad map.</li>
+        <li>hosp_story_pirate->[PATIENT_nameDef] of [PATIENT_factionName] was [activity] on a day off, and [PATIENT_pronoun] came down with [DISEASE_label].</li>
+
+        <li>hosp_sick->has been complaining about it loudly ever since</li>
+        <li>hosp_sick->has been blaming the weather ever since</li>
+        <li>hosp_sick->wants everyone to know how brave [PATIENT_pronoun] is about it</li>
+        <li>hosp_sick->has not stopped talking about it</li>
+        <li>hosp_sick->the whole camp has heard about it</li>
+
+        <li>hosp_twist->the [AdjectiveLarge] [Animal] sneezed in [PATIENT_possessive] face</li>
+        <li>hosp_twist->a stranger from [hosp_town] coughed on [PATIENT_objective]</li>
+        <li>hosp_twist->the [Animal] named [hosp_petname] licked [PATIENT_possessive] face</li>
+        <li>hosp_twist->the [PersonJob] offered [PATIENT_objective] a spoonful of something suspicious</li>
+        <li>hosp_twist->[PATIENT_possessive] [PersonFamily] decided that washing was overrated</li>
+        <li>hosp_twist->the [Mechanoid] woke up and sneezed</li>
+        <li>hosp_twist->the [Enemy] asked a very awkward question about [TalkTopicLight]</li>
+        <li>hosp_twist->the [AdjectiveAngsty] [PersonJob] began a lecture about [ConceptAngsty]</li>
+        <li>hosp_twist->the [NaturalObject] turned out to be home to a lot of uninvited guests</li>
+        <li>hosp_twist->a [AnimalGroup] of animals walked past</li>
+        <li>hosp_twist->the [PersonBadass] shared a drink from the same cup</li>
+        <li>hosp_twist->the [TerrainFeature] turned out to be a bad place for a picnic</li>
+
+        <li>r_leave->[PATIENT_nameDef] went home, swearing never to do things like [activity] again.</li>
+        <li>r_leave->[PATIENT_nameDef] went home, vowing to stay far away from [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, still sniffling at the memory of [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, swearing to give up [activity] for good.</li>
+        <li>r_leave->[PATIENT_nameDef] went home with a new respect for the dangers of [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, thinking twice before ever going back to [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home and told everyone the [DISEASE_label] came from the [AdjectiveLarge] [Animal], not from [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, still insisting that [activity] had nothing to do with [DISEASE_label].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, thanking the doctors and the [PersonAlly] who kept everyone else away after [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, already telling the [PersonJob] an embellished tale of [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home with a clean bill of health and a long list of excuses about [activity].</li>
+        <li>r_leave->[PATIENT_nameDef] went home, now an expert on [DISEASE_label] and on the dangers of [activity].</li>
+        <li>r_leave(PATIENT_faction==TribeCivil,p=2)->[hosp_leave_tribe]</li>
+        <li>r_leave(PATIENT_faction==TribeRough,p=2)->[hosp_leave_tribe]</li>
+        <li>r_leave(PATIENT_faction==TribeSavage,p=2)->[hosp_leave_tribe]</li>
+        <li>r_leave(PATIENT_faction==OutlanderCivil,p=2)->[hosp_leave_outlander]</li>
+        <li>r_leave(PATIENT_faction==OutlanderRough,p=2)->[hosp_leave_outlander]</li>
+        <li>r_leave(PATIENT_faction==Pirate,p=2)->[PATIENT_nameDef] went back to [PATIENT_factionName], still blaming a bad map for [activity].</li>
+        <li>r_leave(PATIENT_royalInCurrentFaction==True,p=4)->[PATIENT_nameDef] went home and told the court that [activity] had been an official duty.</li>
+        <li>hosp_leave_tribe->[PATIENT_nameDef] went home to [PATIENT_factionName], where the elders will hear a heavily edited version of [activity].</li>
+        <li>hosp_leave_outlander->[PATIENT_nameDef] went home to [PATIENT_factionName] with a list of medicines and a long story about [activity].</li>
+
+        <li>activity(DISEASE_category==Respiratory,p=3)->[act_resp]</li>
+        <li>activity(DISEASE_category==Insect,p=3)->[act_insect]</li>
+        <li>activity(DISEASE_category==Parasite,p=3)->[act_parasite]</li>
+        <li>activity(DISEASE_category==Mechanites,p=3)->[act_mech]</li>
+        <li>activity(DISEASE_category==Infection,p=3)->[act_infection]</li>
+        <li>activity(DISEASE_category==Toxic,p=3)->[act_toxic]</li>
+        <li>activity->[act_any]</li>
+
+        <li>act_resp->sharing a spoon with the [PersonJob]</li>
+        <li>act_resp->kissing the [Animal] goodbye</li>
+        <li>act_resp->sleeping outside in the rain</li>
+        <li>act_resp->dancing barefoot in the snow</li>
+        <li>act_resp->hugging the coughing [PersonJob]</li>
+        <li>act_resp->singing duets with the [PersonJob] in a freezing barn</li>
+        <li>act_resp->shouting about [TalkTopicLight] across the [TerrainFeature]</li>
+        <li>act_resp->attending a very crowded wedding</li>
+        <li>act_resp->arguing about [TalkTopicLight] in a crowded caravan</li>
+        <li>act_resp->standing in a draft for the sake of [ConceptPositive]</li>
+        <li>act_resp->napping in a damp cave</li>
+        <li>act_resp->breathing in the dust of the [Community] hall</li>
+        <li>act_resp->telling [PATIENT_possessive] [PersonFamily] to stop coughing</li>
+        <li>act_resp->wearing a wet [Apparel] for three days</li>
+        <li>act_resp->swimming in the lake in midwinter</li>
+
+        <li>act_insect->napping next to the swamp</li>
+        <li>act_insect->counting mosquitoes at dusk</li>
+        <li>act_insect->sleeping outdoors without a net</li>
+        <li>act_insect->arguing with a swarm of insects about [TalkTopicLight]</li>
+        <li>act_insect->waving at the [Animal] by a stagnant pond</li>
+        <li>act_insect->writing poetry about [ConceptPositive] beside a swamp</li>
+        <li>act_insect->hiding from the [Enemy] in the jungle</li>
+        <li>act_insect->swatting at the [AdjectiveLarge] insect</li>
+        <li>act_insect->picnicking near the [TerrainFeature] at sunset</li>
+        <li>act_insect->letting the [Animal] sleep in the tent</li>
+        <li>act_insect->painting the [Color] tent in a marsh</li>
+        <li>act_insect->taking a photograph of the swamp for [PATIENT_possessive] [PersonFamily]</li>
+
+        <li>act_parasite->tasting the [Color] mushroom</li>
+        <li>act_parasite->eating undercooked [Animal] meat</li>
+        <li>act_parasite->drinking from a puddle on a dare</li>
+        <li>act_parasite->tasting [Vegetable] stew that sat out for a week</li>
+        <li>act_parasite->licking the [NaturalObject] to see what it tastes like</li>
+        <li>act_parasite->eating raw [Vegetable] on a bet with the [PersonJob]</li>
+        <li>act_parasite->kissing the [Animal]</li>
+        <li>act_parasite->drinking from the stream below the [TerrainFeature]</li>
+        <li>act_parasite->washing every dish with the same rag for a month</li>
+        <li>act_parasite->sharing a spoon with the [Animal]</li>
+        <li>act_parasite->snacking on the [Color] berries</li>
+        <li>act_parasite->cooking [Vegetable] soup without washing the [Vegetable]</li>
+
+        <li>act_mech->tinkering with a broken [Mechanoid]</li>
+        <li>act_mech->licking a rusty bolt on a dare</li>
+        <li>act_mech->poking a dead [Mechanoid] with a stick</li>
+        <li>act_mech->opening a sealed crate from [hosp_bizname] [hosp_business]</li>
+        <li>act_mech->scavenging scrap from a derelict ship</li>
+        <li>act_mech->sorting spare parts in a dusty bunker</li>
+        <li>act_mech->trying on the [Apparel] found in an ancient ruin</li>
+        <li>act_mech->shaking hands with the [Mechanoid]</li>
+        <li>act_mech->arguing with the [PersonJob] about [TalkTopicLight] over a pile of scrap</li>
+        <li>act_mech->wearing the [Color] helmet of a fallen [Mechanoid]</li>
+
+        <li>act_infection->refusing to wash a small scratch</li>
+        <li>act_infection->wrestling the [Animal] in a muddy field</li>
+        <li>act_infection->pulling out a splinter with dirty fingers</li>
+        <li>act_infection->digging in the garden without gloves</li>
+        <li>act_infection->patching a fence with rusty wire</li>
+        <li>act_infection->treating a scratch with [Vegetable] juice</li>
+        <li>act_infection->bandaging a small cut with a muddy rag</li>
+        <li>act_infection->cleaning the [Animal] pen barefoot</li>
+        <li>act_infection->playing [Game] in a muddy pit</li>
+        <li>act_infection->ignoring a tiny wound for the sake of [ConceptBadass]</li>
+        <li>act_infection->letting the [Animal] named [hosp_petname] chew on a sore finger</li>
+
+        <li>act_toxic->sniffing the [Color] dye</li>
+        <li>act_toxic->sleeping next to a fuming generator</li>
+        <li>act_toxic->cleaning up a toxic spill with bare hands</li>
+        <li>act_toxic->inspecting the [Color] puddle behind the workshop</li>
+        <li>act_toxic->standing downwind of a toxic spill</li>
+        <li>act_toxic->stirring a barrel of unknown liquid</li>
+        <li>act_toxic->cooking [Vegetable] stew in a leaky chemical pot</li>
+        <li>act_toxic->napping in the shed next to the old barrels</li>
+        <li>act_toxic->bathing in a strangely [Color] pond out of [hosp_curious] curiosity</li>
+        <li>act_toxic->showing the [PersonJob] a suspicious barrel</li>
+
+        <li>act_any->eating a questionable meal</li>
+        <li>act_any->petting the [Animal]</li>
+        <li>act_any->kissing the [Animal] on the nose</li>
+        <li>act_any->sharing a blanket with the [Animal]</li>
+        <li>act_any->shaking hands with the whole [Community]</li>
+        <li>act_any->taking a nap in the hay</li>
+        <li>act_any->sitting next to the [PersonJob] who sneezed</li>
+        <li>act_any->sharing a spoon with the [PersonJob]</li>
+        <li>act_any->chatting about [TalkTopicLight]</li>
+        <li>act_any->tasting the [Color] mushroom on a dare</li>
+        <li>act_any->writing poetry about [ConceptPositive] in a damp room</li>
+        <li>act_any->wearing the [Apparel] of a stranger</li>
+        <li>act_any->hugging [PATIENT_possessive] [PersonFamily] from [hosp_town]</li>
+        <li>act_any->delivering a package from [hosp_bizname] [hosp_business] to [hosp_town]</li>
+        <li>act_any->telling the legend of the [AdjectiveLarge] [Animal] to the [PersonJob]</li>
+        <li>act_any->arguing with the [PersonJob] about [TalkTopicHeavy]</li>
+        <li>act_any->hiding from the [Mechanoid] in the [TerrainFeature]</li>
+        <li>act_any->joining the [AdjectiveBadass] [Animal] [hosp_group]</li>
+      </rulesStrings>
+      <rulesFiles>
+        <li>hosp_business->Words/Nouns/BusinessTypes</li>
+        <li>hosp_bizname->Names/Business</li>
+        <li>hosp_petname->Names/Animal_Unisex</li>
+        <li>hosp_town->Names/OutlanderTown</li>
+        <li>hosp_curious->Words/Adjectives/Curious</li>
+        <li>hosp_group->Words/Nouns/GroupNames</li>
+      </rulesFiles>
+    </rulePack>
+  </RulePackDef>
+</Defs>
