@@ -41,12 +41,71 @@ public static class IVDrugInfuserCompat
                         harmony.Patch(method,
                                 prefix: new HarmonyMethod(typeof(IVDrugInfuserCompat), nameof(Prefix)),
                                 postfix: new HarmonyMethod(typeof(IVDrugInfuserCompat), nameof(Postfix)));
+                        PatchTakeDrug(harmony, label);
                         Log.Message("[Hospital] " + label + " detected, compatibility enabled");
                 }
                 catch (Exception e)
                 {
                         Log.Message("[Hospital] " + label + " detected, but compatibility failed to start and is disabled: " + e.GetType().Name);
                 }
+        }
+
+        // Dose limiting: CompMultiRefuelable.TakeDrug (private) is the single place a dose starts, before ConsumeFuel(1f).
+        // Skipping it keeps the fuel; the infuser retries on its next rare tick. Needs the Pawn (protected) and FuelThingDef getters.
+        private static MethodInfo pawnGetter, fuelDefGetter;
+        private static bool limitOff;
+        private static readonly System.Collections.Generic.HashSet<string> withheldLogged = new System.Collections.Generic.HashSet<string>();
+
+        private static void PatchTakeDrug(Harmony harmony, string label)
+        {
+            try
+            {
+                var comp = AccessTools.TypeByName("IVDrugInfuser.CompMultiRefuelable");
+                var take = comp == null ? null : AccessTools.Method(comp, "TakeDrug", Type.EmptyTypes);
+                pawnGetter = comp == null ? null : AccessTools.PropertyGetter(comp, "Pawn");
+                fuelDefGetter = comp == null ? null : AccessTools.PropertyGetter(comp, "FuelThingDef");
+                if (take == null || pawnGetter == null || fuelDefGetter == null
+                    || pawnGetter.ReturnType != typeof(Pawn) || fuelDefGetter.ReturnType != typeof(ThingDef))
+                {
+                        limitOff = true;
+                        Log.Message("[Hospital] " + label + ": dose limiting by patient drug policy is off (API differs), billing stays on");
+                        return;
+                }
+                harmony.Patch(take, prefix: new HarmonyMethod(typeof(IVDrugInfuserCompat), nameof(TakeDrugPrefix)));
+            }
+            catch (Exception e)
+            {
+                limitOff = true;
+                Log.Message("[Hospital] " + label + ": dose limiting by patient drug policy failed to start and is off: " + e.GetType().Name);
+            }
+        }
+
+        // false = skip the dose. Whitelist for active patients: medicine always; other drugs only when a patient drug policy allows them now.
+        public static bool TakeDrugPrefix(object __instance)
+        {
+            if (limitOff || disabled) return true;
+            try
+            {
+                var pawn = pawnGetter.Invoke(__instance, null) as Pawn;
+                if (pawn == null || !pawn.IsPatient(out var hospital, activeOnly: true)) return true;
+                var def = fuelDefGetter.Invoke(__instance, null) as ThingDef;
+                if (def == null || def.IsMedicine) return true;
+                if (!hospital.GetPatientData(pawn, out var data)) return true;
+                if (DrugUtility.PolicyAllowsNow(hospital, pawn, data, def, Find.TickManager.TicksGame))
+                {
+                    if (Prefs.DevMode) withheldLogged.Remove(pawn.ThingID + def.defName);
+                    return true;
+                }
+                if (Prefs.DevMode && withheldLogged.Add(pawn.ThingID + def.defName))
+                    Log.Message("[Hospital] IV Drug Infuser: " + def.defName + " withheld from " + pawn.LabelShortCap + " (not allowed by patient drug policy / not due yet)");
+                return false;
+            }
+            catch (Exception e)
+            {
+                limitOff = true;
+                Log.Message("[Hospital] IV Drug Infuser dose limiting disabled after an error: " + e.GetType().Name);
+                return true;
+            }
         }
 
         // The thing is destroyed inside Infused: keep its def.
@@ -81,7 +140,9 @@ public static class IVDrugInfuserCompat
         {
                 if (pawn == null || !pawn.IsPatient(out var hospital, activeOnly: true)) return;
                 if (!hospital.GetPatientData(pawn, out var data)) return;
-                pawn.AddToBill(hospital, PriceOf(def));
+                pawn.AddToBill(hospital, PriceOf(def), Prefs.DevMode ? "IV Drug Infuser: " + def.label : null);
                 data.LastDrugTick[def] = Find.TickManager.TicksGame;
+                // A waiting Administer bill for the same drug would give a second dose.
+                if (!def.IsMedicine) DrugUtility.RemoveAdministerBillsFor(pawn, def);
         }
 }

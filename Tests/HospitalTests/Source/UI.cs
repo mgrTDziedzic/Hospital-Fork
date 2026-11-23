@@ -80,4 +80,42 @@ namespace HospitalTests
             }
         }
     }
+
+    // Scrollable text with a "Copy to clipboard" button (colour tags stripped in the copy).
+    public class Window_TextSample : Window
+    {
+        private readonly string title;
+        private readonly string text;
+        private Vector2 scroll;
+
+        public Window_TextSample(string title, string text)
+        {
+            this.title = title;
+            this.text = text;
+            doCloseX = true;
+            draggable = true;
+            resizeable = true;
+            absorbInputAroundWindow = false;
+        }
+
+        public override Vector2 InitialSize => new Vector2(900f, 650f);
+
+        public override void DoWindowContents(Rect inRect)
+        {
+            Text.Font = GameFont.Medium;
+            Widgets.Label(new Rect(0, 0, inRect.width - 200f, 32f), title);
+            Text.Font = GameFont.Small;
+            if (Widgets.ButtonText(new Rect(inRect.width - 180f, 2f, 160f, 28f), "Copy to clipboard"))
+            {
+                GUIUtility.systemCopyBuffer = System.Text.RegularExpressions.Regex.Replace(text, "<[^>]+>", "");
+                Messages.Message("Copied to clipboard", MessageTypeDefOf.SilentInput, false);
+            }
+            var outRect = new Rect(0, 38f, inRect.width, inRect.height - 38f);
+            float h = Text.CalcHeight(text, outRect.width - 16f);
+            var view = new Rect(0, 0, outRect.width - 16f, h);
+            Widgets.BeginScrollView(outRect, ref scroll, view);
+            Widgets.Label(new Rect(0, 0, view.width, h), text);
+            Widgets.EndScrollView();
+        }
+    }
 }

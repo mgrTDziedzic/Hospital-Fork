@@ -37,12 +37,23 @@ namespace Hospital.Utilities
             if (hospital == null) return false;
             return hospital.GetPatientData(pawn, out var patientData) && (!activeOnly || !patientData.Dismissed);
         }
-        public static void AddToBill(this Pawn pawn, HospitalMapComponent hospital, float silver)
+        public static void AddToBill(this Pawn pawn, HospitalMapComponent hospital, float silver, string reason = null)
         {
             if (pawn == null) return;
             if (!hospital.GetPatientData(pawn, out var patientData)) return;
+            float before = patientData.Bill;
             patientData.Bill += silver;
             patientData.Bill = Mathf.Clamp(patientData.Bill, 0, 4000);
+            LogBill(pawn, patientData.Bill - before, patientData.Bill, reason);
+        }
+
+        // Dev mode only. DevMode is checked first so nothing is formatted otherwise. Raw bill values; payout shown with the silver multiplier.
+        public static void LogBill(Pawn pawn, float added, float total, string reason)
+        {
+            if (!Prefs.DevMode) return;
+            float mult = HospitalMod.Settings.SilverMultiplier;
+            string payout = mult != 1f ? $" (payout x{mult:0.##} = {total * mult:0.#})" : "";
+            Log.Message($"[Hospital] Bill {added:+0.#;-0.#;+0} {pawn?.LabelShort} ({reason ?? "unspecified"}) -> total {total:0.#}{payout}");
         }
         
         public static bool GetPatientRating(this Pawn pawn, out float score, HospitalMapComponent hospital)

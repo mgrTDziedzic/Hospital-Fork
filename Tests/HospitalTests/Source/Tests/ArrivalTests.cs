@@ -47,7 +47,7 @@ namespace HospitalTests
         // Opens the hospital, makes sure a free bed exists, forces one PatientArrives incident and returns the new patients.
         // Everything (settings, bed, patients, lords, letters) is undone by ctx cleanup. Patients are still in their drop pods
         // (nothing ticks inside a test): Skyfaller -> ActiveTransporter -> Contents.innerContainer -> pawn.
-        internal static List<KeyValuePair<Pawn, PatientData>> FireArrival(TestContext ctx, out HashSet<Verse.AI.Group.Lord> lordsBefore)
+        internal static List<KeyValuePair<Pawn, PatientData>> FireArrival(TestContext ctx, out HashSet<Verse.AI.Group.Lord> lordsBefore, PatientSpec spec = null)
         {
             var map = ctx.Map;
             var hospital = map.GetComponent<HospitalMapComponent>();
@@ -100,7 +100,7 @@ namespace HospitalTests
                 "CanSpawnPatient is false even with the hospital open and a free bed (no reachable edge cell?)");
 
             var parms = new IncidentParms { target = map, forced = true };
-            bool fired = worker.TryExecuteWorker(parms);
+            bool fired = spec == null ? worker.TryExecuteWorker(parms) : worker.TryExecute(parms, spec);
             Assert.True(fired,
                 "TryExecuteWorker returned false (no allied/neutral humanlike faction, hostile pawn on the map, or no landing cell?)");
 

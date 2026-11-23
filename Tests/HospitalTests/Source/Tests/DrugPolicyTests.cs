@@ -677,5 +677,25 @@ namespace HospitalTests
                 try { File.Delete(path); } catch { }
             }
         }
+        // Given: a wounded patient. Then: PolicyAllowsNow (the IV Drug Infuser whitelist) is false without a policy, true with a due
+        //        entry, false right after a dose (LastDrugTick) until the frequency passes; RemoveAdministerBillsFor drops the waiting bill.
+        [HospitalTest("Drugs15: PolicyAllowsNow follows policy, frequency and LastDrugTick; waiting Administer bill can be removed")]
+        public static void PolicyAllowsNowRules(TestContext ctx)
+        {
+            var tea = Drug(TeaDefName);
+            var rig = WoundedPatient(ctx);
+            int now = Find.TickManager.TicksGame;
+            Assert.False(DrugUtility.PolicyAllowsNow(rig.Hospital, rig.Pawn, rig.Data, tea, now), "no policy -> blocked");
+            rig.Hospital.DrugsAllPatients = Policy(ctx, tea);
+            Assert.True(DrugUtility.PolicyAllowsNow(rig.Hospital, rig.Pawn, rig.Data, tea, now), "due entry -> allowed");
+            Assert.False(DrugUtility.PolicyAllowsNow(rig.Hospital, rig.Pawn, rig.Data, Drug(BeerDefName), now), "drug not in policy -> blocked");
+            Assert.True(DrugUtility.ScheduleFor(rig.Hospital, rig.Pawn, rig.Data, now) > 0, "administer bill added");
+            Assert.True(DrugUtility.HasPendingBillFor(rig.Pawn, tea), "bill waiting");
+            rig.Data.LastDrugTick[tea] = now;
+            Assert.False(DrugUtility.PolicyAllowsNow(rig.Hospital, rig.Pawn, rig.Data, tea, now + 1000), "just given -> blocked");
+            Assert.True(DrugUtility.PolicyAllowsNow(rig.Hospital, rig.Pawn, rig.Data, tea, now + GenDate.TicksPerDay + 1), "frequency passed -> allowed");
+            Assert.True(DrugUtility.RemoveAdministerBillsFor(rig.Pawn, tea) == 1, "waiting bill removed");
+            Assert.False(DrugUtility.HasPendingBillFor(rig.Pawn, tea), "no bill left");
+        }
     }
 }

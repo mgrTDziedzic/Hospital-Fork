@@ -25,7 +25,8 @@ public class Billing_Feed_Patch
                 HospitalMapComponent hospital;
                 if (__instance.Deliveree.IsPatient(out hospital))
                 {
-                    __instance.Deliveree.AddToBill(hospital, Mathf.Clamp(__instance.Food.MarketValue * 1.1f, 0, 70));
+                    __instance.Deliveree.AddToBill(hospital, Mathf.Clamp(__instance.Food.MarketValue * 1.1f, 0, 70),
+                        Verse.Prefs.DevMode ? "meal: " + __instance.Food.def.label : null);
                 }
             });
         }

@@ -8,6 +8,8 @@ public class Settings : ModSettings
 {
     public bool ShowMessageAtArrival;
     public bool PreventIncapacitatedArrivals = true;
+    // Display only: the backstory is always generated at arrival (MP: settings are per client, RNG use must not depend on them).
+    public bool ShowPatientBackstories = true;
     public float SilverMultiplier = 1f;
     // Shows the cosmetic 3x3 / 5x5 Patient Landing Spot variants in the build menu.
     public bool EnableLandingSpotVariants = true;
@@ -28,6 +30,7 @@ public class Settings : ModSettings
         Scribe_Values.Look(ref SilverMultiplier, "silverMultiplier", 1f);
         Scribe_Values.Look(ref EnableLandingSpotVariants, "enableLandingSpotVariants", true);
         Scribe_Values.Look(ref ShowMessageAtArrival, "showMessageAtArrival", false);
+        Scribe_Values.Look(ref ShowPatientBackstories, "showPatientBackstories", true);
         Scribe_Values.Look(ref PreventIncapacitatedArrivals, "preventIncapacitatedArrivals", true);
         Scribe_Values.Look(ref GoodwillGainMultiplier, "goodwillGainMultiplier", 1f);
         Scribe_Values.Look(ref DeathGoodwillPenalty, "deathGoodwillPenalty", 10);
@@ -45,6 +48,7 @@ public class Settings : ModSettings
         listingStandard.Begin(inRect);
 
         listingStandard.CheckboxLabeled("ShowMessageAtArrival".Translate(), ref ShowMessageAtArrival, "ShowMessageAtArrivalTooltip".Translate());
+        listingStandard.CheckboxLabeled("ShowPatientBackstories".Translate(), ref ShowPatientBackstories, "ShowPatientBackstoriesTooltip".Translate());
         listingStandard.CheckboxLabeled("PreventIncapacitatedArrivals".Translate(), ref PreventIncapacitatedArrivals, "PreventIncapacitatedArrivalsTooltip".Translate());
         listingStandard.CheckboxLabeled("EnableLandingSpotVariants".Translate(), ref EnableLandingSpotVariants, "EnableLandingSpotVariantsTooltip".Translate());
 
@@ -97,6 +101,7 @@ public class Settings : ModSettings
     private void ResetToDefaults()
     {
         PreventIncapacitatedArrivals = true;
+        ShowPatientBackstories = true;
         EnableLandingSpotVariants = true;
         SilverMultiplier = 1f;
         GoodwillGainMultiplier = 1f;

@@ -25,7 +25,7 @@ Features that are planned for future versions.
 Ideas under consideration. They might not be worth doing, or might not be possible at all.
 
 - **Patient backstories (flavor text).** A short description of what happened to each patient. Approaches to weigh:
-  1. **Randomly generated combinations**, in the style of RimWorld's art descriptions. They don't have to make much sense. Examples: *"X suffered severe injuries while petting a hare."* / *"Y lost a leg in a horrible accident while eating a simple meal."*
+  1. **Randomly generated combinations**, in the style of RimWorld's art descriptions. *Started: wounded and sick patients (text in the arrival letter and as a tooltip on Diagnosis in the Hospital tab; activity matches the kind of wound or disease). Surgery patients have none yet.* They don't have to make much sense. Examples: *"X suffered severe injuries while petting a hare."* / *"Y lost a leg in a horrible accident while eating a simple meal."*
   2. **A large pool of hand-written stories.** Example: *"X's tongue was cut out so he could not testify against a corrupt noble. His relatives raised money for a bionic tongue so that justice could be served."*
   3. **A mix of both.** Some patients get a hand-written story, but most get a randomly generated one, so the hand-written ones don't start repeating too soon.
 - **Patients stay until fully cured.** Patients with conditions that need repeated tending (e.g. sensory mechanites) would stay until the condition is fully healed, instead of leaving after the first tending. Open problem: what do they do between treatments? They need to eat and sleep somewhere.
@@ -63,3 +63,4 @@ Ideas under consideration. They might not be worth doing, or might not be possib
   2. **Medieval / settler:** quality of care matters more. They pay mostly in silver, sometimes in gold.
   3. **Industrial / spacer:** quality of care matters a lot. They pay in silver or gold. With a very high rating, they may add a high-tech gift, such as an item normally available only as a quest reward.
 - **Patient teleporter (new research).** Once researched and built, discharged patients leave through a teleporter instead of walking to the map edge, which eliminates the risk of them being attacked on the way. Open questions: is it feasible, and does it make sense?
+- **Bill breakdown tooltip.** A tooltip on the "bill" column of the Patients tab would list the patient's recent charges with their reasons (tend, meal, surgery, drug), visible without dev mode. This needs a short list of charges stored in the patient's data, which changes the save format. Old saves would start with an empty list.

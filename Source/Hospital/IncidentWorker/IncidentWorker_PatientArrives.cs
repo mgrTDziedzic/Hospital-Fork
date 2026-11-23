@@ -92,6 +92,12 @@ namespace Hospital
             {
                 text += "\n\n" + "PatientSedatedWarning".Translate(HospitalMod.Settings.SedationHours.ToString("0.#"));
             }
+            if (patient.Type == PatientType.Wounds || patient.Type == PatientType.Disease)
+            {
+                BackstoryUtility.AssignBackstory(pawn, patient); // wound or disease texts by type
+                string backstory = BackstoryUtility.GetBackstory(pawn, patient);
+                if (!backstory.NullOrEmpty()) text += "\n\n" + backstory;
+            }
             //text += " " + patient.baseCost.ToStringMoney();
             TaggedString title = def.letterLabel.Formatted(pawn.Named("PAWN")).AdjustedFor(pawn);
             if (HospitalMod.Settings.ShowMessageAtArrival)

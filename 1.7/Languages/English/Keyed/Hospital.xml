@@ -45,6 +45,7 @@
     <HospitalDrugTeetotalersTooltip>When enabled, teetotalers also get this list's drugs. When disabled, teetotalers skip this list.</HospitalDrugTeetotalersTooltip>
     <!-- settings -->
     <HospitalMapSettings>Hospital policies</HospitalMapSettings>
+    <HospitalOpeningHours>Opening hours</HospitalOpeningHours>
     <HospitalSettings>Hospital policies</HospitalSettings>
     <AcceptPatients>Allow patients</AcceptPatients>
     <AcceptPatientsTooltip>When enabled, patients from other factions can arrive on this map for treatment.\n\nDefault: Disabled</AcceptPatientsTooltip>
@@ -77,10 +78,13 @@
     <SedationHours>Aggressive patient sedation time</SedationHours>
     <SedationHoursTooltip>How long an aggressive patient stays sedated after arrival. If they are not cured by then, they turn berserk. Used only when "Allow aggressive patients" is enabled in hospital policies.\n\nDefault: 8h</SedationHoursTooltip>
     <PatientSedatedWarning>Sedated by their faction. They wake up in about {0} hours and will turn berserk unless cured first.</PatientSedatedWarning>
+    <HospitalPatientChip>Hospital patient</HospitalPatientChip>
     <ResetToDefaults>Reset to defaults</ResetToDefaults>
     <ResetToDefaultsTooltip>Restores all settings on this page to their default values.</ResetToDefaultsTooltip>
     <ShowMessageAtArrival>Show message instead of letter</ShowMessageAtArrival>
     <ShowMessageAtArrivalTooltip>When enabled, a new patient's arrival is shown as a message instead of a letter.\n\nDefault: Disabled</ShowMessageAtArrivalTooltip>
+    <ShowPatientBackstories>Show patient backstories</ShowPatientBackstories>
+    <ShowPatientBackstoriesTooltip>When enabled, the generated backstory of wounded and sick patients is shown in the arrival letter and in tooltips (Diagnosis column of the Hospital tab, patient chip in the Bio tab).\n\nDefault: Enabled</ShowPatientBackstoriesTooltip>
     <PreventIncapacitatedArrivals>Prevent incapacitated arrivals</PreventIncapacitatedArrivals>
     <PreventIncapacitatedArrivalsTooltip>When enabled, arriving patients are wounded only up to the point of collapse, so they can still walk. Disable it for harder mass casualty events with downed patients you must rescue.\n\nDefault: Enabled</PreventIncapacitatedArrivalsTooltip>
     <EnableLandingSpotVariants>Show patient landing pads</EnableLandingSpotVariants>

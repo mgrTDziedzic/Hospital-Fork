@@ -1,31 +1,25 @@
 using System;
 using RimWorld;
-using UnityEngine;
 using Verse;
-using Hospital.Utilities;
 
 namespace Hospital.MainTab
 {
     public class PawnColumnWorker_PatientTimeSpent : PawnColumnWorker_Text
     {
         protected internal int ticks;
-        private float lastTimeCached;
-        private HospitalMapComponent hospital;
 
         public override string GetTextFor(Pawn pawn)
         {
-            if (Time.unscaledTime > lastTimeCached + 2 || Find.CurrentMap != hospital.map)
-            {
-                lastTimeCached = Time.unscaledTime;
-                hospital = Find.CurrentMap.GetComponent<HospitalMapComponent>();
-            }
-            
-            if (pawn.GetPatientTimeInHospital(out ticks, hospital))
-            {
-                return Math.Truncate(ticks / 2500.0) + " h";
-            }
+            int t = PatientTableHelper.TicksOf(pawn);
+            if (t < 0) return string.Empty;
+            ticks = t;
+            return Math.Truncate(ticks / 2500.0) + " h";
+        }
 
-            return string.Empty;
+        // Sort by the ticks, not by the formatted text.
+        public override int Compare(Pawn a, Pawn b)
+        {
+            return PatientTableHelper.TicksOf(a).CompareTo(PatientTableHelper.TicksOf(b));
         }
     }
 }
