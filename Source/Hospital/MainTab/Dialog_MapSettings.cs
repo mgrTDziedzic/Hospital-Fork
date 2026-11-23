@@ -24,7 +24,7 @@ namespace Hospital.MainTab
             absorbInputAroundWindow = true;
         }
 
-        public override Vector2 InitialSize => new Vector2(450f, 805f);
+        public override Vector2 InitialSize => new Vector2(450f, 840f);
 
         public override void DoWindowContents(Rect inRect)
         {
@@ -38,7 +38,9 @@ namespace Hospital.MainTab
             }
             var listingStandard = new Listing_Standard { ColumnWidth = inRect.width };
             listingStandard.Begin(inRect);
+            Text.Font = GameFont.Medium;
             listingStandard.Label("HospitalSettings".Translate());
+            Text.Font = GameFont.Small;
             listingStandard.Gap();
             listingStandard.CheckboxLabeled("AcceptPatients".Translate(), ref hospital.openForBusiness, "AcceptPatientsTooltip".Translate());
             listingStandard.CheckboxLabeled("AcceptSurgery".Translate(), ref hospital.AcceptSurgery, "AcceptSurgeryTooltip".Translate());
@@ -47,11 +49,13 @@ namespace Hospital.MainTab
             listingStandard.CheckboxLabeled("MassCasualties".Translate(), ref hospital.MassCasualties, "MassCasualtiesTooltip".Translate());
             listingStandard.CheckboxLabeled("MceAcceptDanger".Translate(), ref hospital.MceAcceptDanger, "MceAcceptDangerTooltip".Translate());
             listingStandard.End();
-            int y = 175;
-            TimetableUtility.DoHeader(new Rect(0, y, inRect.width, 50));
-            y += 60;
+            int y = 205; // 175 + extra height of the Medium header font + spacing above the label
+            Widgets.Label(new Rect(0, y, inRect.width, 24), "HospitalOpeningHours".Translate());
+            y += 24;
+            TimetableUtility.DoHeader(new Rect(0, y, inRect.width, 20)); // hour numbers sit at the bottom of this rect, right above the bar
+            y += 30;
             TimetableUtility.DoCell(new Rect(0, y, inRect.width, 20), hospital.openingHours, map);
-            y += 34;
+            y += 44;
             Rect rect = new Rect(inRect.x, y, 170f, 28f);
             Rect rect2 = new Rect(170f, y, 140f, 28f);
             Widgets.LabelFit(rect, "DefaultMedicineSettings".Translate());

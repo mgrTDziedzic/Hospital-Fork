@@ -5,6 +5,7 @@ using Verse;
 namespace Hospital.MainTab {
     public class PawnColumnWorker_ButtonDisallow : PawnColumnWorker
     {
+        private const int ManageButtonHeight = 32;
         private float lastTimeCached;
         private HospitalMapComponent hospital;
         
@@ -32,7 +33,9 @@ namespace Hospital.MainTab {
 
         public override void DoHeader(Rect rect, PawnTable table)
         {
-            if (Widgets.ButtonText(rect, "HospitalMapSettings".Translate(), true, false))
+            // Same size as the vanilla Assign tab policy buttons: column width (max 360) x 32.
+            Rect buttonRect = new Rect(rect.x, rect.y + (rect.height - ManageButtonHeight), Mathf.Min(rect.width, 360f), ManageButtonHeight);
+            if (Widgets.ButtonText(buttonRect, "HospitalMapSettings".Translate()))
             {
                 Find.WindowStack.Add(new Dialog_MapSettings(Find.CurrentMap));
             }
@@ -41,6 +44,11 @@ namespace Hospital.MainTab {
         public override int GetMinWidth(PawnTable table)
         {
             return Mathf.Max(base.GetMinWidth(table), 120);
+        }
+
+        public override int GetMinHeaderHeight(PawnTable table)
+        {
+            return Mathf.Max(base.GetMinHeaderHeight(table), ManageButtonHeight);
         }
 
         public override int GetMaxWidth(PawnTable table)

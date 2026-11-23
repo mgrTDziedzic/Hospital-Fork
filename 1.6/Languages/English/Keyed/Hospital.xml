@@ -45,6 +45,7 @@
     <HospitalDrugTeetotalersTooltip>When enabled, teetotalers also get this list's drugs. When disabled, teetotalers skip this list.</HospitalDrugTeetotalersTooltip>
     <!-- settings -->
     <HospitalMapSettings>Hospital policies</HospitalMapSettings>
+    <HospitalOpeningHours>Opening hours</HospitalOpeningHours>
     <HospitalSettings>Hospital policies</HospitalSettings>
     <AcceptPatients>Allow patients</AcceptPatients>
     <AcceptPatientsTooltip>When enabled, patients from other factions can arrive on this map for treatment.\n\nDefault: Disabled</AcceptPatientsTooltip>
